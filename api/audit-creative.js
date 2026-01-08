@@ -17,7 +17,7 @@ export default async function handler(req, res) {
 
   try {
     // Usamos el modelo FLASH que es más rápido y barato
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
         Actúa como un Director Creativo de Publicidad.
