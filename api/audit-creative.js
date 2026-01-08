@@ -1,9 +1,5 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
 export default async function handler(req, res) {
-  // Permisos para que la web hable con el servidor
+  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -11,27 +7,34 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { imageBase64, mimeType } = req.body;
-
-  // ESTA ES LA CLAVE: Validamos imagen, NO url
   if (!imageBase64) return res.status(400).json({ error: 'Falta la imagen' });
 
+  const apiKey = process.env.GEMINI_API_KEY;
+
   try {
-    // Usamos gemini-1.5-flash que es rápido y acepta imágenes
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Llamada DIRECTA a la API (Sin librerías)
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-    const prompt = `Analiza esta imagen publicitaria. Dame: 🎨Impacto(1-10), 📢Claridad, 🔧Mejora Técnica.`;
+    const response = await fetch(geminiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: "Actúa como Director Creativo. Analiza esta imagen publicitaria. Dame: 🎨Impacto(1-10), 📢Claridad, 🔧Mejora Técnica." },
+            { inline_data: { mime_type: mimeType || "image/jpeg", data: imageBase64 } }
+          ]
+        }]
+      })
+    });
 
-    const imagePart = {
-      inlineData: {
-        data: imageBase64,
-        mimeType: mimeType || "image/jpeg",
-      },
-    };
+    const data = await response.json();
 
-    const result = await model.generateContent([prompt, imagePart]);
-    const response = await result.response;
-    
-    return res.status(200).json({ critique: response.text() });
+    if (data.error) throw new Error(data.error.message);
+
+    const text = data.candidates[0].content.parts[0].text;
+    return res.status(200).json({ critique: text });
+
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
