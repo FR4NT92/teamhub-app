@@ -436,10 +436,37 @@
         window.crearNuevoCliente = async () => await addDoc(collection(db,"clientes"), { nombre: 'Nuevo Cliente', creado: Date.now() });
         window.renombrarCliente = async (id, v) => { if(v.trim()) await updateDoc(doc(db,"clientes",id), { nombre: v }); };
         window.eliminarCliente = async (id) => await deleteDoc(doc(db,"clientes",id));
-        window.crearNuevaTarea = async () => { if(!appData.activeClientId) return alert("Selecciona cliente"); await addDoc(collection(db,"tareas"), { clienteId: appData.activeClientId, titulo: 'Nueva Tarea', descripcion: 'Descripción...', asignado: 'Johans', status: 'pendiente', creado: Date.now(), attachments: [], comments: [], deadline: '' }); };
+       window.crearNuevaTarea = async () => { 
+            if(!appData.activeClientId) return alert("Selecciona cliente"); 
+            
+            const titulo = 'Nueva Tarea';
+            const cliente = appData.clientes.find(c => c.id === appData.activeClientId).nombre;
+            const asignado = 'Johans'; // Default
+
+            // 1. Guardar en Firebase
+            await addDoc(collection(db,"tareas"), { 
+                clienteId: appData.activeClientId, 
+                titulo: titulo, 
+                descripcion: 'Click para editar descripción...', 
+                asignado: asignado, 
+                status: 'pendiente', 
+                creado: Date.now(), 
+                attachments: [], 
+                comments: [], 
+                deadline: '' 
+            }); 
+
+            // 2. Avisar al Servidor para enviar Email (Silencioso)
+            fetch('/api/send-email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ taskTitle: titulo, clientName: cliente, assignee: asignado })
+            }).then(r => console.log("Email enviado"));
+        };
         window.actualizarTarea = async (id, f, v) => await updateDoc(doc(db,"tareas",id), { [f]: v });
         window.cambiarEstado = async (id) => { const t = appData.tareas.find(x => x.id === id); const map = { 'pendiente': 'en-proceso', 'en-proceso': 'completo', 'completo': 'pendiente' }; await updateDoc(doc(db,"tareas",id), { status: map[t.status] }); };
         window.eliminarTarea = async (id) => await deleteDoc(doc(db,"tareas",id));
     </script>
 </body>
+
 </html>
