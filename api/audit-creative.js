@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // 1. Configuración de Seguridad (CORS)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -7,15 +6,13 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { imageBase64, mimeType } = req.body;
-  
-  // VALIDACIÓN CORRECTA: Buscamos imagen, no URL
   if (!imageBase64) return res.status(400).json({ error: 'Falta la imagen' });
 
   const apiKey = process.env.GEMINI_API_KEY;
 
   try {
-    // 2. LLAMADA DIRECTA A GOOGLE (Sin Librerías)
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // CAMBIO CLAVE: Usamos 'gemini-1.5-flash-latest'
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
     const response = await fetch(endpoint, {
       method: "POST",
