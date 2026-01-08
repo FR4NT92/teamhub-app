@@ -3,6 +3,7 @@
   "type": "module",
   "version": "1.0.0",
   "dependencies": {
-    "resend": "^3.2.0"
+    "resend": "^3.2.0",
+    "@google/generative-ai": "^0.1.3"
   }
 }
