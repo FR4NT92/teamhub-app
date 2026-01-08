@@ -33,7 +33,7 @@ export default async function handler(req, res) {
                               .substring(0, 8000);
 
     // 2. IA
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const prompt = `Analiza este contenido de landing page (CRO): ${cleanText}. Dame: 🏆Puntaje(1-10), ✅Lo Bueno, ❌Lo Malo, 💡Acción Inmediata.`;
 
     const result = await model.generateContent(prompt);
