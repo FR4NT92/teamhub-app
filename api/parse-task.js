@@ -10,35 +10,30 @@ export default async function handler(req, res) {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
-    // Le enseñamos a Alfred a pensar como un Project Manager
     const prompt = `
-      Eres un asistente de gestión de proyectos. Analiza este comando: "${command}".
+      Eres el asistente Alfred. Analiza: "${command}".
       
-      Datos disponibles:
-      - Clientes existentes: ${clients.join(', ')}
-      - Equipo: ${team.join(', ')}
+      Datos del sistema:
+      - Clientes válidos: ${JSON.stringify(clients)}
+      - Equipo: ${JSON.stringify(team)}
 
-      Tu misión:
-      1. Identificar el CLIENTE más probable de la lista.
-      2. Identificar el RESPONSABLE (si no se menciona, usa "Johans").
-      3. Crear un TÍTULO corto y profesional.
-      4. Crear una DESCRIPCIÓN detallada y accionable basada en el pedido.
+      Instrucciones:
+      1. Busca si se menciona un CLIENTE de la lista. Si no está EXACTAMENTE en la lista o no se menciona, devuelve null.
+      2. Busca un RESPONSABLE del equipo. Si no, "Johans".
+      3. Redacta Título y Descripción profesional.
 
-      Responde SOLO con este JSON (sin markdown, sin explicaciones):
+      Responde SOLO este JSON:
       {
-        "clientName": "Nombre exacto del cliente encontrado o null",
-        "assignee": "Nombre del responsable",
-        "title": "Título de la tarea",
-        "description": "Descripción profesional"
+        "clientName": "Nombre exacto o null",
+        "assignee": "Nombre",
+        "title": "Título",
+        "description": "Descripción"
       }
     `;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    let text = response.text();
-    
-    // Limpieza por si la IA devuelve bloques de código markdown
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    let text = response.text().replace(/```json/g, '').replace(/```/g, '').trim();
 
     return res.status(200).json(JSON.parse(text));
   } catch (error) {
