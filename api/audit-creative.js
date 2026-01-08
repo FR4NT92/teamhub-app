@@ -3,45 +3,46 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export default async function handler(req, res) {
-  // Cabeceras CORS
-  res.setHeader('Access-Control-Allow-Credentials', true);
+  // CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const { imageBase64, mimeType } = req.body;
+  const { url } = req.body;
+  if (!url) return res.status(400).json({ error: 'Falta URL' });
 
   try {
+    // 1. DISFRAZ: Usamos un User-Agent real para que no nos bloqueen
+    const siteRes = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+      }
+    });
+
+    if (!siteRes.ok) throw new Error(`La web rechazó la conexión (Status: ${siteRes.status})`);
+
+    const htmlText = await siteRes.text();
+    
+    // Limpieza de texto
+    const cleanText = htmlText.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, "")
+                              .replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, "")
+                              .replace(/<[^>]+>/g, ' ')
+                              .replace(/\s+/g, ' ')
+                              .substring(0, 8000);
+
+    // 2. IA
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const prompt = `Analiza este contenido de landing page (CRO): ${cleanText}. Dame: 🏆Puntaje(1-10), ✅Lo Bueno, ❌Lo Malo, 💡Acción Inmediata.`;
 
-    const prompt = `
-        Actúa como un Director Creativo de Publicidad (Meta Ads / Google Ads).
-        Analiza esta imagen y sé brutalmente honesto.
-        
-        Responde en este formato:
-        🎨 **Impacto Visual:** (1-10, ¿frena el scroll?)
-        📢 **Claridad:** ¿Se entiende qué venden en menos de 3 segundos?
-        🔧 **Mejora Técnica:** (Ej: "Aumentar contraste", "Texto muy pequeño", "Cambiar color de fondo")
-    `;
-
-    const imagePart = {
-      inlineData: {
-        data: imageBase64,
-        mimeType: mimeType || "image/jpeg",
-      },
-    };
-
-    const result = await model.generateContent([prompt, imagePart]);
+    const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text();
+    
+    return res.status(200).json({ critique: response.text() });
 
-    return res.status(200).json({ critique: text });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error(error);
+    return res.status(500).json({ error: "Error leyendo web: " + error.message });
   }
 }
