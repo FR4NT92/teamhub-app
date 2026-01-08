@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // CORS
+  // 1. Configuración de Seguridad (CORS)
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -7,21 +7,23 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { imageBase64, mimeType } = req.body;
+  
+  // VALIDACIÓN CORRECTA: Buscamos imagen, no URL
   if (!imageBase64) return res.status(400).json({ error: 'Falta la imagen' });
 
   const apiKey = process.env.GEMINI_API_KEY;
 
   try {
-    // Llamada DIRECTA a la API (Sin librerías)
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // 2. LLAMADA DIRECTA A GOOGLE (Sin Librerías)
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-    const response = await fetch(geminiUrl, {
+    const response = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{
           parts: [
-            { text: "Actúa como Director Creativo. Analiza esta imagen publicitaria. Dame: 🎨Impacto(1-10), 📢Claridad, 🔧Mejora Técnica." },
+            { text: "Actúa como Director Creativo. Analiza esta imagen. Dame: 🎨Impacto(1-10), 📢Claridad, 🔧Mejora Técnica." },
             { inline_data: { mime_type: mimeType || "image/jpeg", data: imageBase64 } }
           ]
         }]
@@ -32,7 +34,7 @@ export default async function handler(req, res) {
 
     if (data.error) throw new Error(data.error.message);
 
-    const text = data.candidates[0].content.parts[0].text;
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sin respuesta de IA";
     return res.status(200).json({ critique: text });
 
   } catch (error) {
