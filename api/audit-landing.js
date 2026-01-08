@@ -30,7 +30,7 @@ export default async function handler(req, res) {
                               .substring(0, 8000); // Limitamos caracteres
 
     // 2. Preguntamos a Gemini
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
     const prompt = `
       Actúa como un Experto en CRO (Conversion Rate Optimization).
       Analiza el siguiente contenido extraído de una Landing Page:
