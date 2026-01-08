@@ -3,55 +3,36 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export default async function handler(req, res) {
-  // Configuración de cabeceras CORS para evitar bloqueos
-  res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
-  }
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   const { url } = req.body;
-  if (!url) return res.status(400).json({ error: 'Falta la URL' });
+  if (!url) return res.status(400).json({ error: 'Falta URL' });
 
   try {
-    // 1. Leemos el contenido de la web (Scraping básico)
-    const siteRes = await fetch(url);
-    const htmlText = await siteRes.text();
-    
-    // Limpieza: Quitamos código basura para dejar solo el texto que lee el humano
-    const cleanText = htmlText.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, "")
-                              .replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, "")
-                              .replace(/<[^>]+>/g, ' ')
-                              .replace(/\s+/g, ' ')
-                              .substring(0, 8000); // Limitamos caracteres
+    const siteRes = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124 Safari/537.36" }
+    });
 
-    // 2. Preguntamos a Gemini
+    if (!siteRes.ok) throw new Error(`No pude acceder a la web (Error ${siteRes.status})`);
+
+    const htmlText = await siteRes.text();
+    const cleanText = htmlText.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, "").replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, "").replace(/<[^>]+>/g, ' ').substring(0, 8000);
+
+    // USAMOS GEMINI 1.5 FLASH (El modelo Pro viejo da error 404)
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-    const prompt = `
-      Actúa como un Experto en CRO (Conversion Rate Optimization).
-      Analiza el siguiente contenido extraído de una Landing Page:
-      ---
-      ${cleanText}
-      ---
-      
-      Dame un diagnóstico CRÍTICO y PROFESIONAL en este formato:
-      🏆 **Puntaje de Persuasión:** (1-10)
-      ✅ **Lo Bueno:** (2 puntos clave)
-      ❌ **Lo Malo:** (2 errores que bajan la conversión)
-      💡 **Acción Inmediata:** (Qué cambiarías YA para vender más)
-    `;
+    
+    const prompt = `Analiza este texto de una landing page (CRO): ${cleanText}. Dame: 🏆Puntaje(1-10), ✅Lo Bueno, ❌Lo Malo, 💡Acción Inmediata.`;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    const text = response.text();
-
-    return res.status(200).json({ critique: text });
+    
+    return res.status(200).json({ critique: response.text() });
 
   } catch (error) {
-    return res.status(500).json({ error: "No pude leer la web. " + error.message });
+    return res.status(500).json({ error: "Error: " + error.message });
   }
 }
