@@ -346,10 +346,8 @@
        async function ejecutarComandoIA(command) {
             document.getElementById('loader').style.display = 'flex';
             try {
-                // 1. Preparamos la lista de nombres para la IA
                 const clientsList = appData.clientes.map(c => c.nombre);
                 
-                // 2. Consultamos a Alfred
                 const res = await fetch('/api/parse-task', { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' }, 
@@ -358,17 +356,59 @@
                 
                 const data = await res.json();
                 
-                // 3. Lógica de búsqueda de cliente (Mejorada)
+                // 1. Lógica de búsqueda de cliente
                 let targetClientId = null;
-                
                 if (data.clientName) {
-                    // Buscamos ignorando mayúsculas/minúsculas
                     const found = appData.clientes.find(c => 
-                        c.nombre.toLowerCase().trim() === data.clientName.toLowerCase().trim() || 
                         c.nombre.toLowerCase().includes(data.clientName.toLowerCase())
                     );
                     if (found) targetClientId = found.id;
                 }
+                
+                // Fallback de cliente
+                if (!targetClientId) {
+                    if (appData.activeClientId) {
+                        targetClientId = appData.activeClientId;
+                    } else {
+                        throw new Error("No pude identificar el cliente. Por favor abre un cliente o menciónalo explícitamente.");
+                    }
+                }
+
+                // 2. SANITIZACIÓN DE DATOS (El arreglo del error undefined)
+                // Si la IA falla y manda undefined, usamos textos por defecto.
+                const tituloSeguro = data.title ? String(data.title) : "Nueva Tarea IA";
+                const descSegura = data.description ? String(data.description) : command;
+                const asignadoSeguro = data.assignee ? String(data.assignee) : "Johans";
+
+                // 3. Guardar en Firebase con datos seguros
+                await addDoc(collection(db, "tareas"), { 
+                    clienteId: targetClientId, 
+                    titulo: tituloSeguro, 
+                    descripcion: descSegura,
+                    asignado: asignadoSeguro, 
+                    status: 'pendiente', 
+                    creado: Date.now(), 
+                    attachments: [], 
+                    comments: [], 
+                    deadline: '' 
+                });
+                
+                playSound();
+                // Forzamos recarga de la vista para ver la tarea nueva
+                if(appData.activeClientId === targetClientId) {
+                    renderMain();
+                } else {
+                    seleccionarCliente(targetClientId);
+                }
+
+            } catch (e) { 
+                console.error(e);
+                alert("Alerta de Alfred: " + e.message); 
+            }
+            finally { 
+                document.getElementById('loader').style.display = 'none'; 
+            }
+        }
                 
                 // Si la IA no encontró cliente, intentamos usar el cliente que tienes abierto en pantalla
                 if (!targetClientId) {
@@ -447,4 +487,5 @@
     </script>
 </body>
 </html>
+
 
