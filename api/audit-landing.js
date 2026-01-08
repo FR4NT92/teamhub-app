@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     const cleanText = htmlText.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, "").replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, "").replace(/<[^>]+>/g, ' ').substring(0, 8000);
 
     // USAMOS GEMINI 1.5 FLASH (El modelo Pro viejo da error 404)
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
     const prompt = `Analiza este texto de una landing page (CRO): ${cleanText}. Dame: 🏆Puntaje(1-10), ✅Lo Bueno, ❌Lo Malo, 💡Acción Inmediata.`;
 
