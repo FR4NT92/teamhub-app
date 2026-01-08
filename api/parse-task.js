@@ -11,32 +11,53 @@ export default async function handler(req, res) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
     const prompt = `
-      Eres el asistente Alfred. Analiza: "${command}".
+      Eres un asistente JSON. Analiza la orden: "${command}".
       
-      Datos del sistema:
-      - Clientes válidos: ${JSON.stringify(clients)}
+      Listas disponibles:
+      - Clientes: ${JSON.stringify(clients)}
       - Equipo: ${JSON.stringify(team)}
 
-      Instrucciones:
-      1. Busca si se menciona un CLIENTE de la lista. Si no está EXACTAMENTE en la lista o no se menciona, devuelve null.
-      2. Busca un RESPONSABLE del equipo. Si no, "Johans".
-      3. Redacta Título y Descripción profesional.
+      REGLAS OBLIGATORIAS:
+      1. Si mencionan un cliente parecido a la lista, usa ese nombre EXACTO. Si no, devuelve null.
+      2. Si mencionan a alguien del equipo, usa su nombre. Si no, "Johans".
+      3. Genera un "title" breve.
+      4. Genera una "description" profesional.
 
-      Responde SOLO este JSON:
+      Responde ÚNICAMENTE con este JSON válido (sin markdown):
       {
-        "clientName": "Nombre exacto o null",
+        "clientName": "Nombre o null",
         "assignee": "Nombre",
-        "title": "Título",
-        "description": "Descripción"
+        "title": "Titulo de la tarea",
+        "description": "Descripcion"
       }
     `;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
-    let text = response.text().replace(/```json/g, '').replace(/```/g, '').trim();
+    let text = response.text();
 
-    return res.status(200).json(JSON.parse(text));
+    // Limpieza agresiva de Markdown
+    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+    const jsonResponse = JSON.parse(text);
+
+    // BLINDAJE: Valores por defecto si la IA falla
+    const finalData = {
+        clientName: jsonResponse.clientName || null,
+        assignee: jsonResponse.assignee || "Johans",
+        title: jsonResponse.title || "Nueva Tarea IA",
+        description: jsonResponse.description || command // Si falla descripción, usa el comando original
+    };
+
+    return res.status(200).json(finalData);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error("Error IA:", error);
+    // En caso de catástrofe, devolver un JSON seguro basado en el comando
+    return res.status(200).json({
+        clientName: null,
+        assignee: "Johans",
+        title: "Tarea (Revisar)",
+        description: command
+    });
   }
 }
