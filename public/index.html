@@ -343,27 +343,71 @@
         }
         window.closeModal = () => { document.getElementById('custom-modal').classList.remove('show'); }
 
-        async function ejecutarComandoIA(command) {
+       async function ejecutarComandoIA(command) {
             document.getElementById('loader').style.display = 'flex';
             try {
+                // 1. Preparamos la lista de nombres para la IA
                 const clientsList = appData.clientes.map(c => c.nombre);
-                const res = await fetch('/api/parse-task', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ command, clients: clientsList, team: equipo }) });
+                
+                // 2. Consultamos a Alfred
+                const res = await fetch('/api/parse-task', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ command, clients: clientsList, team: equipo }) 
+                });
+                
                 const data = await res.json();
                 
+                // 3. Lógica de búsqueda de cliente (Mejorada)
                 let targetClientId = null;
-                // Lógica de búsqueda estricta o fallback
+                
                 if (data.clientName) {
-                    const found = appData.clientes.find(c => c.nombre.toLowerCase().includes(data.clientName.toLowerCase()));
+                    // Buscamos ignorando mayúsculas/minúsculas
+                    const found = appData.clientes.find(c => 
+                        c.nombre.toLowerCase().trim() === data.clientName.toLowerCase().trim() || 
+                        c.nombre.toLowerCase().includes(data.clientName.toLowerCase())
+                    );
                     if (found) targetClientId = found.id;
                 }
                 
+                // Si la IA no encontró cliente, intentamos usar el cliente que tienes abierto en pantalla
                 if (!targetClientId) {
-                    if (appData.activeClientId) targetClientId = appData.activeClientId; // Usa el activo si falla la IA
-                    else {
-                        alert("Alfred no encontró el cliente. Por favor, selecciona uno primero.");
-                        return;
+                    if (appData.activeClientId) {
+                        targetClientId = appData.activeClientId;
+                    } else {
+                        alert(`Alfred no pudo vincular un cliente automáticamente.\nIntenta decir: "Para [Nombre Cliente], hacer..."\nO abre un cliente antes de usar la varita.`);
+                        return; // Detenemos aquí para no romper la base de datos
                     }
                 }
+
+                // 4. Guardado Seguro (Blindado contra undefined)
+                await addDoc(collection(db, "tareas"), { 
+                    clienteId: targetClientId, 
+                    titulo: data.title || "Tarea sin título", // Fallback de seguridad
+                    descripcion: data.description || "...", 
+                    asignado: data.assignee || "Johans", 
+                    status: 'pendiente', 
+                    creado: Date.now(), 
+                    attachments: [], 
+                    comments: [], 
+                    deadline: '' 
+                });
+                
+                // 5. Feedback visual
+                playSound(); // Sonido de éxito
+                alert("¡Tarea creada exitosamente!"); 
+                
+                // Si estábamos en otro lado, vamos a la vista de tareas de ese cliente
+                seleccionarCliente(targetClientId);
+
+            } catch (e) { 
+                console.error(e);
+                alert("Hubo un problema de comunicación: " + e.message); 
+            }
+            finally { 
+                document.getElementById('loader').style.display = 'none'; 
+            }
+        }
 
                 await addDoc(collection(db, "tareas"), { clienteId: targetClientId, titulo: data.title, descripcion: data.description, asignado: data.assignee, status: 'pendiente', creado: Date.now(), attachments: [], comments: [], deadline: '' });
                 // Notificar éxito (Podríamos usar un toast mejorado luego)
@@ -403,3 +447,4 @@
     </script>
 </body>
 </html>
+
