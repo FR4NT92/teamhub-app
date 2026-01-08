@@ -3,22 +3,31 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Solo POST' });
+  // Cabeceras CORS
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
 
   const { imageBase64, mimeType } = req.body;
 
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const prompt = `Actúa como un Director Creativo Senior de publicidad.
-    Analiza esta imagen (anuncio/diseño) críticamente.
-    
-    Dame un reporte BREVE (máximo 50 palabras por punto) con:
-    1. 🎯 **Impacto Visual:** (1-10) ¿Detiene el scroll?
-    2. 📢 **Claridad del Mensaje:** ¿Se entiende qué venden?
-    3. 💡 **Mejora Crítica:** Un cambio específico para vender más.
-    
-    Sé directo y profesional.`;
+    const prompt = `
+        Actúa como un Director Creativo de Publicidad (Meta Ads / Google Ads).
+        Analiza esta imagen y sé brutalmente honesto.
+        
+        Responde en este formato:
+        🎨 **Impacto Visual:** (1-10, ¿frena el scroll?)
+        📢 **Claridad:** ¿Se entiende qué venden en menos de 3 segundos?
+        🔧 **Mejora Técnica:** (Ej: "Aumentar contraste", "Texto muy pequeño", "Cambiar color de fondo")
+    `;
 
     const imagePart = {
       inlineData: {
