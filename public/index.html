@@ -152,52 +152,47 @@
         .spinner { width: 40px; height: 40px; border: 4px solid rgba(0, 199, 183, 0.3); border-top: 4px solid var(--accent-primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        /* --- ESTILOS MODAL IA (GLOW CONTENIDO) --- */
+        /* --- ESTILOS MODAL IA (GLOW ESTILO GITHUB) --- */
         #custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 400; justify-content: center; align-items: center; }
         #custom-modal.show { display: flex; }
 
-        /* Envoltorio para contener el brillo */
-        .modal-glow-wrapper {
+        /* La caja exterior: actua como el borde transparente y contiene el brillo */
+        .modal-wrapper {
             position: relative;
-            z-index: 401;
-            border-radius: 18px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            padding: 2px; /* El grosor del "borde" transparente */
+            border-radius: 14px; /* Un poco más grande que la caja interior */
+            background: rgba(255, 255, 255, 0.05); /* Color sutil del borde */
+            overflow: hidden; /* IMPORTANTE: Recorta el brillo para contenerlo */
+            z-index: 1;
         }
 
-        /* El brillo giratorio (Detrás del envoltorio) */
-        .modal-glow-wrapper::before {
-            content: "";
+        /* El brillo giratorio (Detrás de todo) */
+        .modal-wrapper::before {
+            content: '';
             position: absolute;
-            z-index: -1;
-            top: -5px; left: -5px; right: -5px; bottom: -5px;
-            border-radius: 20px;
+            top: -50%; left: -50%; width: 200%; height: 200%; /* Gigante para poder girar */
             
-            /* Degradado de luz */
+            /* El degradado con tus colores */
             background: conic-gradient(
-                from 0deg,
-                transparent 0%,
-                var(--accent-primary) 25%,
-                #7928ca 50%,
-                transparent 75%
+                transparent 0%, 
+                var(--accent-primary) 30%, 
+                #7928ca 50%, 
+                transparent 70%
             );
             
-            animation: rotateGlow 3s linear infinite;
-            filter: blur(12px);
-            opacity: 0.8;
+            animation: rotateGlow 4s linear infinite;
+            z-index: -1; /* Detrás del contenido */
+            filter: blur(20px); /* Suavizado */
         }
 
-        /* Contenido del modal (Encima del brillo) */
+        /* La caja interior con el contenido */
         .modal-content {
             position: relative;
-            background: var(--bg-card);
+            background: var(--bg-card); /* Fondo sólido */
             padding: 30px;
-            border-radius: 16px;
+            border-radius: 12px;
             width: 450px;
-            z-index: 2;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 2; /* Encima del brillo */
         }
 
         @keyframes rotateGlow {
@@ -224,7 +219,7 @@
     <div class="loading-overlay" id="loader" style="display:none;"><div class="spinner"></div><div style="font-weight:600; color:white;">Procesando...</div></div>
 
     <div id="custom-modal">
-        <div class="modal-glow-wrapper">
+        <div class="modal-wrapper">
             <div class="modal-content">
                 <h3 class="modal-title">Alfred AI</h3>
                 <input type="text" id="modal-input" class="modal-input" placeholder="Ej: Francisco, logo para Coca Cola...">
