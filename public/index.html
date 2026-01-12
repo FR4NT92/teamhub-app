@@ -6,44 +6,7 @@
     <title>TeamHub - Alfred v30 (Stable)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-       /* Agrega esto al final de tus estilos */
-/* --- CORRECCIÓN DE SCROLL --- */
-.result-box {
-    max-height: 500px;      /* Altura máxima */
-    overflow-y: auto;       /* Scroll vertical automático */
-    display: block;         /* Asegura que la caja respete el tamaño */
-    
-    /* Estilo para Firefox */
-    scrollbar-width: thin;
-    scrollbar-color: #555 #1e1e1e;
-}
-
-/* Estilo para Chrome, Edge y Safari */
-.result-box::-webkit-scrollbar {
-    width: 8px;
-}
-.result-box::-webkit-scrollbar-track {
-    background: #1e1e1e;
-}
-.result-box::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 4px;
-}
-.result-box::-webkit-scrollbar-thumb:hover {
-    background: #777;
-}
-
-/* Para Chrome/Edge/Safari */
-.result-box::-webkit-scrollbar
-}
-.result-box::-webkit-scrollbar-track {
-    background: #1e1e1e;
-}
-.result-box::-webkit-scrollbar-thumb {
-    background: #555;
-    border-radius: 4px;
-}
-        /* --- ESTILOS V30 (ICONOS BLINDADOS) --- */
+        /* --- ESTILOS GENERALES --- */
         :root {
             --bg-body: #0d1117; --bg-sidebar: #161b22; --bg-card: #161b22; --bg-hover: #21262d;
             --border-color: #30363d; --text-main: #c9d1d9; --text-muted: #8b949e;
@@ -53,6 +16,33 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; outline: none; }
         body { background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
         
+        /* --- SCROLLBAR CORREGIDO (RESULT BOX) --- */
+        .result-box {
+            max-height: 500px;      /* Altura máxima */
+            overflow-y: auto;       /* Scroll vertical automático */
+            display: block;         /* Asegura que la caja respete el tamaño */
+            background: var(--bg-body); 
+            padding: 20px; 
+            border-radius: 8px; 
+            font-size: 13px; 
+            color: var(--text-main); 
+            margin-top: 10px; 
+            display: none; 
+            border: 1px solid var(--border-color); 
+            white-space: pre-wrap; 
+            line-height: 1.6;
+            
+            /* Estilo para Firefox */
+            scrollbar-width: thin;
+            scrollbar-color: #555 #1e1e1e;
+        }
+
+        /* Estilo para Chrome, Edge y Safari */
+        .result-box::-webkit-scrollbar { width: 8px; }
+        .result-box::-webkit-scrollbar-track { background: #1e1e1e; }
+        .result-box::-webkit-scrollbar-thumb { background: #555; border-radius: 4px; }
+        .result-box::-webkit-scrollbar-thumb:hover { background: #777; }
+
         /* LAYOUT */
         #app-content { display: none; width: 100%; height: 100%; }
         #app-content.active { display: flex; }
@@ -129,7 +119,6 @@
         .lab-input { width: 100%; background: var(--bg-body); border: 1px solid var(--border-color); padding: 12px; border-radius: 6px; color: white; font-size: 13px; }
         .file-upload-label { border: 2px dashed var(--border-color); padding: 20px; text-align: center; border-radius: 8px; cursor: pointer; color: var(--text-muted); font-size: 13px; transition: 0.2s; }
         .file-upload-label:hover { border-color: var(--accent-primary); color: var(--accent-primary); background: rgba(0,199,183,0.05); }
-        .result-box { background: var(--bg-body); padding: 20px; border-radius: 8px; font-size: 13px; color: var(--text-main); margin-top: 10px; display: none; border: 1px solid var(--border-color); white-space: pre-wrap; line-height: 1.6; }
         .btn-reset { background: transparent; color: var(--text-muted); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; width: 100%; margin-top: 5px; text-align: center; transition: 0.2s; }
         .btn-reset:hover { color: var(--text-main); border-color: var(--text-main); background: var(--bg-hover); }
 
@@ -162,106 +151,65 @@
         .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 17, 23, 0.9); display: flex; justify-content: center; align-items: center; z-index: 300; transition: opacity 0.3s; flex-direction: column; gap: 15px; }
         .spinner { width: 40px; height: 40px; border: 4px solid rgba(0, 199, 183, 0.3); border-top: 4px solid var(--accent-primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* --- ESTILOS MODAL IA (GLOW CONTENIDO) --- */
         #custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 400; justify-content: center; align-items: center; }
         #custom-modal.show { display: flex; }
-/* --- MODAL ESTILO GITHUB / VERCEL --- */
-.modal-content {
-    position: relative;
-    background: var(--bg-card); /* Fondo sólido oscuro */
-    padding: 25px;
-    border-radius: 12px;
-    width: 400px;
-    z-index: 1;
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Un borde sutil base */
-    overflow: visible; /* Importante para que el brillo salga de la caja */
-}
 
-/* CAPA 1: El borde de luz nítida que gira */
-.modal-content::before {
-    content: "";
-    position: absolute;
-    inset: -2px; /* Se sale 2px para crear el efecto de borde exterior */
-    z-index: -1; /* Detrás de la caja */
-    border-radius: 14px; /* Un poco más grande que la caja original */
-    
-    /* El degradado cónico "fino" */
-    background: conic-gradient(
-        from 0deg,
-        transparent 0%,
-        transparent 70%,
-        var(--accent-primary) 85%, /* Color Turquesa */
-        #7928ca 100%               /* Color Morado */
-    );
-    
-    /* Animación de giro */
-    animation: rotateBorder 4s linear infinite;
-}
+        /* Envoltorio para contener el brillo */
+        .modal-glow-wrapper {
+            position: relative;
+            z-index: 401;
+            border-radius: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-/* CAPA 2: El "Glow" suave detrás (el ambiente) */
-.modal-content::after {
-    content: "";
-    position: absolute;
-    inset: -4px; /* Un poco más afuera aun */
-    z-index: -2; /* Detrás del borde */
-    border-radius: 16px;
-    background: inherit; /* Hereda el mismo degradado del ::before */
-    
-    /* Aquí está la magia: difuminamos esta capa */
-    filter: blur(15px);
-    opacity: 0.6;
-    
-    /* Misma animación para que giren juntos */
-    background: conic-gradient(
-        from 0deg,
-        transparent 0%,
-        transparent 60%,
-        var(--accent-primary) 80%,
-        #7928ca 100%
-    );
-    animation: rotateBorder 4s linear infinite;
-}
+        /* El brillo giratorio (Detrás del envoltorio) */
+        .modal-glow-wrapper::before {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            border-radius: 20px;
+            
+            /* Degradado de luz */
+            background: conic-gradient(
+                from 0deg,
+                transparent 0%,
+                var(--accent-primary) 25%,
+                #7928ca 50%,
+                transparent 75%
+            );
+            
+            animation: rotateGlow 3s linear infinite;
+            filter: blur(12px);
+            opacity: 0.8;
+        }
 
-@keyframes rotateBorder {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+        /* Contenido del modal (Encima del brillo) */
+        .modal-content {
+            position: relative;
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 16px;
+            width: 450px;
+            z-index: 2;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
 
-/* La capa mágica del brillo detrás */
-.modal-content::before {
-    content: '';
-    position: absolute;
-    z-index: -1; /* Colocar detrás de la caja */
-    /* Hacemos que sea mucho más grande que la caja para que al girar cubra todo */
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    
-    /* El gradiente que crea el efecto. Usamos tus colores: turquesa y morado */
-    background: conic-gradient(
-        transparent 0%, 
-        var(--accent-primary) 30%, 
-        #7928ca 50%, /* Color morado de tu tema */
-        transparent 70%
-    );
-    
-    /* La animación de giro */
-    animation: rotateGlow 4s linear infinite;
-    
-    /* IMPORTANTE: Esto es lo que lo hace "leve". Cuanto más alto el blur, más suave */
-    filter: blur(20px); 
-    opacity: 0.5; /* Ajusta la intensidad del brillo */
-}
+        @keyframes rotateGlow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
 
-/* Definición de la animación */
-@keyframes rotateGlow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
         .modal-input { width: 100%; background: var(--bg-body); border: 1px solid var(--border-color); color: white; padding: 12px; border-radius: 6px; font-size: 14px; margin: 15px 0; }
         .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
         .btn-modal-cancel { background: transparent; color: var(--text-muted); border: none; padding: 8px 16px; cursor: pointer; font-weight: 600; }
         .btn-modal-confirm { background: var(--accent-primary); color: #0d1117; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+
         .home-view { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
         .chat-container { display: flex; flex-direction: column; height: 100%; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); overflow: hidden; }
         .chat-messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
@@ -276,12 +224,14 @@
     <div class="loading-overlay" id="loader" style="display:none;"><div class="spinner"></div><div style="font-weight:600; color:white;">Procesando...</div></div>
 
     <div id="custom-modal">
-        <div class="modal-content">
-            <h3 class="modal-title">Alfred AI</h3>
-            <input type="text" id="modal-input" class="modal-input" placeholder="Ej: Francisco, logo para Coca Cola...">
-            <div class="modal-actions">
-                <button class="btn-modal-cancel" onclick="closeModal()">Cancelar</button>
-                <button class="btn-modal-confirm" id="modal-confirm">Ejecutar</button>
+        <div class="modal-glow-wrapper">
+            <div class="modal-content">
+                <h3 class="modal-title">Alfred AI</h3>
+                <input type="text" id="modal-input" class="modal-input" placeholder="Ej: Francisco, logo para Coca Cola...">
+                <div class="modal-actions">
+                    <button class="btn-modal-cancel" onclick="closeModal()">Cancelar</button>
+                    <button class="btn-modal-confirm" id="modal-confirm">Ejecutar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -565,9 +515,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
