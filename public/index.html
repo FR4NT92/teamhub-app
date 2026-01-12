@@ -6,6 +6,27 @@
     <title>TeamHub - Alfred v30 (Stable)</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+       /* Agrega esto al final de tus estilos */
+.resultado-box {
+    max-height: 500px;  /* Altura máxima */
+    overflow-y: auto;   /* Scroll vertical */
+    
+    /* Opcional: Para que se vea bonito en fondo oscuro */
+    scrollbar-width: thin;
+    scrollbar-color: #555 #1e1e1e;
+}
+
+/* Para Chrome/Edge/Safari */
+.resultado-box::-webkit-scrollbar {
+    width: 8px;
+}
+.resultado-box::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+.resultado-box::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
         /* --- ESTILOS V30 (ICONOS BLINDADOS) --- */
         :root {
             --bg-body: #0d1117; --bg-sidebar: #161b22; --bg-card: #161b22; --bg-hover: #21262d;
@@ -435,3 +456,4 @@
     </script>
 </body>
 </html>
+
