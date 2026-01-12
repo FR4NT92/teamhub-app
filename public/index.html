@@ -7,17 +7,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
        /* Agrega esto al final de tus estilos */
-.result-box {     <-- CORRECTO (Quítale el "ado")
-    max-height: 500px;
-    overflow-y: auto;
-    /* ... deja el resto igual ... */
+/* --- CORRECCIÓN DE SCROLL --- */
+.result-box {
+    max-height: 500px;      /* Altura máxima */
+    overflow-y: auto;       /* Scroll vertical automático */
+    display: block;         /* Asegura que la caja respete el tamaño */
+    
+    /* Estilo para Firefox */
     scrollbar-width: thin;
     scrollbar-color: #555 #1e1e1e;
 }
-    
-    /* Opcional: Para que se vea bonito en fondo oscuro */
-    scrollbar-width: thin;
-    scrollbar-color: #555 #1e1e1e;
+
+/* Estilo para Chrome, Edge y Safari */
+.result-box::-webkit-scrollbar {
+    width: 8px;
+}
+.result-box::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+.result-box::-webkit-scrollbar-thumb {
+    background: #555;
+    border-radius: 4px;
+}
+.result-box::-webkit-scrollbar-thumb:hover {
+    background: #777;
 }
 
 /* Para Chrome/Edge/Safari */
@@ -459,5 +472,6 @@
     </script>
 </body>
 </html>
+
 
 
