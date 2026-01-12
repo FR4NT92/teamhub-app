@@ -1,61 +1,66 @@
 export default async function handler(req, res) {
-  // 1. Configuración CORS (Permisos de acceso)
+  // 1. Configuración de Seguridad (CORS) - Para que el navegador no bloquee
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+  // Si es una "pregunta" del navegador, respondemos OK y listo
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // 2. Validación de entrada
+  // 2. Validación de datos
   const { url } = req.body;
-  if (!url) return res.status(400).json({ error: 'Falta URL' });
+  if (!url) return res.status(400).json({ error: 'Falta la URL para analizar.' });
 
   const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'Falta configuración de API Key en el servidor' });
+  if (!apiKey) return res.status(500).json({ error: 'Error interno: Falta la API Key en el servidor.' });
 
   try {
-    // 3. Leer la web (Scraping con User-Agent real)
+    // 3. Leer la web (Scraping)
     const siteRes = await fetch(url, {
       headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/91.0.4472.124 Safari/537.36" }
     });
     
-    if (!siteRes.ok) throw new Error(`Error leyendo la web: ${siteRes.status}`);
+    if (!siteRes.ok) throw new Error(`No pude entrar a la web. Código de error: ${siteRes.status}`);
     
     const htmlText = await siteRes.text();
-    // Limpieza agresiva de código basura
+    
+    // Limpieza de texto (Sacamos scripts y estilos para ahorrar tokens)
     const cleanText = htmlText.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, "")
                               .replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, "")
-                              .replace(/<[^>]+>/g, ' ')
-                              .replace(/\s+/g, ' ')
-                              .substring(0, 9000); // Aumentamos un poco el límite
+                              .replace(/<[^>]+>/g, ' ') // Sacar tags HTML
+                              .replace(/\s+/g, ' ')     // Sacar espacios extra
+                              .substring(0, 10000);     // Límite seguro
 
-    // 4. LLAMADA DIRECTA A LA API (Bypass de librerías)
-    // Usamos el endpoint v1beta que es el más compatible con Flash
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // 4. LLAMADA A LA IA (Modelo Específico 001)
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-001:generateContent?key=${apiKey}`;
 
     const aiRes = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{
-          parts: [{ text: `Eres un experto en CRO (Optimización de Conversión). Analiza el texto de esta landing page: "${cleanText}". Dame un reporte con: 🏆 Puntaje (1-10), ✅ Lo Bueno, ❌ Lo Malo, 💡 Acción Inmediata para vender más.` }]
+          parts: [{ text: `Actúa como un experto en Marketing Digital y CRO. Analiza el texto de esta landing page: "${cleanText}". Dame un reporte breve y directo con: 🏆 Puntaje (1-10), ✅ Lo Bueno, ❌ Lo Malo, 💡 Acción Inmediata.` }]
         }]
       })
     });
 
     const data = await aiRes.json();
 
-    // Manejo de errores de Google
+    // 5. Manejo de Errores de Google
     if (data.error) {
-      console.error("Gemini Error:", data.error);
-      throw new Error(`Error de IA: ${data.error.message}`);
+      console.error("Error de Gemini:", data.error);
+      // Devolvemos el mensaje exacto de Google para debuggear si hiciera falta
+      throw new Error(`Google AI rechazo la solicitud: ${data.error.message}`);
     }
     
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "La IA no devolvió texto.";
+    // Extraemos la respuesta
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error("La IA respondió pero no generó texto (Bloqueo de seguridad o error vacío).");
+
     return res.status(200).json({ critique: text });
 
   } catch (error) {
-    console.error("Server Error:", error);
+    console.error("Server Fault:", error);
     return res.status(500).json({ error: error.message });
   }
 }
