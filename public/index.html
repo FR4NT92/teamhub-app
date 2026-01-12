@@ -7,9 +7,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
        /* Agrega esto al final de tus estilos */
-.resultado-box {
-    max-height: 500px;  /* Altura máxima */
-    overflow-y: auto;   /* Scroll vertical */
+.result-box {     <-- CORRECTO (Quítale el "ado")
+    max-height: 500px;
+    overflow-y: auto;
+    /* ... deja el resto igual ... */
+    scrollbar-width: thin;
+    scrollbar-color: #555 #1e1e1e;
+}
     
     /* Opcional: Para que se vea bonito en fondo oscuro */
     scrollbar-width: thin;
@@ -17,8 +21,7 @@
 }
 
 /* Para Chrome/Edge/Safari */
-.resultado-box::-webkit-scrollbar {
-    width: 8px;
+.result-box::-webkit-scrollbar
 }
 .resultado-box::-webkit-scrollbar-track {
     background: #1e1e1e;
@@ -456,4 +459,5 @@
     </script>
 </body>
 </html>
+
 
