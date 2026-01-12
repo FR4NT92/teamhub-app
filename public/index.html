@@ -164,7 +164,51 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 400; justify-content: center; align-items: center; }
         #custom-modal.show { display: flex; }
-        .modal-content { background: var(--bg-card); border: 1px solid var(--border-color); padding: 25px; border-radius: 12px; width: 400px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+/* --- NUEVO ESTILO MODAL CON GLOW --- */
+.modal-content {
+    position: relative; /* Necesario para ubicar el brillo detrás */
+    background: var(--bg-card); /* Fondo sólido para tapar el centro del brillo */
+    padding: 25px;
+    border-radius: 12px; /* Bordes redondeados de la caja */
+    width: 400px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    z-index: 1; /* Asegura que el contenido (texto, inputs) quede por encima */
+    overflow: hidden; /* Recorta el brillo para que no se salga de las esquinas */
+    border: none; /* Quitamos el borde sólido aburrido */
+}
+
+/* La capa mágica del brillo detrás */
+.modal-content::before {
+    content: '';
+    position: absolute;
+    z-index: -1; /* Colocar detrás de la caja */
+    /* Hacemos que sea mucho más grande que la caja para que al girar cubra todo */
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    
+    /* El gradiente que crea el efecto. Usamos tus colores: turquesa y morado */
+    background: conic-gradient(
+        transparent 0%, 
+        var(--accent-primary) 30%, 
+        #7928ca 50%, /* Color morado de tu tema */
+        transparent 70%
+    );
+    
+    /* La animación de giro */
+    animation: rotateGlow 4s linear infinite;
+    
+    /* IMPORTANTE: Esto es lo que lo hace "leve". Cuanto más alto el blur, más suave */
+    filter: blur(20px); 
+    opacity: 0.5; /* Ajusta la intensidad del brillo */
+}
+
+/* Definición de la animación */
+@keyframes rotateGlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
         .modal-input { width: 100%; background: var(--bg-body); border: 1px solid var(--border-color); color: white; padding: 12px; border-radius: 6px; font-size: 14px; margin: 15px 0; }
         .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
         .btn-modal-cancel { background: transparent; color: var(--text-muted); border: none; padding: 8px 16px; cursor: pointer; font-weight: 600; }
@@ -472,6 +516,7 @@
     </script>
 </body>
 </html>
+
 
 
 
