@@ -164,17 +164,66 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         #custom-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 400; justify-content: center; align-items: center; }
         #custom-modal.show { display: flex; }
-/* --- NUEVO ESTILO MODAL CON GLOW --- */
+/* --- MODAL ESTILO GITHUB / VERCEL --- */
 .modal-content {
-    position: relative; /* Necesario para ubicar el brillo detrás */
-    background: var(--bg-card); /* Fondo sólido para tapar el centro del brillo */
+    position: relative;
+    background: var(--bg-card); /* Fondo sólido oscuro */
     padding: 25px;
-    border-radius: 12px; /* Bordes redondeados de la caja */
+    border-radius: 12px;
     width: 400px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    z-index: 1; /* Asegura que el contenido (texto, inputs) quede por encima */
-    overflow: hidden; /* Recorta el brillo para que no se salga de las esquinas */
-    border: none; /* Quitamos el borde sólido aburrido */
+    z-index: 1;
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Un borde sutil base */
+    overflow: visible; /* Importante para que el brillo salga de la caja */
+}
+
+/* CAPA 1: El borde de luz nítida que gira */
+.modal-content::before {
+    content: "";
+    position: absolute;
+    inset: -2px; /* Se sale 2px para crear el efecto de borde exterior */
+    z-index: -1; /* Detrás de la caja */
+    border-radius: 14px; /* Un poco más grande que la caja original */
+    
+    /* El degradado cónico "fino" */
+    background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        transparent 70%,
+        var(--accent-primary) 85%, /* Color Turquesa */
+        #7928ca 100%               /* Color Morado */
+    );
+    
+    /* Animación de giro */
+    animation: rotateBorder 4s linear infinite;
+}
+
+/* CAPA 2: El "Glow" suave detrás (el ambiente) */
+.modal-content::after {
+    content: "";
+    position: absolute;
+    inset: -4px; /* Un poco más afuera aun */
+    z-index: -2; /* Detrás del borde */
+    border-radius: 16px;
+    background: inherit; /* Hereda el mismo degradado del ::before */
+    
+    /* Aquí está la magia: difuminamos esta capa */
+    filter: blur(15px);
+    opacity: 0.6;
+    
+    /* Misma animación para que giren juntos */
+    background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        transparent 60%,
+        var(--accent-primary) 80%,
+        #7928ca 100%
+    );
+    animation: rotateBorder 4s linear infinite;
+}
+
+@keyframes rotateBorder {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
 /* La capa mágica del brillo detrás */
@@ -516,6 +565,7 @@
     </script>
 </body>
 </html>
+
 
 
 
