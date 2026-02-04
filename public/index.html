@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <title>Abundance - Growth OS</title>
-    <link rel="icon" type="image/png" href="ISO.png"> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="ISO.png"> 
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         /* --- 1. CORE VARIABLES (LIQUID ONYX) --- */
         :root {
@@ -43,7 +47,7 @@
             border-top: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             color: var(--text-sec);
-            position: relative; /* Necesario para dropdowns */
+            position: relative; 
         }
         .btn:hover {
             background: rgba(255, 255, 255, 0.08); border-top-color: rgba(255, 255, 255, 0.3);
@@ -71,7 +75,7 @@
         .tab { padding: 8px 20px; font-size: 13px; color: var(--text-sec); cursor: pointer; border-radius: 100px; border: none; background: transparent; transition: 0.3s; font-weight: 500; }
         .tab.active { background: rgba(255,255,255,0.1); color: white; font-weight: 600; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
 
-        /* DROPDOWN MENU (Fix Calendario) */
+        /* DROPDOWN MENU */
         .dropdown-menu {
             position: absolute; top: 110%; right: 0; 
             background: #111; border: 1px solid rgba(255,255,255,0.1);
@@ -93,9 +97,9 @@
         .brand { 
             padding: 30px 24px; 
             display: flex; align-items: center; 
-            /* Logo Horizontal aquí */
+            /* Asegurate de tener LOGO HORIZONTAL.png */
+            font-weight: 700; letter-spacing: -0.5px; font-size: 18px;
         }
-        .brand img { height: 24px; opacity: 0.9; } /* Ajuste de logo */
         
         .nav-menu { flex: 1; padding: 10px 16px; display: flex; flex-direction: column; gap: 4px; }
         .nav-item { padding: 10px 16px; border-radius: 100px; color: var(--text-sec); font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
@@ -165,7 +169,7 @@
 
     <div id="login-screen">
         <div class="login-box">
-            <img src="LOGO HORIZONTAL.png" alt="Abundance" style="height: 30px; margin-bottom: 20px;">
+            <img src="LOGO HORIZONTAL.png" alt="Abundance" style="height: 30px; margin-bottom: 20px; display:block; margin-left:auto; margin-right:auto;">
             <p style="color:var(--text-sec); margin-bottom:24px;">Enterprise Growth OS</p>
             <button class="btn btn-primary" id="btn-login-google" style="width:100%; justify-content:center;">
                 Ingresar con Google
@@ -179,7 +183,7 @@
 
     <aside class="sidebar">
         <div class="brand">
-            <img src="LOGO HORIZONTAL.png" alt="Abundance Logo" style="height: 22px;">
+            <img src="LOGO HORIZONTAL.png" alt="Abundance" style="height: 24px;">
         </div>
         <nav class="nav-menu">
             <div class="nav-item active" onclick="nav('dash', this)">
@@ -245,7 +249,13 @@
 
         <div id="view-crm" class="view-container hidden"><h2 style="margin-bottom:20px;">Gestión de Clientes</h2><div class="glass-card">Próximamente: Tabla de Clientes Reales</div></div>
         
-        <div id="view-reports" class="view-container hidden"><h2 style="margin-bottom:20px;">Reportes</h2><div class="glass-card">Próximamente: Generador PDF</div></div>
+        <div id="view-reports" class="view-container hidden">
+            <h2 style="margin-bottom:20px;">Reportes</h2>
+            <div class="glass-card" style="text-align:center; padding: 60px;">
+                <div style="color:var(--text-sec); margin-bottom:20px;">Descarga un PDF con el estado actual del Dashboard.</div>
+                <button class="btn btn-primary" style="margin:0 auto;" onclick="generatePDF()">📄 Descargar Reporte PDF</button>
+            </div>
+        </div>
     </main>
 
     <aside class="ai-sidebar" id="ai-panel">
@@ -274,33 +284,67 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, doc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, doc, query, where, orderBy, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // FIREBASE CONFIG
-        const app = initializeApp({
-            apiKey: "AIzaSyADJ2mcVqCUBxAhS1K1fiL5zFGupm6CoWA",
-            authDomain: "teamhub-app-e0269.firebaseapp.com",
-            projectId: "teamhub-app-e0269",
-            storageBucket: "teamhub-app-e0269.firebasestorage.app",
-            messagingSenderId: "651905154908",
-            appId: "1:651905154908:web:83975461f8215d89100b99"
-        });
-        const db = getFirestore(app);
-        const auth = getAuth(app);
+        // --- 🔴 IMPORTANTE: REEMPLAZA ESTO CON TUS DATOS DE FIREBASE 🔴 ---
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY_AQUI",
+            authDomain: "TU_PROJECT.firebaseapp.com",
+            projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_PROJECT.firebasestorage.app",
+            messagingSenderId: "NUMERO",
+            appId: "APP_ID"
+        };
+
+        // NOTA: Si no tienes los datos, sigue el manual de abajo para conseguirlos.
+        
+        let app, db, auth;
+        
+        try {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+        } catch (e) {
+            console.error("Error iniciando Firebase (Probablemente faltan las credenciales):", e);
+        }
 
         // STATE
-        let state = { orgId: 'demo_org', campaigns: [], currentTab: 'meta' };
+        let state = { orgId: null, campaigns: [], currentTab: 'meta' };
 
-        // AUTH
+        // AUTH & ONBOARDING (MULTI-TENANT)
         window.googleLogin = async () => { try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e){ alert(e.message); } };
-        onAuthStateChanged(auth, (user) => {
-            document.getElementById('login-screen').style.display = user ? 'none' : 'flex';
-            if(user) initData();
-        });
+        
+        if (auth) {
+            onAuthStateChanged(auth, async (user) => {
+                const loginScreen = document.getElementById('login-screen');
+                if (user) {
+                    loginScreen.style.display = 'none';
+                    
+                    // ONBOARDING: Chequear si usuario existe, si no, crear Org
+                    const userRef = doc(db, "users", user.uid);
+                    const userSnap = await getDoc(userRef);
+
+                    if (userSnap.exists()) {
+                        state.orgId = userSnap.data().orgId;
+                    } else {
+                        // Crear Nuevo Usuario y Organización
+                        const newOrgId = "org_" + user.uid;
+                        await setDoc(userRef, { email: user.email, name: user.displayName, orgId: newOrgId, role: 'owner' });
+                        await setDoc(doc(db, "organizations", newOrgId), { name: user.displayName + "'s Agency", plan: 'free' });
+                        state.orgId = newOrgId;
+                    }
+                    
+                    initData();
+                } else {
+                    loginScreen.style.display = 'flex';
+                }
+            });
+        }
 
         // DATA
         function initData() {
+            if (!state.orgId) return;
             const q = query(collection(db, "campaigns"), where("orgId", "==", state.orgId), orderBy("createdAt", "desc"));
             onSnapshot(q, (snap) => {
                 state.campaigns = snap.docs.map(d => ({id:d.id, ...d.data()}));
@@ -323,6 +367,20 @@
 
         window.toggleStatus = async (id, status) => {
             await updateDoc(doc(db, "campaigns", id), { status: status === 'active' ? 'paused' : 'active' });
+        };
+
+        window.generatePDF = () => {
+            const element = document.getElementById('view-dash');
+            const btn = document.querySelector('#view-reports .btn-primary');
+            btn.innerText = "⏳ Generando...";
+            
+            const opt = {
+                margin: 10, filename: 'Reporte_Abundance.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#000000' },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+            html2pdf().set(opt).from(element).save().then(() => btn.innerText = "📄 Descargar Reporte PDF");
         };
 
         // UI LOGIC
@@ -384,7 +442,8 @@
             if(!e.target.closest('#calendar-btn')) document.getElementById('calendar-menu').classList.remove('show');
         }
 
-        document.getElementById('btn-login-google').onclick = window.googleLogin;
+        const loginBtn = document.getElementById('btn-login-google');
+        if(loginBtn) loginBtn.onclick = window.googleLogin;
 
         // INIT CHART
         const ctx = document.getElementById('revenueChart').getContext('2d');
