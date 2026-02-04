@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abundance - Liquid Glass OS</title>
+    <title>Abundance - Growth OS</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -11,29 +11,19 @@
         :root {
             --bg-body: #000000;       
             --bg-sidebar: #050505;    
-            
-            /* Textos */
             --text-main: #ffffff;
             --text-sec: #9ca3af;      
-            
-            /* Acentos Neón Sutiles */
             --accent-cyan: #00c7b7;    
             --accent-purple: #8b5cf6;
             --accent-green: #10b981;   
             --accent-red: #ef4444;     
-            
             --font-main: 'Inter', sans-serif;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-main); outline: none; }
         
         body { 
-            background-color: var(--bg-body); 
-            color: var(--text-main); 
-            display: flex; 
-            height: 100vh; 
-            overflow: hidden;
-            /* Luz ambiental muy sutil de fondo */
+            background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden;
             background-image: radial-gradient(circle at 50% -20%, rgba(120, 119, 198, 0.1), rgba(0,0,0,0));
         }
         
@@ -42,221 +32,129 @@
         ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
 
         /* --- 2. LIQUID GLASS BUTTONS --- */
-        
         .btn { 
-            padding: 10px 24px; 
-            border-radius: 100px; /* Píldora completa */
-            font-size: 13px; font-weight: 500; 
+            padding: 10px 24px; border-radius: 100px; font-size: 13px; font-weight: 500; 
             cursor: pointer; display: flex; align-items: center; gap: 8px; 
             transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            
-            /* EFECTO LIQUID GLASS */
             background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-top: 1px solid rgba(255, 255, 255, 0.15); /* Reflejo superior */
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             color: var(--text-sec);
         }
-        
         .btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-top-color: rgba(255, 255, 255, 0.3);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            background: rgba(255, 255, 255, 0.08); border-top-color: rgba(255, 255, 255, 0.3);
+            color: white; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
-
-        /* Botón Primario (Acción Principal) */
         .btn-primary { 
-            background: rgba(255, 255, 255, 0.9);
-            color: black;
-            font-weight: 600;
-            border: none;
+            background: rgba(255, 255, 255, 0.9); color: black; font-weight: 600; border: none;
             box-shadow: 0 0 15px rgba(255,255,255,0.1);
         }
-        .btn-primary:hover { 
-            background: #ffffff; 
-            box-shadow: 0 0 25px rgba(255,255,255,0.3);
-            color: black;
-        }
+        .btn-primary:hover { background: #ffffff; box-shadow: 0 0 25px rgba(255,255,255,0.3); color: black; }
 
-        /* --- 3. COMPONENTS --- */
-
-        /* Inputs Glass */
+        /* --- 3. UI COMPONENTS --- */
         .input-field { 
-            background: rgba(255, 255, 255, 0.03); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            color: white; padding: 12px 16px; border-radius: 12px; width: 100%; font-size: 13px; 
-            transition: 0.2s;
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); 
+            color: white; padding: 12px 16px; border-radius: 12px; width: 100%; font-size: 13px; transition: 0.2s;
         }
-        .input-field:focus { 
-            background: rgba(255, 255, 255, 0.05);
-            border-color: var(--accent-cyan); 
-            box-shadow: 0 0 0 1px var(--accent-cyan);
-        }
+        .input-field:focus { background: rgba(255, 255, 255, 0.05); border-color: var(--accent-cyan); box-shadow: 0 0 0 1px var(--accent-cyan); }
 
-        /* Cards Glass */
         .glass-card {
-            background: rgba(20, 20, 20, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 24px;
+            background: rgba(20, 20, 20, 0.6); border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px; padding: 24px;
         }
 
-        /* Tabs Group */
-        .tab-group {
-            display: flex; background: rgba(255,255,255,0.03); 
-            padding: 4px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.05);
-            width: fit-content;
-        }
-        .tab {
-            padding: 8px 20px; font-size: 13px; color: var(--text-sec); 
-            cursor: pointer; border-radius: 100px; border: none; background: transparent;
-            transition: 0.3s; font-weight: 500;
-        }
+        .tab-group { display: flex; background: rgba(255,255,255,0.03); padding: 4px; border-radius: 100px; border: 1px solid rgba(255,255,255,0.05); width: fit-content; }
+        .tab { padding: 8px 20px; font-size: 13px; color: var(--text-sec); cursor: pointer; border-radius: 100px; border: none; background: transparent; transition: 0.3s; font-weight: 500; }
         .tab.active { background: rgba(255,255,255,0.1); color: white; font-weight: 600; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
 
         /* --- 4. LAYOUT --- */
-        aside.sidebar { 
-            width: 240px; 
-            background: var(--bg-sidebar); 
-            border-right: 1px solid rgba(255,255,255,0.03); 
-            display: flex; flex-direction: column; 
-            z-index: 20; 
-        }
-        
-        .brand { 
-            padding: 30px 24px; font-size: 18px; font-weight: 700; color: white; 
-            display: flex; align-items: center; gap: 10px;
-            letter-spacing: -0.5px;
-        }
+        aside.sidebar { width: 240px; background: var(--bg-sidebar); border-right: 1px solid rgba(255,255,255,0.03); display: flex; flex-direction: column; z-index: 20; }
+        .brand { padding: 30px 24px; font-size: 18px; font-weight: 700; color: white; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px; }
         
         .nav-menu { flex: 1; padding: 10px 16px; display: flex; flex-direction: column; gap: 4px; }
-        .nav-item { 
-            padding: 10px 16px; border-radius: 100px; 
-            color: var(--text-sec); font-size: 13px; font-weight: 500; 
-            cursor: pointer; display: flex; align-items: center; gap: 12px; 
-            transition: 0.2s;
-        }
+        .nav-item { padding: 10px 16px; border-radius: 100px; color: var(--text-sec); font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
         .nav-item:hover { color: white; background: rgba(255,255,255,0.03); }
         .nav-item.active { background: rgba(255,255,255,0.08); color: white; }
         .nav-item svg { width: 18px; height: 18px; opacity: 0.7; }
         .nav-item.active svg { opacity: 1; color: var(--accent-cyan); }
 
         main { flex: 1; display: flex; flex-direction: column; position: relative; }
-        
-        header.topbar { 
-            height: 80px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 0 40px; background: transparent; 
-        }
-
+        header.topbar { height: 80px; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; background: transparent; }
         .view-container { flex: 1; overflow-y: auto; padding: 0 40px 40px 40px; }
         .hidden { display: none !important; }
 
-        /* --- 5. DATA VISUALIZATION --- */
+        /* --- 5. DASHBOARD & TABLES --- */
         .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
         .kpi-title { font-size: 11px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;}
         .kpi-val { font-size: 28px; font-weight: 600; color: white; }
-        .kpi-trend { font-size: 12px; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
-        
         .chart-wrapper { height: 350px; position: relative; width: 100%; margin-top: 20px;}
 
-        /* --- 6. TABLE --- */
         .table-container { border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { 
-            background: rgba(255,255,255,0.02); padding: 16px 24px; 
-            color: var(--text-sec); font-weight: 500; font-size: 11px; 
-            text-transform: uppercase; text-align: left;
-        }
+        th { background: rgba(255,255,255,0.02); padding: 16px 24px; color: var(--text-sec); font-weight: 500; font-size: 11px; text-transform: uppercase; text-align: left; }
         td { padding: 16px 24px; border-bottom: 1px solid rgba(255,255,255,0.03); color: var(--text-main); }
-        tr:last-child td { border-bottom: none; }
         tr:hover td { background: rgba(255,255,255,0.02); }
         
-        .status-pill { 
-            padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 600; 
-            text-transform: uppercase; border: 1px solid transparent;
-        }
+        .status-pill { padding: 4px 10px; border-radius: 100px; font-size: 10px; font-weight: 600; text-transform: uppercase; border: 1px solid transparent; }
         .st-active { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); border-color: rgba(16, 185, 129, 0.2); }
         .st-paused { background: rgba(255, 255, 255, 0.05); color: var(--text-sec); border-color: rgba(255, 255, 255, 0.1); }
 
-        /* --- 7. GEMINI FLOATING BUTTON (NUEVO) --- */
+        /* --- 6. GEMINI FLOATING BTN --- */
         .gemini-float-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            top: auto;
-            
-            /* Estilo Liquid Glass Premium */
-            background: rgba(10, 10, 10, 0.6);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.3); /* Reflejo */
-            border-radius: 100px;
-            
-            padding: 10px 20px;
-            color: white;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            
+            position: fixed; bottom: 30px; right: 30px; z-index: 1000;
+            background: rgba(10, 10, 10, 0.6); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 100px; padding: 12px 24px;
+            color: white; font-size: 13px; font-weight: 600; cursor: pointer;
             display: flex; align-items: center; gap: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Efecto rebote */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: all 0.3s;
         }
-
-        .gemini-float-btn:hover {
-            transform: scale(1.05) translateY(-2px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 20px rgba(139, 92, 246, 0.2); /* Glow violeta */
-            border-color: rgba(139, 92, 246, 0.5);
-        }
-
-        .gemini-icon {
-            font-size: 16px;
-            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5));
-        }
+        .gemini-float-btn:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 15px 40px rgba(0,0,0,0.5), 0 0 20px rgba(139, 92, 246, 0.2); border-color: rgba(139, 92, 246, 0.5); }
+        .gemini-icon { font-size: 16px; background: linear-gradient(135deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5)); }
 
         /* AI SIDEBAR */
         .ai-sidebar { 
             position: fixed; top: 0; right: -420px; width: 420px; height: 100%; 
-            background: #0a0a0a; border-left: 1px solid var(--border-subtle); 
+            background: #0a0a0a; border-left: 1px solid rgba(255,255,255,0.1); 
             z-index: 999; transition: right 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-            display: flex; flex-direction: column;
-            box-shadow: -20px 0 50px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; box-shadow: -20px 0 50px rgba(0,0,0,0.5);
         }
         .ai-sidebar.open { right: 0; }
-        
         .ai-header { padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
         .chat-area { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
-        
         .msg { padding: 14px 18px; border-radius: 18px; font-size: 14px; line-height: 1.5; max-width: 85%; }
         .msg-ai { background: rgba(255,255,255,0.05); color: #e5e7eb; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
         .msg-user { background: white; color: black; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 500; }
 
-        /* --- 8. MODAL CAMPAÑA --- */
+        /* --- 7. MODALS --- */
         #campaign-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; }
         .modal-box { background: #0a0a0a; border: 1px solid rgba(255,255,255,0.1); padding: 32px; border-radius: 24px; width: 450px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        
+        #login-screen { position: fixed; inset: 0; background: #000; z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .login-box { background: #0a0a0a; padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
 
     </style>
 </head>
 <body>
 
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 style="font-size:24px; font-weight:700; margin-bottom:8px;">Abundance.</h2>
+            <p style="color:var(--text-sec); margin-bottom:24px;">Enterprise Growth OS</p>
+            <button class="btn btn-primary" id="btn-login-google" style="width:100%; justify-content:center;">
+                Ingresar con Google
+            </button>
+        </div>
+    </div>
+
     <button class="gemini-float-btn" onclick="toggleAI()">
-        <span class="gemini-icon">✦</span>
-        Gemini AI
+        <span class="gemini-icon">✦</span> Gemini AI
     </button>
 
     <aside class="sidebar">
-        <div class="brand">
-            Abundance.
-        </div>
+        <div class="brand">Abundance.</div>
         <nav class="nav-menu">
             <div class="nav-item active" onclick="nav('dash', this)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
@@ -280,40 +178,17 @@
     <main>
         <header class="topbar">
             <h2 id="page-title" style="font-size:16px; font-weight:500; color:var(--text-sec);">Resumen General</h2>
-            
-            <button class="btn" onclick="alert('Cambiando rango de fecha...')">
-                <span>📅 Este Mes</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
-            </button>
+            <button class="btn" onclick="alert('Cambiando rango de fecha...')">📅 Este Mes</button>
         </header>
 
         <div id="view-dash" class="view-container">
             <div class="kpi-grid">
-                <div class="glass-card">
-                    <div class="kpi-title">Inversión (Ad Spend)</div>
-                    <div class="kpi-val">$12,450</div>
-                    <div class="kpi-trend" style="color:var(--accent-green)">+12% vs. periodo anterior</div>
-                </div>
-                <div class="glass-card">
-                    <div class="kpi-title">ROAS Global</div>
-                    <div class="kpi-val">4.2x</div>
-                    <div class="kpi-trend" style="color:var(--accent-green)">+0.5 pts</div>
-                </div>
-                <div class="glass-card">
-                    <div class="kpi-title">Leads / Conversiones</div>
-                    <div class="kpi-val">845</div>
-                    <div class="kpi-trend" style="color:var(--text-sec)">-2% (Estable)</div>
-                </div>
-                <div class="glass-card">
-                    <div class="kpi-title">Ingreso Generado</div>
-                    <div class="kpi-val">$52,290</div>
-                    <div class="kpi-trend" style="color:var(--accent-green)">Record histórico</div>
-                </div>
+                <div class="glass-card"><div class="kpi-title">Inversión</div><div class="kpi-val">$12,450</div><div class="kpi-trend" style="color:var(--accent-green)">+12% vs anterior</div></div>
+                <div class="glass-card"><div class="kpi-title">ROAS Global</div><div class="kpi-val">4.2x</div><div class="kpi-trend" style="color:var(--accent-green)">+0.5 pts</div></div>
+                <div class="glass-card"><div class="kpi-title">Leads</div><div class="kpi-val">845</div><div class="kpi-trend" style="color:var(--text-sec)">-2% (Estable)</div></div>
+                <div class="glass-card"><div class="kpi-title">Ingresos</div><div class="kpi-val">$52,290</div><div class="kpi-trend" style="color:var(--accent-green)">Record histórico</div></div>
             </div>
-
-            <div class="glass-card chart-wrapper">
-                <canvas id="revenueChart"></canvas>
-            </div>
+            <div class="glass-card chart-wrapper"><canvas id="revenueChart"></canvas></div>
         </div>
 
         <div id="view-ads" class="view-container hidden">
@@ -324,438 +199,154 @@
                 </div>
                 <button class="btn-primary btn" onclick="document.getElementById('campaign-modal').style.display='flex'">+ Crear Campaña</button>
             </div>
-
             <div class="table-container">
                 <table>
-                    <thead>
-                        <tr>
-                            <th>Status</th>
-                            <th>Nombre Campaña</th>
-                            <th>Presupuesto</th>
-                            <th>Resultados</th>
-                            <th>Costo / Res</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="ads-table-body">
-                        </tbody>
+                    <thead><tr><th>Status</th><th>Campaña</th><th>Presupuesto</th><th>Resultados</th><th>Costo/Res</th><th>Acciones</th></tr></thead>
+                    <tbody id="ads-table-body"></tbody>
                 </table>
             </div>
         </div>
 
-        <div id="view-crm" class="view-container hidden">
-            <h2 style="margin-bottom:20px;">Gestión de Clientes</h2>
-            <div class="table-container">
-                <table>
-                    <thead><tr><th>Cliente</th><th>Plan</th><th>Estado</th><th>Ingreso Mensual</th></tr></thead>
-                    <tbody>
-                        <tr><td>Empresa A</td><td>Agency Pro</td><td><span class="status-pill st-active">Activo</span></td><td>$1,500</td></tr>
-                        <tr><td>Empresa B</td><td>Starter</td><td><span class="status-pill st-paused">Pendiente</span></td><td>$800</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div id="view-reports" class="view-container hidden">
-            <h2 style="margin-bottom:20px;">Reportes Generados</h2>
-            <div class="glass-card" style="text-align:center; padding: 60px;">
-                <div style="color:var(--text-sec); margin-bottom:20px;">No has generado reportes este mes.</div>
-                <button class="btn" style="margin:0 auto;" onclick="alert('Generando PDF...')">Generar Reporte PDF</button>
-            </div>
-        </div>
-
+        <div id="view-crm" class="view-container hidden"><h2 style="margin-bottom:20px;">Gestión de Clientes</h2><div class="glass-card">Próximamente: Tabla de Clientes Reales</div></div>
+        
+        <div id="view-reports" class="view-container hidden"><h2 style="margin-bottom:20px;">Reportes</h2><div class="glass-card">Próximamente: Generador PDF</div></div>
     </main>
 
     <aside class="ai-sidebar" id="ai-panel">
         <div class="ai-header">
-            <div style="font-weight:600; color:white; display:flex; align-items:center; gap:8px;">
-                <span style="color:var(--accent-purple)">✦</span> Gemini AI
-            </div>
+            <div style="font-weight:600; color:white; display:flex; align-items:center; gap:8px;"><span style="color:var(--accent-purple)">✦</span> Gemini AI</div>
             <button onclick="toggleAI()" style="background:none; border:none; color:var(--text-sec); cursor:pointer;">✕</button>
         </div>
-        <div class="chat-area" id="chat-feed">
-            <div class="msg msg-ai">Hola. Soy Gemini, integrado en Abundance. Estoy conectado a tus cuentas de Meta y Google. ¿Qué métrica quieres analizar hoy?</div>
-        </div>
-        <div style="padding:20px; border-top:1px solid rgba(255,255,255,0.05);">
-            <div style="display:flex; gap:10px;">
-                <input id="ai-input" class="input-field" placeholder="Escribe aquí..." onkeypress="if(event.key==='Enter') sendMsg()">
-                <button onclick="sendMsg()" class="btn btn-primary" style="padding:0 12px;">→</button>
-            </div>
+        <div class="chat-area" id="chat-feed"><div class="msg msg-ai">Hola. Soy Gemini. ¿Qué analizamos hoy?</div></div>
+        <div style="padding:20px; border-top:1px solid rgba(255,255,255,0.05); display:flex; gap:10px;">
+            <input id="ai-input" class="input-field" placeholder="Escribe aquí..." onkeypress="if(event.key==='Enter') sendMsg()">
+            <button onclick="sendMsg()" class="btn-primary btn" style="padding:0 14px;">→</button>
         </div>
     </aside>
 
     <div id="campaign-modal">
         <div class="modal-box">
             <h3 style="margin-bottom: 20px; font-weight:600;">Nueva Campaña</h3>
-            <label style="font-size:12px; color:var(--text-sec); display:block; margin-bottom:8px;">Nombre de la campaña</label>
-            <input type="text" class="input-field" placeholder="Ej: Black Friday Sales" style="margin-bottom: 20px;">
-            
-            <label style="font-size:12px; color:var(--text-sec); display:block; margin-bottom:8px;">Presupuesto Diario</label>
-            <input type="number" class="input-field" placeholder="$ 0.00" style="margin-bottom: 30px;">
-            
+            <input type="text" id="camp-name" class="input-field" placeholder="Nombre de Campaña" style="margin-bottom: 12px;">
+            <input type="number" id="camp-budget" class="input-field" placeholder="Presupuesto Diario ($)" style="margin-bottom: 24px;">
             <div style="display:flex; justify-content:flex-end; gap:10px;">
                 <button class="btn" onclick="document.getElementById('campaign-modal').style.display='none'">Cancelar</button>
-                <button class="btn-primary btn" onclick="alert('Campaña creada (Simulación)'); document.getElementById('campaign-modal').style.display='none'">Lanzar Campaña</button>
+                <button class="btn-primary btn" onclick="createCampaign()">Lanzar</button>
             </div>
         </div>
     </div>
 
-    <script>
-        // --- 1. NAVIGATION ---
-        function nav(viewId, el) {
-            document.querySelectorAll('.view-container').forEach(d => d.classList.add('hidden'));
-            document.getElementById('view-'+viewId).classList.remove('hidden');
-            
-            document.querySelectorAll('.nav-item').forEach(d => d.classList.remove('active'));
-            if(el) el.classList.add('active');
-
-            const titles = {'dash':'Resumen General', 'ads':'Gestor de Campañas', 'crm':'CRM Clientes', 'reports':'Reportes'};
-            document.getElementById('page-title').innerText = titles[viewId];
-        }
-
-        // --- 2. ADS LOGIC ---
-        const metaData = [
-            {id:1, name:'Prospecting - Cold Traffic', budget:'$100/d', res:'45 Leads', cpr:'$2.20', status:'active'},
-            {id:2, name:'Retargeting - Checkout', budget:'$50/d', res:'12 Sales', cpr:'$15.00', status:'active'},
-            {id:3, name:'Test Creativos - Feb', budget:'$20/d', res:'2 Leads', cpr:'$45.00', status:'paused'}
-        ];
-        const googleData = [
-            {id:4, name:'Search - Brand Keywords', budget:'$50/d', res:'80 Clics', cpr:'$0.60', status:'active'},
-            {id:5, name:'YouTube - Awareness', budget:'$30/d', res:'5k Views', cpr:'$0.02', status:'active'}
-        ];
-
-        function renderTable(data) {
-            const tbody = document.getElementById('ads-table-body');
-            tbody.innerHTML = data.map(item => `
-                <tr id="row-${item.id}">
-                    <td><span class="status-pill ${item.status === 'active' ? 'st-active' : 'st-paused'}">${item.status === 'active' ? 'Activo' : 'Pausado'}</span></td>
-                    <td style="font-weight:500; color:white;">${item.name}</td>
-                    <td style="color:var(--text-sec);">${item.budget}</td>
-                    <td>${item.res}</td>
-                    <td>${item.cpr}</td>
-                    <td><button class="btn" style="padding:4px 12px; font-size:11px;" onclick="toggleStatus(${item.id}, this)">${item.status === 'active' ? 'Pausar' : 'Activar'}</button></td>
-                </tr>
-            `).join('');
-        }
-
-        function switchAdsTab(platform) {
-            document.getElementById('tab-meta').className = platform === 'meta' ? 'tab active' : 'tab';
-            document.getElementById('tab-google').className = platform === 'google' ? 'tab active' : 'tab';
-            renderTable(platform === 'meta' ? metaData : googleData);
-        }
-
-        function toggleStatus(id, btn) {
-            const row = document.getElementById(`row-${id}`);
-            const pill = row.querySelector('.status-pill');
-            
-            if(pill.classList.contains('st-active')) {
-                pill.className = 'status-pill st-paused'; pill.innerText = 'Pausado'; btn.innerText = 'Activar';
-            } else {
-                pill.className = 'status-pill st-active'; pill.innerText = 'Activo'; btn.innerText = 'Pausar';
-            }
-        }
-
-        // --- 3. AI LOGIC ---
-        function toggleAI() {
-            document.getElementById('ai-panel').classList.toggle('open');
-        }
-
-        function sendMsg() {
-            const input = document.getElementById('ai-input');
-            const feed = document.getElementById('chat-feed');
-            if(!input.value.trim()) return;
-            
-            feed.innerHTML += `<div class="msg msg-user">${input.value}</div>`;
-            input.value = '';
-            feed.scrollTop = feed.scrollHeight;
-
-            setTimeout(() => {
-                feed.innerHTML += `<div class="msg msg-ai">Entendido. Estoy procesando esa solicitud con los datos actuales...</div>`;
-                feed.scrollTop = feed.scrollHeight;
-            }, 1000);
-        }
-
-        // --- 4. INIT CHART ---
-        const ctx = document.getElementById('revenueChart').getContext('2d');
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['1 Feb', '5 Feb', '10 Feb', '15 Feb', '20 Feb', '25 Feb'],
-                datasets: [{
-                    label: 'Ingresos ($)',
-                    data: [12000, 15000, 14000, 22000, 38000, 52000],
-                    borderColor: '#ffffff',
-                    backgroundColor: gradient,
-                    borderWidth: 1.5,
-                    pointRadius: 0,
-                    pointHoverRadius: 6,
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    x: { grid: { display: false }, ticks: { color: '#555' } },
-                    y: { grid: { color: '#222' }, ticks: { color: '#555' } }
-                }
-            }
-        });
-
-        // Load Default
-        renderTable(metaData);
-        <script type="module">
-        // 1. IMPORTACIONES DE FIREBASE
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, doc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // 2. CONFIGURACIÓN (Tus credenciales)
-        const firebaseConfig = {
+        // FIREBASE CONFIG
+        const app = initializeApp({
             apiKey: "AIzaSyADJ2mcVqCUBxAhS1K1fiL5zFGupm6CoWA",
             authDomain: "teamhub-app-e0269.firebaseapp.com",
             projectId: "teamhub-app-e0269",
             storageBucket: "teamhub-app-e0269.firebasestorage.app",
             messagingSenderId: "651905154908",
             appId: "1:651905154908:web:83975461f8215d89100b99"
-        };
-
-        const app = initializeApp(firebaseConfig);
+        });
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // 3. ESTADO GLOBAL DE LA APP
-        let state = {
-            user: null,
-            orgId: 'demo_org', // En el futuro esto vendrá del perfil del usuario
-            campaigns: [],
-            currentTab: 'meta' // 'meta' o 'google'
-        };
+        // STATE
+        let state = { orgId: 'demo_org', campaigns: [], currentTab: 'meta' };
 
-        // ---------------------------------------------------------
-        // A. SISTEMA DE AUTENTICACIÓN
-        // ---------------------------------------------------------
-        
-        // Exponer funciones al window para que los botones HTML funcionen
-        window.googleLogin = async () => {
-            try { await signInWithPopup(auth, new GoogleAuthProvider()); } 
-            catch (e) { console.error(e); alert("Error de acceso"); }
-        };
-
-        window.logout = () => signOut(auth);
-
+        // AUTH
+        window.googleLogin = async () => { try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e){ alert(e.message); } };
         onAuthStateChanged(auth, (user) => {
-            state.user = user;
-            const loginScreen = document.getElementById('login-screen');
-            
-            if (user) {
-                // Usuario logueado
-                loginScreen.style.display = 'none';
-                console.log("Usuario conectado:", user.email);
-                
-                // INICIAR ESCUCHA DE DATOS EN TIEMPO REAL
-                initRealtimeData(); 
-            } else {
-                // Usuario desconectado
-                loginScreen.style.display = 'flex';
-            }
+            document.getElementById('login-screen').style.display = user ? 'none' : 'flex';
+            if(user) initData();
         });
 
-        // ---------------------------------------------------------
-        // B. LÓGICA DE DATOS (CRUD)
-        // ---------------------------------------------------------
-
-        function initRealtimeData() {
-            // Escuchar cambios en la colección "campaigns"
-            // Filtramos por la organización actual para simular SaaS
-            const q = query(
-                collection(db, "campaigns"), 
-                where("orgId", "==", state.orgId),
-                orderBy("createdAt", "desc")
-            );
-
-            onSnapshot(q, (snapshot) => {
-                state.campaigns = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                // Cada vez que cambian los datos, redibujamos la tabla
+        // DATA
+        function initData() {
+            const q = query(collection(db, "campaigns"), where("orgId", "==", state.orgId), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snap) => {
+                state.campaigns = snap.docs.map(d => ({id:d.id, ...d.data()}));
                 renderAdsTable();
-                updateDashboardKPIs(); // Actualizar números del dashboard
             });
         }
 
-        // Función para crear campaña (Conectada al Modal)
+        // ACTIONS (Attached to Window for HTML access)
         window.createCampaign = async () => {
-            const nameInput = document.querySelector('#campaign-modal input[type="text"]');
-            const budgetInput = document.querySelector('#campaign-modal input[type="number"]');
+            const name = document.getElementById('camp-name').value;
+            const budget = document.getElementById('camp-budget').value;
+            if(!name || !budget) return alert("Completa los datos");
             
-            if (!nameInput.value || !budgetInput.value) return alert("Completa los campos");
-
-            const newCampaign = {
-                orgId: state.orgId,
-                name: nameInput.value,
-                budget: `$${budgetInput.value}/d`,
-                platform: state.currentTab, // 'meta' o 'google'
-                status: 'active',
-                results: '0', // Inicial en 0
-                costPerResult: '$0.00',
-                createdAt: Date.now()
-            };
-
-            try {
-                await addDoc(collection(db, "campaigns"), newCampaign);
-                
-                // Limpiar y cerrar modal
-                nameInput.value = '';
-                budgetInput.value = '';
-                document.getElementById('campaign-modal').style.display = 'none';
-                
-                // Feedback visual (opcional)
-                // alert("Campaña creada exitosamente"); 
-            } catch (e) {
-                console.error("Error creando campaña:", e);
-                alert("Error al guardar en base de datos");
-            }
+            await addDoc(collection(db, "campaigns"), {
+                orgId: state.orgId, name, budget: `$${budget}/d`, platform: state.currentTab,
+                status: 'active', results: '0', costPerResult: '$0.00', createdAt: Date.now()
+            });
+            document.getElementById('campaign-modal').style.display = 'none';
         };
 
-        // Función para Pausar/Activar (Update)
-        window.toggleStatus = async (id, currentStatus) => {
-            const newStatus = currentStatus === 'active' ? 'paused' : 'active';
-            const campaignRef = doc(db, "campaigns", id);
-            
-            try {
-                await updateDoc(campaignRef, { status: newStatus });
-            } catch (e) {
-                console.error("Error actualizando:", e);
-            }
+        window.toggleStatus = async (id, status) => {
+            await updateDoc(doc(db, "campaigns", id), { status: status === 'active' ? 'paused' : 'active' });
         };
 
-        // ---------------------------------------------------------
-        // C. RENDERIZADO (UI)
-        // ---------------------------------------------------------
+        // UI LOGIC
+        window.nav = (view, el) => {
+            document.querySelectorAll('.view-container').forEach(d => d.classList.add('hidden'));
+            document.getElementById('view-'+view).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(d => d.classList.remove('active'));
+            if(el) el.classList.add('active');
+            const titles = {'dash':'Resumen General', 'ads':'Ads Manager', 'crm':'Clientes', 'reports':'Reportes'};
+            document.getElementById('page-title').innerText = titles[view];
+        };
 
-        function renderAdsTable() {
-            const tbody = document.getElementById('ads-table-body');
-            
-            // Filtrar campañas según la pestaña activa (Meta o Google)
-            const filteredData = state.campaigns.filter(c => c.platform === state.currentTab);
-
-            if (filteredData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--text-sec);">No hay campañas de ${state.currentTab} activas. Crea una nueva.</td></tr>`;
-                return;
-            }
-
-            tbody.innerHTML = filteredData.map(item => `
-                <tr class="fade-in">
-                    <td>
-                        <span class="status-pill ${item.status === 'active' ? 'st-active' : 'st-paused'}">
-                            ${item.status === 'active' ? 'Activo' : 'Pausado'}
-                        </span>
-                    </td>
-                    <td style="font-weight:500; color:white;">${item.name}</td>
-                    <td style="color:var(--text-sec);">${item.budget}</td>
-                    <td>${item.results}</td>
-                    <td>${item.costPerResult}</td>
-                    <td>
-                        <button class="btn" style="padding:4px 12px; font-size:11px;" 
-                            onclick="toggleStatus('${item.id}', '${item.status}')">
-                            ${item.status === 'active' ? 'Pausar' : 'Activar'}
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function updateDashboardKPIs() {
-            // Ejemplo: Calcular inversión total sumando presupuestos (Simplificado)
-            // En un SaaS real, esto vendría de la API de Meta
-            const totalCampaigns = state.campaigns.length;
-            const activeCampaigns = state.campaigns.filter(c => c.status === 'active').length;
-            
-            // Aquí podrías actualizar el DOM del dashboard si quisieras
-            // document.getElementById('kpi-total-campaigns').innerText = totalCampaigns;
-        }
-
-        // ---------------------------------------------------------
-        // D. UTILIDADES UI
-        // ---------------------------------------------------------
-        
         window.switchAdsTab = (platform) => {
             state.currentTab = platform;
-            
-            // Actualizar clases visuales de los tabs
-            document.getElementById('tab-meta').className = platform === 'meta' ? 'tab active' : 'tab';
-            document.getElementById('tab-google').className = platform === 'google' ? 'tab active' : 'tab';
-            
-            // Redibujar tabla
+            document.getElementById('tab-meta').className = platform==='meta'?'tab active':'tab';
+            document.getElementById('tab-google').className = platform==='google'?'tab active':'tab';
             renderAdsTable();
         };
 
-        window.nav = (viewId, el) => {
-            document.querySelectorAll('.view-container').forEach(d => d.classList.add('hidden'));
-            document.getElementById('view-'+viewId).classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(d => d.classList.remove('active'));
-            if(el) el.classList.add('active');
+        function renderAdsTable() {
+            const tbody = document.getElementById('ads-table-body');
+            const data = state.campaigns.filter(c => c.platform === state.currentTab);
             
-            const titles = {'dash':'Resumen General', 'ads':'Gestor de Campañas', 'crm':'CRM Clientes', 'reports':'Reportes'};
-            document.getElementById('page-title').innerText = titles[viewId];
+            if(data.length === 0) { tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:30px; color:gray;">No hay campañas activas.</td></tr>`; return; }
+
+            tbody.innerHTML = data.map(c => `
+                <tr>
+                    <td><span class="status-pill ${c.status==='active'?'st-active':'st-paused'}">${c.status}</span></td>
+                    <td style="font-weight:500; color:white;">${c.name}</td>
+                    <td style="color:gray;">${c.budget}</td>
+                    <td>${c.results}</td>
+                    <td>${c.costPerResult}</td>
+                    <td><button class="btn" style="padding:4px 12px; font-size:11px;" onclick="toggleStatus('${c.id}', '${c.status}')">${c.status==='active'?'Pausar':'Activar'}</button></td>
+                </tr>`).join('');
+        }
+
+        window.toggleAI = () => document.getElementById('ai-panel').classList.toggle('open');
+        
+        window.sendMsg = () => {
+            const i = document.getElementById('ai-input');
+            const f = document.getElementById('chat-feed');
+            if(!i.value) return;
+            f.innerHTML += `<div class="msg msg-user">${i.value}</div>`;
+            i.value = '';
+            setTimeout(() => { f.innerHTML += `<div class="msg msg-ai">Analizando datos... (Simulado)</div>`; f.scrollTop=f.scrollHeight; }, 1000);
         };
 
-        // Copilot / Gemini Toggle
-        window.toggleAI = () => document.getElementById('ai-panel').classList.toggle('open');
+        document.getElementById('btn-login-google').onclick = window.googleLogin;
 
-        // Asignar eventos a los botones de login del HTML (si no usan onclick inline)
-        const loginBtn = document.getElementById('btn-login-google');
-        if(loginBtn) loginBtn.onclick = window.googleLogin;
-
-        // Render inicial de gráficos (Chart.js)
-        initChart();
-
-        function initChart() {
-            const ctx = document.getElementById('revenueChart');
-            if(!ctx) return;
-            
-            const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
-            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['1 Feb', '5 Feb', '10 Feb', '15 Feb', '20 Feb', '25 Feb'],
-                    datasets: [{
-                        label: 'Ingresos ($)',
-                        data: [12000, 15000, 14000, 22000, 38000, 52000],
-                        borderColor: '#ffffff',
-                        backgroundColor: gradient,
-                        borderWidth: 1.5,
-                        pointRadius: 0,
-                        pointHoverRadius: 6,
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#555' } },
-                        y: { grid: { color: '#222' }, ticks: { color: '#555' } }
-                    }
-                }
-            });
-        }
-    </script>
+        // INIT CHART
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const grad = ctx.createLinearGradient(0,0,0,400); grad.addColorStop(0,'rgba(255,255,255,0.1)'); grad.addColorStop(1,'transparent');
+        new Chart(ctx, {
+            type: 'line',
+            data: { 
+                labels: ['1 Feb','5 Feb','10 Feb','15 Feb','20 Feb','25 Feb'], 
+                datasets: [{ label: 'Revenue', data: [12000,15000,14000,22000,38000,52000], borderColor:'#fff', backgroundColor:grad, fill:true, tension:0.4, pointRadius:0 }] 
+            },
+            options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'#222'}}} }
+        });
     </script>
 </body>
 </html>
-
-
