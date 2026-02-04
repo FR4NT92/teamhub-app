@@ -510,7 +510,252 @@
 
         // Load Default
         renderTable(metaData);
+        <script type="module">
+        // 1. IMPORTACIONES DE FIREBASE
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // 2. CONFIGURACIÓN (Tus credenciales)
+        const firebaseConfig = {
+            apiKey: "AIzaSyADJ2mcVqCUBxAhS1K1fiL5zFGupm6CoWA",
+            authDomain: "teamhub-app-e0269.firebaseapp.com",
+            projectId: "teamhub-app-e0269",
+            storageBucket: "teamhub-app-e0269.firebasestorage.app",
+            messagingSenderId: "651905154908",
+            appId: "1:651905154908:web:83975461f8215d89100b99"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // 3. ESTADO GLOBAL DE LA APP
+        let state = {
+            user: null,
+            orgId: 'demo_org', // En el futuro esto vendrá del perfil del usuario
+            campaigns: [],
+            currentTab: 'meta' // 'meta' o 'google'
+        };
+
+        // ---------------------------------------------------------
+        // A. SISTEMA DE AUTENTICACIÓN
+        // ---------------------------------------------------------
+        
+        // Exponer funciones al window para que los botones HTML funcionen
+        window.googleLogin = async () => {
+            try { await signInWithPopup(auth, new GoogleAuthProvider()); } 
+            catch (e) { console.error(e); alert("Error de acceso"); }
+        };
+
+        window.logout = () => signOut(auth);
+
+        onAuthStateChanged(auth, (user) => {
+            state.user = user;
+            const loginScreen = document.getElementById('login-screen');
+            
+            if (user) {
+                // Usuario logueado
+                loginScreen.style.display = 'none';
+                console.log("Usuario conectado:", user.email);
+                
+                // INICIAR ESCUCHA DE DATOS EN TIEMPO REAL
+                initRealtimeData(); 
+            } else {
+                // Usuario desconectado
+                loginScreen.style.display = 'flex';
+            }
+        });
+
+        // ---------------------------------------------------------
+        // B. LÓGICA DE DATOS (CRUD)
+        // ---------------------------------------------------------
+
+        function initRealtimeData() {
+            // Escuchar cambios en la colección "campaigns"
+            // Filtramos por la organización actual para simular SaaS
+            const q = query(
+                collection(db, "campaigns"), 
+                where("orgId", "==", state.orgId),
+                orderBy("createdAt", "desc")
+            );
+
+            onSnapshot(q, (snapshot) => {
+                state.campaigns = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                // Cada vez que cambian los datos, redibujamos la tabla
+                renderAdsTable();
+                updateDashboardKPIs(); // Actualizar números del dashboard
+            });
+        }
+
+        // Función para crear campaña (Conectada al Modal)
+        window.createCampaign = async () => {
+            const nameInput = document.querySelector('#campaign-modal input[type="text"]');
+            const budgetInput = document.querySelector('#campaign-modal input[type="number"]');
+            
+            if (!nameInput.value || !budgetInput.value) return alert("Completa los campos");
+
+            const newCampaign = {
+                orgId: state.orgId,
+                name: nameInput.value,
+                budget: `$${budgetInput.value}/d`,
+                platform: state.currentTab, // 'meta' o 'google'
+                status: 'active',
+                results: '0', // Inicial en 0
+                costPerResult: '$0.00',
+                createdAt: Date.now()
+            };
+
+            try {
+                await addDoc(collection(db, "campaigns"), newCampaign);
+                
+                // Limpiar y cerrar modal
+                nameInput.value = '';
+                budgetInput.value = '';
+                document.getElementById('campaign-modal').style.display = 'none';
+                
+                // Feedback visual (opcional)
+                // alert("Campaña creada exitosamente"); 
+            } catch (e) {
+                console.error("Error creando campaña:", e);
+                alert("Error al guardar en base de datos");
+            }
+        };
+
+        // Función para Pausar/Activar (Update)
+        window.toggleStatus = async (id, currentStatus) => {
+            const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+            const campaignRef = doc(db, "campaigns", id);
+            
+            try {
+                await updateDoc(campaignRef, { status: newStatus });
+            } catch (e) {
+                console.error("Error actualizando:", e);
+            }
+        };
+
+        // ---------------------------------------------------------
+        // C. RENDERIZADO (UI)
+        // ---------------------------------------------------------
+
+        function renderAdsTable() {
+            const tbody = document.getElementById('ads-table-body');
+            
+            // Filtrar campañas según la pestaña activa (Meta o Google)
+            const filteredData = state.campaigns.filter(c => c.platform === state.currentTab);
+
+            if (filteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:40px; color:var(--text-sec);">No hay campañas de ${state.currentTab} activas. Crea una nueva.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filteredData.map(item => `
+                <tr class="fade-in">
+                    <td>
+                        <span class="status-pill ${item.status === 'active' ? 'st-active' : 'st-paused'}">
+                            ${item.status === 'active' ? 'Activo' : 'Pausado'}
+                        </span>
+                    </td>
+                    <td style="font-weight:500; color:white;">${item.name}</td>
+                    <td style="color:var(--text-sec);">${item.budget}</td>
+                    <td>${item.results}</td>
+                    <td>${item.costPerResult}</td>
+                    <td>
+                        <button class="btn" style="padding:4px 12px; font-size:11px;" 
+                            onclick="toggleStatus('${item.id}', '${item.status}')">
+                            ${item.status === 'active' ? 'Pausar' : 'Activar'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateDashboardKPIs() {
+            // Ejemplo: Calcular inversión total sumando presupuestos (Simplificado)
+            // En un SaaS real, esto vendría de la API de Meta
+            const totalCampaigns = state.campaigns.length;
+            const activeCampaigns = state.campaigns.filter(c => c.status === 'active').length;
+            
+            // Aquí podrías actualizar el DOM del dashboard si quisieras
+            // document.getElementById('kpi-total-campaigns').innerText = totalCampaigns;
+        }
+
+        // ---------------------------------------------------------
+        // D. UTILIDADES UI
+        // ---------------------------------------------------------
+        
+        window.switchAdsTab = (platform) => {
+            state.currentTab = platform;
+            
+            // Actualizar clases visuales de los tabs
+            document.getElementById('tab-meta').className = platform === 'meta' ? 'tab active' : 'tab';
+            document.getElementById('tab-google').className = platform === 'google' ? 'tab active' : 'tab';
+            
+            // Redibujar tabla
+            renderAdsTable();
+        };
+
+        window.nav = (viewId, el) => {
+            document.querySelectorAll('.view-container').forEach(d => d.classList.add('hidden'));
+            document.getElementById('view-'+viewId).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(d => d.classList.remove('active'));
+            if(el) el.classList.add('active');
+            
+            const titles = {'dash':'Resumen General', 'ads':'Gestor de Campañas', 'crm':'CRM Clientes', 'reports':'Reportes'};
+            document.getElementById('page-title').innerText = titles[viewId];
+        };
+
+        // Copilot / Gemini Toggle
+        window.toggleAI = () => document.getElementById('ai-panel').classList.toggle('open');
+
+        // Asignar eventos a los botones de login del HTML (si no usan onclick inline)
+        const loginBtn = document.getElementById('btn-login-google');
+        if(loginBtn) loginBtn.onclick = window.googleLogin;
+
+        // Render inicial de gráficos (Chart.js)
+        initChart();
+
+        function initChart() {
+            const ctx = document.getElementById('revenueChart');
+            if(!ctx) return;
+            
+            const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)');
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['1 Feb', '5 Feb', '10 Feb', '15 Feb', '20 Feb', '25 Feb'],
+                    datasets: [{
+                        label: 'Ingresos ($)',
+                        data: [12000, 15000, 14000, 22000, 38000, 52000],
+                        borderColor: '#ffffff',
+                        backgroundColor: gradient,
+                        borderWidth: 1.5,
+                        pointRadius: 0,
+                        pointHoverRadius: 6,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#555' } },
+                        y: { grid: { color: '#222' }, ticks: { color: '#555' } }
+                    }
+                }
+            });
+        }
+    </script>
     </script>
 </body>
 </html>
+
 
