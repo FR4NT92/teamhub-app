@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Abundance - Growth OS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="ISO.png"> <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* --- 1. CORE VARIABLES (LIQUID ONYX) --- */
@@ -42,6 +43,7 @@
             border-top: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             color: var(--text-sec);
+            position: relative; /* Necesario para dropdowns */
         }
         .btn:hover {
             background: rgba(255, 255, 255, 0.08); border-top-color: rgba(255, 255, 255, 0.3);
@@ -69,9 +71,31 @@
         .tab { padding: 8px 20px; font-size: 13px; color: var(--text-sec); cursor: pointer; border-radius: 100px; border: none; background: transparent; transition: 0.3s; font-weight: 500; }
         .tab.active { background: rgba(255,255,255,0.1); color: white; font-weight: 600; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
 
+        /* DROPDOWN MENU (Fix Calendario) */
+        .dropdown-menu {
+            position: absolute; top: 110%; right: 0; 
+            background: #111; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 6px; width: 180px;
+            display: none; flex-direction: column; gap: 2px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100;
+        }
+        .dropdown-menu.show { display: flex; animation: fadeIn 0.2s ease; }
+        .dropdown-item {
+            padding: 8px 12px; font-size: 13px; color: var(--text-sec);
+            cursor: pointer; border-radius: 8px; transition: 0.2s;
+        }
+        .dropdown-item:hover { background: rgba(255,255,255,0.1); color: white; }
+        .dropdown-item.active { background: var(--accent-cyan); color: black; font-weight: 600; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:translateY(0); } }
+
         /* --- 4. LAYOUT --- */
         aside.sidebar { width: 240px; background: var(--bg-sidebar); border-right: 1px solid rgba(255,255,255,0.03); display: flex; flex-direction: column; z-index: 20; }
-        .brand { padding: 30px 24px; font-size: 18px; font-weight: 700; color: white; display: flex; align-items: center; gap: 10px; letter-spacing: -0.5px; }
+        .brand { 
+            padding: 30px 24px; 
+            display: flex; align-items: center; 
+            /* Logo Horizontal aquí */
+        }
+        .brand img { height: 24px; opacity: 0.9; } /* Ajuste de logo */
         
         .nav-menu { flex: 1; padding: 10px 16px; display: flex; flex-direction: column; gap: 4px; }
         .nav-item { padding: 10px 16px; border-radius: 100px; color: var(--text-sec); font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; }
@@ -141,7 +165,7 @@
 
     <div id="login-screen">
         <div class="login-box">
-            <h2 style="font-size:24px; font-weight:700; margin-bottom:8px;">Abundance.</h2>
+            <img src="LOGO HORIZONTAL.png" alt="Abundance" style="height: 30px; margin-bottom: 20px;">
             <p style="color:var(--text-sec); margin-bottom:24px;">Enterprise Growth OS</p>
             <button class="btn btn-primary" id="btn-login-google" style="width:100%; justify-content:center;">
                 Ingresar con Google
@@ -154,7 +178,9 @@
     </button>
 
     <aside class="sidebar">
-        <div class="brand">Abundance.</div>
+        <div class="brand">
+            <img src="LOGO HORIZONTAL.png" alt="Abundance Logo" style="height: 22px;">
+        </div>
         <nav class="nav-menu">
             <div class="nav-item active" onclick="nav('dash', this)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
@@ -178,7 +204,17 @@
     <main>
         <header class="topbar">
             <h2 id="page-title" style="font-size:16px; font-weight:500; color:var(--text-sec);">Resumen General</h2>
-            <button class="btn" onclick="alert('Cambiando rango de fecha...')">📅 Este Mes</button>
+            
+            <div style="position: relative;">
+                <button class="btn" id="calendar-btn" onclick="toggleCalendar(event)">
+                    📅 <span id="selected-date">Este Mes</span> ▾
+                </button>
+                <div id="calendar-menu" class="dropdown-menu">
+                    <div class="dropdown-item active" onclick="selectDate('Este Mes', this)">Este Mes</div>
+                    <div class="dropdown-item" onclick="selectDate('Mes Pasado', this)">Mes Pasado</div>
+                    <div class="dropdown-item" onclick="selectDate('Último Trimestre', this)">Último Trimestre</div>
+                </div>
+            </div>
         </header>
 
         <div id="view-dash" class="view-container">
@@ -272,7 +308,7 @@
             });
         }
 
-        // ACTIONS (Attached to Window for HTML access)
+        // ACTIONS
         window.createCampaign = async () => {
             const name = document.getElementById('camp-name').value;
             const budget = document.getElementById('camp-budget').value;
@@ -333,6 +369,20 @@
             i.value = '';
             setTimeout(() => { f.innerHTML += `<div class="msg msg-ai">Analizando datos... (Simulado)</div>`; f.scrollTop=f.scrollHeight; }, 1000);
         };
+
+        // CALENDAR DROPDOWN FIX
+        window.toggleCalendar = (e) => {
+            e.stopPropagation();
+            document.getElementById('calendar-menu').classList.toggle('show');
+        }
+        window.selectDate = (txt, el) => {
+            document.getElementById('selected-date').innerText = txt;
+            document.querySelectorAll('.dropdown-item').forEach(d => d.classList.remove('active'));
+            el.classList.add('active');
+        }
+        window.onclick = (e) => {
+            if(!e.target.closest('#calendar-btn')) document.getElementById('calendar-menu').classList.remove('show');
+        }
 
         document.getElementById('btn-login-google').onclick = window.googleLogin;
 
