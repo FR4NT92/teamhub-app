@@ -156,12 +156,27 @@
         .msg-ai { background: rgba(255,255,255,0.05); color: #e5e7eb; align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
         .msg-user { background: white; color: black; align-self: flex-end; border-bottom-right-radius: 4px; font-weight: 500; }
 
-        /* --- 7. MODALS --- */
+        /* --- 7. MODALS & LOGIN SCREEN --- */
         #campaign-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000; justify-content: center; align-items: center; }
         .modal-box { background: #0a0a0a; border: 1px solid rgba(255,255,255,0.1); padding: 32px; border-radius: 24px; width: 450px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         
-        #login-screen { position: fixed; inset: 0; background: #000; z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .login-box { background: #0a0a0a; padding: 40px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+        /* LOGIN SCREEN CON DEGRADADO SUTIL */
+        #login-screen { 
+            position: fixed; inset: 0; z-index: 3000; 
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            background-color: var(--bg-body);
+            /* Degradado sutil inspirado en la referencia */
+            background-image: 
+                radial-gradient(circle at 50% 30%, rgba(120, 119, 198, 0.15), transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 199, 183, 0.1), transparent 50%);
+        }
+        .login-box { 
+            background: rgba(10, 10, 10, 0.7); /* Un poco más transparente */
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 40px; border-radius: 24px; 
+            border: 1px solid rgba(255,255,255,0.1); text-align: center; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
 
     </style>
 </head>
@@ -171,7 +186,7 @@
         <div class="login-box">
             <img src="LOGO HORIZONTAL.png" alt="Abundance" style="height: 30px; margin-bottom: 20px; display:block; margin-left:auto; margin-right:auto;">
             <p style="color:var(--text-sec); margin-bottom:24px;">Enterprise Growth OS</p>
-            <button class="btn btn-primary" id="btn-login-google" style="width:100%; justify-content:center;">
+            <button class="btn btn-primary" id="btn-login-google" style="width:100%; justify-content:center;" onclick="googleLogin()">
                 Ingresar con Google
             </button>
         </div>
@@ -289,16 +304,13 @@
 
         // --- 🔴 IMPORTANTE: REEMPLAZA ESTO CON TUS DATOS DE FIREBASE 🔴 ---
         const firebaseConfig = {
-  apiKey: "AIzaSyDGWfj8yoNEBGnKr-5PNh5w9iPeVu8ijk8",
-  authDomain: "abundance-98670.firebaseapp.com",
-  projectId: "abundance-98670",
-  storageBucket: "abundance-98670.firebasestorage.app",
-  messagingSenderId: "269658460750",
-  appId: "1:269658460750:web:e0953ac63e983b33d2a91f"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+            apiKey: "TU_API_KEY_AQUI",
+            authDomain: "TU_PROJECT.firebaseapp.com",
+            projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_PROJECT.firebasestorage.app",
+            messagingSenderId: "NUMERO",
+            appId: "APP_ID"
+        };
 
         // NOTA: Si no tienes los datos, sigue el manual de abajo para conseguirlos.
         
@@ -308,20 +320,32 @@ const app = initializeApp(firebaseConfig);
             app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
+            console.log("Firebase inicializado correctamente");
         } catch (e) {
             console.error("Error iniciando Firebase (Probablemente faltan las credenciales):", e);
+            alert("Error de configuración: Faltan las credenciales de Firebase en el código.");
         }
 
         // STATE
         let state = { orgId: null, campaigns: [], currentTab: 'meta' };
 
         // AUTH & ONBOARDING (MULTI-TENANT)
-        window.googleLogin = async () => { try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e){ alert(e.message); } };
+        window.googleLogin = async () => { 
+            if (!auth) return alert("Firebase no está configurado.");
+            try { 
+                console.log("Intentando login con Google...");
+                await signInWithPopup(auth, new GoogleAuthProvider()); 
+            } catch(e){ 
+                console.error("Error de login:", e);
+                alert("Error al iniciar sesión: " + e.message); 
+            } 
+        };
         
         if (auth) {
             onAuthStateChanged(auth, async (user) => {
                 const loginScreen = document.getElementById('login-screen');
                 if (user) {
+                    console.log("Usuario detectado:", user.email);
                     loginScreen.style.display = 'none';
                     
                     // ONBOARDING: Chequear si usuario existe, si no, crear Org
@@ -330,7 +354,9 @@ const app = initializeApp(firebaseConfig);
 
                     if (userSnap.exists()) {
                         state.orgId = userSnap.data().orgId;
+                        console.log("Organización existente cargada:", state.orgId);
                     } else {
+                        console.log("Usuario nuevo. Creando organización...");
                         // Crear Nuevo Usuario y Organización
                         const newOrgId = "org_" + user.uid;
                         await setDoc(userRef, { email: user.email, name: user.displayName, orgId: newOrgId, role: 'owner' });
@@ -340,6 +366,7 @@ const app = initializeApp(firebaseConfig);
                     
                     initData();
                 } else {
+                    console.log("No hay usuario activo. Mostrando login.");
                     loginScreen.style.display = 'flex';
                 }
             });
@@ -348,10 +375,13 @@ const app = initializeApp(firebaseConfig);
         // DATA
         function initData() {
             if (!state.orgId) return;
+            console.log("Iniciando escucha de datos para:", state.orgId);
             const q = query(collection(db, "campaigns"), where("orgId", "==", state.orgId), orderBy("createdAt", "desc"));
             onSnapshot(q, (snap) => {
                 state.campaigns = snap.docs.map(d => ({id:d.id, ...d.data()}));
                 renderAdsTable();
+            }, (error) => {
+                console.error("Error obteniendo datos (posiblemente permisos de Firestore):", error);
             });
         }
 
@@ -445,9 +475,6 @@ const app = initializeApp(firebaseConfig);
             if(!e.target.closest('#calendar-btn')) document.getElementById('calendar-menu').classList.remove('show');
         }
 
-        const loginBtn = document.getElementById('btn-login-google');
-        if(loginBtn) loginBtn.onclick = window.googleLogin;
-
         // INIT CHART
         const ctx = document.getElementById('revenueChart').getContext('2d');
         const grad = ctx.createLinearGradient(0,0,0,400); grad.addColorStop(0,'rgba(255,255,255,0.1)'); grad.addColorStop(1,'transparent');
@@ -462,4 +489,3 @@ const app = initializeApp(firebaseConfig);
     </script>
 </body>
 </html>
-
