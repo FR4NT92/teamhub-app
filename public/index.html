@@ -20,6 +20,8 @@
             --text-sec: #9ca3af;      
             --accent-cyan: #00c7b7;    
             --accent-purple: #8b5cf6;
+            --accent-green: #10b981;   
+            --accent-red: #ef4444;     
             --font-main: 'Inter', sans-serif;
         }
 
@@ -193,14 +195,14 @@
                 Enterprise Growth Operating System
             </p>
             
-            <button class="btn btn-primary" style="width:100%; justify-content:center; padding: 12px;" onclick="googleLogin()">
+            <button class="btn btn-primary" id="btn-login-google" style="width:100%; justify-content:center; padding: 12px;">
                 <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:8px;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#000"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#000"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#000"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#000"/></svg>
                 Ingresar con Google
             </button>
         </div>
     </div>
 
-    <button class="gemini-float-btn" onclick="toggleAI()">
+    <button class="gemini-float-btn" id="btn-toggle-ai">
         <span class="gemini-icon">✦</span> Gemini AI
     </button>
 
@@ -209,19 +211,19 @@
             <img src="LOGO HORIZONTAL.png" alt="Abundance" style="height: 24px;">
         </div>
         <nav class="nav-menu">
-            <div class="nav-item active" onclick="nav('dash', this)">
+            <div class="nav-item active" id="nav-dash">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                 Dashboard
             </div>
-            <div class="nav-item" onclick="nav('ads', this)">
+            <div class="nav-item" id="nav-ads">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path></svg>
                 Ads Manager
             </div>
-            <div class="nav-item" onclick="nav('crm', this)">
+            <div class="nav-item" id="nav-crm">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                 Clientes
             </div>
-            <div class="nav-item" onclick="nav('reports', this)">
+            <div class="nav-item" id="nav-reports">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
                 Reportes
             </div>
@@ -233,13 +235,13 @@
             <h2 id="page-title" style="font-size:16px; font-weight:500; color:var(--text-sec);">Resumen General</h2>
             
             <div style="position: relative;">
-                <button class="btn" id="calendar-btn" onclick="toggleCalendar(event)">
+                <button class="btn" id="calendar-btn">
                     📅 <span id="selected-date">Este Mes</span> ▾
                 </button>
                 <div id="calendar-menu" class="dropdown-menu">
-                    <div class="dropdown-item active" onclick="selectDate('Este Mes', this)">Este Mes</div>
-                    <div class="dropdown-item" onclick="selectDate('Mes Pasado', this)">Mes Pasado</div>
-                    <div class="dropdown-item" onclick="selectDate('Último Trimestre', this)">Último Trimestre</div>
+                    <div class="dropdown-item active" data-range="Este Mes">Este Mes</div>
+                    <div class="dropdown-item" data-range="Mes Pasado">Mes Pasado</div>
+                    <div class="dropdown-item" data-range="Último Trimestre">Último Trimestre</div>
                 </div>
             </div>
         </header>
@@ -257,10 +259,10 @@
         <div id="view-ads" class="view-container hidden">
             <div style="display:flex; justify-content:space-between; margin-bottom:24px;">
                 <div class="tab-group">
-                    <button id="tab-meta" class="tab active" onclick="switchAdsTab('meta')">Meta Ads</button>
-                    <button id="tab-google" class="tab" onclick="switchAdsTab('google')">Google Ads</button>
+                    <button id="tab-meta" class="tab active">Meta Ads</button>
+                    <button id="tab-google" class="tab">Google Ads</button>
                 </div>
-                <button class="btn-primary btn" onclick="document.getElementById('campaign-modal').style.display='flex'">+ Crear Campaña</button>
+                <button class="btn-primary btn" id="btn-create-campaign">+ Crear Campaña</button>
             </div>
             <div class="table-container">
                 <table>
@@ -276,7 +278,7 @@
             <h2 style="margin-bottom:20px;">Reportes</h2>
             <div class="glass-card" style="text-align:center; padding: 60px;">
                 <div style="color:var(--text-sec); margin-bottom:20px;">Descarga un PDF con el estado actual del Dashboard.</div>
-                <button class="btn btn-primary" style="margin:0 auto;" onclick="generatePDF()">📄 Descargar Reporte PDF</button>
+                <button class="btn btn-primary" style="margin:0 auto;" id="btn-download-pdf">📄 Descargar Reporte PDF</button>
             </div>
         </div>
     </main>
@@ -284,12 +286,12 @@
     <aside class="ai-sidebar" id="ai-panel">
         <div class="ai-header">
             <div style="font-weight:600; color:white; display:flex; align-items:center; gap:8px;"><span style="color:var(--accent-purple)">✦</span> Gemini AI</div>
-            <button onclick="toggleAI()" style="background:none; border:none; color:var(--text-sec); cursor:pointer;">✕</button>
+            <button id="btn-close-ai" style="background:none; border:none; color:var(--text-sec); cursor:pointer;">✕</button>
         </div>
         <div class="chat-area" id="chat-feed"><div class="msg msg-ai">Hola. Soy Gemini. ¿Qué analizamos hoy?</div></div>
         <div style="padding:20px; border-top:1px solid rgba(255,255,255,0.05); display:flex; gap:10px;">
-            <input id="ai-input" class="input-field" placeholder="Escribe aquí..." onkeypress="if(event.key==='Enter') sendMsg()">
-            <button onclick="sendMsg()" class="btn-primary btn" style="padding:0 14px;">→</button>
+            <input id="ai-input" class="input-field" placeholder="Escribe aquí...">
+            <button id="btn-send-ai" class="btn-primary btn" style="padding:0 14px;">→</button>
         </div>
     </aside>
 
@@ -299,8 +301,8 @@
             <input type="text" id="camp-name" class="input-field" placeholder="Nombre de Campaña" style="margin-bottom: 12px;">
             <input type="number" id="camp-budget" class="input-field" placeholder="Presupuesto Diario ($)" style="margin-bottom: 24px;">
             <div style="display:flex; justify-content:flex-end; gap:10px;">
-                <button class="btn" onclick="document.getElementById('campaign-modal').style.display='none'">Cancelar</button>
-                <button class="btn-primary btn" onclick="createCampaign()">Lanzar</button>
+                <button class="btn" id="btn-cancel-modal">Cancelar</button>
+                <button class="btn-primary btn" id="btn-confirm-campaign">Lanzar</button>
             </div>
         </div>
     </div>
@@ -310,55 +312,53 @@
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, doc, query, where, orderBy, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // --- 🔴 IMPORTANTE: BORRA ESTO Y PEGA LO QUE TE DA FIREBASE 🔴 ---
+        // TUS CREDENCIALES
         const firebaseConfig = {
-  apiKey: "AIzaSyDGWfj8yoNEBGnKr-5PNh5w9iPeVu8ijk8",
-  authDomain: "abundance-98670.firebaseapp.com",
-  projectId: "abundance-98670",
-  storageBucket: "abundance-98670.firebasestorage.app",
-  messagingSenderId: "269658460750",
-  appId: "1:269658460750:web:e0953ac63e983b33d2a91f"
-};
+            apiKey: "AIzaSyDGWfj8yoNEBGnKr-5PNh5w9iPeVu8ijk8",
+            authDomain: "abundance-98670.firebaseapp.com",
+            projectId: "abundance-98670",
+            storageBucket: "abundance-98670.firebasestorage.app",
+            messagingSenderId: "269658460750",
+            appId: "1:269658460750:web:e0953ac63e983b33d2a91f"
+        };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-        // -----------------------------------------------------------------
-
-        // Inicialización de Firebase
         let app, db, auth;
         try {
             app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             auth = getAuth(app);
+            console.log("🔥 Firebase inicializado.");
         } catch (e) {
-            console.error("Error iniciando Firebase:", e);
+            console.error("🔥 Error Firebase:", e);
         }
 
-        // STATE
         let state = { orgId: null, campaigns: [], currentTab: 'meta' };
 
-        // AUTH & ONBOARDING (Función Global para el Botón)
-        window.googleLogin = async () => { 
-            // Verificación simple para no romper todo si no hay config
-            if (firebaseConfig.apiKey === "TU_API_KEY_AQUI") {
-                alert("⚠️ FALTA CONFIGURACIÓN: Tienes que pegar tus claves de Firebase en el código (Línea 320 aprox) para que esto funcione.");
-                return;
-            }
-            try { 
-                await signInWithPopup(auth, new GoogleAuthProvider()); 
-            } catch(e){ 
-                console.error("Login Error:", e);
-                alert("Error de Login: " + e.message); 
-            } 
-        };
+        // --- AUTH LOGIC (BINDING EVENTS) ---
+        const loginBtn = document.getElementById('btn-login-google');
         
+        async function handleLogin() {
+            try {
+                console.log("Iniciando popup...");
+                await signInWithPopup(auth, new GoogleAuthProvider());
+            } catch (e) {
+                console.error("Login falló:", e);
+                alert("Error de autenticación: " + e.message);
+            }
+        }
+
+        if (loginBtn) {
+            loginBtn.addEventListener('click', handleLogin);
+        }
+
         if (auth) {
             onAuthStateChanged(auth, async (user) => {
-                const loginScreen = document.getElementById('login-screen');
+                const screen = document.getElementById('login-screen');
                 if (user) {
-                    loginScreen.style.display = 'none';
+                    console.log("Usuario:", user.email);
+                    screen.style.display = 'none';
                     
-                    // ONBOARDING SIMPLE
+                    // Onboarding
                     const userRef = doc(db, "users", user.uid);
                     const userSnap = await getDoc(userRef);
 
@@ -370,15 +370,14 @@ const app = initializeApp(firebaseConfig);
                         await setDoc(doc(db, "organizations", newOrgId), { name: user.displayName + "'s Agency", plan: 'free' });
                         state.orgId = newOrgId;
                     }
-                    
                     initData();
                 } else {
-                    loginScreen.style.display = 'flex';
+                    screen.style.display = 'flex';
                 }
             });
         }
 
-        // DATA
+        // --- DATA LOGIC ---
         function initData() {
             if (!state.orgId) return;
             const q = query(collection(db, "campaigns"), where("orgId", "==", state.orgId), orderBy("createdAt", "desc"));
@@ -388,53 +387,43 @@ const app = initializeApp(firebaseConfig);
             });
         }
 
-        // ACTIONS
-        window.createCampaign = async () => {
+        async function createCampaign() {
             const name = document.getElementById('camp-name').value;
             const budget = document.getElementById('camp-budget').value;
-            if(!name || !budget) return alert("Completa los datos");
+            if(!name || !budget) return alert("Faltan datos");
             
             await addDoc(collection(db, "campaigns"), {
                 orgId: state.orgId, name, budget: `$${budget}/d`, platform: state.currentTab,
                 status: 'active', results: '0', costPerResult: '$0.00', createdAt: Date.now()
             });
             document.getElementById('campaign-modal').style.display = 'none';
-        };
+        }
 
-        window.toggleStatus = async (id, status) => {
-            await updateDoc(doc(db, "campaigns", id), { status: status === 'active' ? 'paused' : 'active' });
-        };
+        // --- UI BINDINGS ---
+        
+        // Navigation
+        ['dash', 'ads', 'crm', 'reports'].forEach(view => {
+            document.getElementById('nav-' + view).addEventListener('click', function() {
+                document.querySelectorAll('.view-container').forEach(d => d.classList.add('hidden'));
+                document.getElementById('view-' + view).classList.remove('hidden');
+                document.querySelectorAll('.nav-item').forEach(d => d.classList.remove('active'));
+                this.classList.add('active');
+                
+                const titles = {'dash':'Resumen General', 'ads':'Ads Manager', 'crm':'Clientes', 'reports':'Reportes'};
+                document.getElementById('page-title').innerText = titles[view];
+            });
+        });
 
-        window.generatePDF = () => {
-            const element = document.getElementById('view-dash');
-            const btn = document.querySelector('#view-reports .btn-primary');
-            btn.innerText = "⏳ Generando...";
-            
-            const opt = {
-                margin: 10, filename: 'Reporte_Abundance.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#000000' },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-            };
-            html2pdf().set(opt).from(element).save().then(() => btn.innerText = "📄 Descargar Reporte PDF");
-        };
+        // Tabs
+        document.getElementById('tab-meta').addEventListener('click', () => switchTab('meta'));
+        document.getElementById('tab-google').addEventListener('click', () => switchTab('google'));
 
-        // UI LOGIC
-        window.nav = (view, el) => {
-            document.querySelectorAll('.view-container').forEach(d => d.classList.add('hidden'));
-            document.getElementById('view-'+view).classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(d => d.classList.remove('active'));
-            if(el) el.classList.add('active');
-            const titles = {'dash':'Resumen General', 'ads':'Ads Manager', 'crm':'Clientes', 'reports':'Reportes'};
-            document.getElementById('page-title').innerText = titles[view];
-        };
-
-        window.switchAdsTab = (platform) => {
+        function switchTab(platform) {
             state.currentTab = platform;
             document.getElementById('tab-meta').className = platform==='meta'?'tab active':'tab';
             document.getElementById('tab-google').className = platform==='google'?'tab active':'tab';
             renderAdsTable();
-        };
+        }
 
         function renderAdsTable() {
             const tbody = document.getElementById('ads-table-body');
@@ -449,36 +438,64 @@ const app = initializeApp(firebaseConfig);
                     <td style="color:gray;">${c.budget}</td>
                     <td>${c.results}</td>
                     <td>${c.costPerResult}</td>
-                    <td><button class="btn" style="padding:4px 12px; font-size:11px;" onclick="toggleStatus('${c.id}', '${c.status}')">${c.status==='active'?'Pausar':'Activar'}</button></td>
+                    <td><button class="btn row-action" data-id="${c.id}" data-status="${c.status}" style="padding:4px 12px; font-size:11px;">${c.status==='active'?'Pausar':'Activar'}</button></td>
                 </tr>`).join('');
+            
+            // Re-bind buttons inside table
+            document.querySelectorAll('.row-action').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    const id = e.target.dataset.id;
+                    const status = e.target.dataset.status;
+                    await updateDoc(doc(db, "campaigns", id), { status: status === 'active' ? 'paused' : 'active' });
+                });
+            });
         }
 
-        window.toggleAI = () => document.getElementById('ai-panel').classList.toggle('open');
+        // Modals
+        document.getElementById('btn-create-campaign').addEventListener('click', () => document.getElementById('campaign-modal').style.display='flex');
+        document.getElementById('btn-cancel-modal').addEventListener('click', () => document.getElementById('campaign-modal').style.display='none');
+        document.getElementById('btn-confirm-campaign').addEventListener('click', createCampaign);
+
+        // PDF
+        document.getElementById('btn-download-pdf').addEventListener('click', () => {
+            const el = document.getElementById('view-dash');
+            const btn = document.getElementById('btn-download-pdf');
+            btn.innerText = "⏳ Generando...";
+            html2pdf().from(el).save('Reporte_Abundance.pdf').then(() => btn.innerText = "📄 Descargar Reporte PDF");
+        });
+
+        // AI
+        document.getElementById('btn-toggle-ai').addEventListener('click', () => document.getElementById('ai-panel').classList.add('open'));
+        document.getElementById('btn-close-ai').addEventListener('click', () => document.getElementById('ai-panel').classList.remove('open'));
         
-        window.sendMsg = () => {
+        function sendAi() {
             const i = document.getElementById('ai-input');
             const f = document.getElementById('chat-feed');
             if(!i.value) return;
             f.innerHTML += `<div class="msg msg-user">${i.value}</div>`;
             i.value = '';
             setTimeout(() => { f.innerHTML += `<div class="msg msg-ai">Analizando datos... (Simulado)</div>`; f.scrollTop=f.scrollHeight; }, 1000);
-        };
+        }
+        document.getElementById('btn-send-ai').addEventListener('click', sendAi);
+        document.getElementById('ai-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendAi(); });
 
-        // CALENDAR DROPDOWN FIX
-        window.toggleCalendar = (e) => {
+        // Calendar
+        document.getElementById('calendar-btn').addEventListener('click', (e) => {
             e.stopPropagation();
             document.getElementById('calendar-menu').classList.toggle('show');
-        }
-        window.selectDate = (txt, el) => {
-            document.getElementById('selected-date').innerText = txt;
-            document.querySelectorAll('.dropdown-item').forEach(d => d.classList.remove('active'));
-            el.classList.add('active');
-        }
-        window.onclick = (e) => {
+        });
+        document.querySelectorAll('.dropdown-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.getElementById('selected-date').innerText = this.dataset.range;
+                document.querySelectorAll('.dropdown-item').forEach(d => d.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        window.addEventListener('click', (e) => {
             if(!e.target.closest('#calendar-btn')) document.getElementById('calendar-menu').classList.remove('show');
-        }
+        });
 
-        // INIT CHART
+        // Chart
         const ctx = document.getElementById('revenueChart').getContext('2d');
         const grad = ctx.createLinearGradient(0,0,0,400); grad.addColorStop(0,'rgba(255,255,255,0.1)'); grad.addColorStop(1,'transparent');
         new Chart(ctx, {
@@ -489,6 +506,7 @@ const app = initializeApp(firebaseConfig);
             },
             options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}, y:{grid:{color:'#222'}}} }
         });
+
     </script>
 </body>
 </html>
