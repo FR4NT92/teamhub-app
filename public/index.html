@@ -323,8 +323,9 @@
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // TUS CREDENCIALES
-        apiKey: "AIzaSyDGWfj8yoNEBGnKr-5PNh5w9iPeVu8ijk8",
+       // TUS CREDENCIALES
+        const firebaseConfig = {  // <--- FALTABA ESTA LÍNEA DE APERTURA
+            apiKey: "AIzaSyDGWfj8yoNEBGnKr-5PNh5w9iPeVu8ijk8",
             authDomain: "abundance-98670.firebaseapp.com",
             projectId: "abundance-98670",
             storageBucket: "abundance-98670.firebasestorage.app",
@@ -444,4 +445,5 @@
     </script>
 </body>
 </html>
+
 
