@@ -3,27 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abundance - Growth OS</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Abundance - Enterprise Growth</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <style>
-        /* --- 1. CORE VARIABLES (Bexdin Ultra-Dark) --- */
+        /* --- 1. CORE VARIABLES (ONYX / ENTERPRISE DARK) --- */
         :root {
-            --bg-body: #02040a;       /* Negro azulado casi imperceptible */
-            --bg-glass: rgba(255, 255, 255, 0.03); /* Vidrio base */
-            --bg-glass-hover: rgba(255, 255, 255, 0.06);
+            /* Backgrounds: Negros puros y planos */
+            --bg-body: #000000;       
+            --bg-sidebar: #050505;    
+            --bg-card: #0a0a0a;       
+            --bg-hover: #141414;      
             
-            --border-glass: rgba(255, 255, 255, 0.08); 
-            --border-glow: rgba(0, 240, 255, 0.3);
+            /* Bordes: Sutiles y técnicos */
+            --border-subtle: #1f1f1f; 
+            --border-light: #333333;
 
-            --text-main: #ffffff;
-            --text-sec: #94a3b8;      
+            /* Textos */
+            --text-main: #ededed;
+            --text-sec: #888888;      
             
-            /* Neones */
-            --neon-cyan: #00f0ff;   
-            --neon-purple: #7000ff; 
-            --neon-green: #00ff94;  
+            /* Acentos: Solo para destacar (Minimal) */
+            --accent-primary: #ffffff; /* Blanco para acciones principales */
+            --accent-cyan: #00c7b7;    /* Cian para marca/estado activo */
+            --accent-green: #22c55e;   /* Positivo */
+            --accent-red: #ef4444;     /* Negativo/Pausado */
             
             --font-main: 'Inter', sans-serif;
         }
@@ -36,307 +40,338 @@
             display: flex; 
             height: 100vh; 
             overflow: hidden; 
-            /* Fondo ambiental "Aurora" */
-            background-image: 
-                radial-gradient(circle at 10% 0%, rgba(112, 0, 255, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 90% 10%, rgba(0, 240, 255, 0.1) 0%, transparent 40%);
         }
-
-        /* --- 2. GLASSMORPHISM UTILS --- */
-        .glass-panel {
-            background: var(--bg-glass);
-            backdrop-filter: blur(16px) saturate(180%);
-            -webkit-backdrop-filter: blur(16px) saturate(180%);
-            border: 1px solid var(--border-glass);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        }
-
-        /* --- 3. COMPONENTS --- */
         
-        /* Botones "Glow" */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-body); }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+        /* --- 2. COMPONENTS (MINIMALIST) --- */
+        
+        /* Botones: Sobrios */
         .btn { 
-            padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; 
+            padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; 
             cursor: pointer; display: flex; align-items: center; gap: 8px; 
-            transition: all 0.3s ease; position: relative; overflow: hidden;
-            border: 1px solid var(--border-glass);
-            background: rgba(255,255,255,0.02);
-            color: white;
+            transition: all 0.2s ease; border: 1px solid transparent;
         }
         
+        /* Primario: Blanco sobre negro (Alto contraste) */
         .btn-primary { 
-            background: rgba(0, 240, 255, 0.1); 
-            border-color: rgba(0, 240, 255, 0.2);
-            color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
+            background: var(--text-main); 
+            color: black;
+            font-weight: 600;
         }
-        .btn-primary:hover { 
-            background: rgba(0, 240, 255, 0.2);
-            box-shadow: 0 0 25px rgba(0, 240, 255, 0.3);
-            transform: translateY(-1px);
+        .btn-primary:hover { background: #cccccc; }
+
+        /* Secundario: Borde fino */
+        .btn-secondary { 
+            background: transparent; 
+            border: 1px solid var(--border-subtle);
+            color: var(--text-sec);
         }
+        .btn-secondary:hover { 
+            border-color: var(--text-main); 
+            color: var(--text-main); 
+            background: var(--bg-hover);
+        }
+
+        /* Tabs (Meta/Google) */
+        .tab-group {
+            display: flex; background: var(--bg-sidebar); 
+            padding: 2px; border-radius: 6px; border: 1px solid var(--border-subtle);
+        }
+        .tab {
+            padding: 6px 16px; font-size: 13px; color: var(--text-sec); 
+            cursor: pointer; border-radius: 4px; border: none; background: transparent;
+            transition: 0.2s; font-weight: 500;
+        }
+        .tab.active { background: var(--bg-hover); color: var(--text-main); font-weight: 600; }
 
         /* Inputs */
         .input-field { 
-            background: rgba(0,0,0,0.4); 
-            border: 1px solid var(--border-glass); 
-            color: white; padding: 12px 16px; border-radius: 8px; width: 100%; font-size: 14px; 
+            background: var(--bg-card); 
+            border: 1px solid var(--border-subtle); 
+            color: white; padding: 10px 12px; border-radius: 6px; width: 100%; font-size: 13px; 
             transition: 0.2s;
         }
-        .input-field:focus { 
-            border-color: var(--neon-cyan); 
-            box-shadow: 0 0 0 1px var(--neon-cyan);
-        }
+        .input-field:focus { border-color: var(--text-sec); }
 
-        /* --- 4. LAYOUT --- */
+        /* Dropdowns */
+        .dropdown-menu {
+            position: absolute; top: 100%; right: 0; margin-top: 6px;
+            background: #111; border: 1px solid var(--border-light);
+            border-radius: 6px; padding: 4px; width: 180px;
+            display: none; flex-direction: column; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 100;
+        }
+        .dropdown-menu.show { display: flex; }
+        .dropdown-item {
+            padding: 8px 12px; font-size: 13px; color: var(--text-sec);
+            cursor: pointer; border-radius: 4px;
+        }
+        .dropdown-item:hover { background: var(--bg-hover); color: white; }
+        .dropdown-item.active { color: var(--accent-cyan); background: rgba(0, 199, 183, 0.1); }
+
+        /* --- 3. LAYOUT --- */
         aside.sidebar { 
-            width: 260px; 
+            width: 240px; 
+            background: var(--bg-sidebar); 
+            border-right: 1px solid var(--border-subtle); 
             display: flex; flex-direction: column; 
             z-index: 20; 
-            border-right: 1px solid var(--border-glass);
-            /* Glassmorphism Sidebar */
-            background: rgba(5, 7, 15, 0.6);
-            backdrop-filter: blur(20px);
         }
         
         .brand { 
-            padding: 32px 24px; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: white; 
-            display: flex; align-items: center; gap: 12px;
-            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+            padding: 24px; font-size: 16px; font-weight: 600; color: white; 
+            display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border-subtle);
         }
+        .brand-dot { width: 8px; height: 8px; background: var(--accent-cyan); border-radius: 50%; box-shadow: 0 0 8px var(--accent-cyan); }
         
-        .nav-menu { flex: 1; padding: 0 16px; display: flex; flex-direction: column; gap: 8px; }
+        .nav-menu { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
         .nav-item { 
-            padding: 12px 16px; border-radius: 12px; 
-            color: var(--text-sec); font-size: 14px; font-weight: 500; 
-            cursor: pointer; display: flex; align-items: center; gap: 12px; 
-            transition: 0.3s; border: 1px solid transparent;
+            padding: 8px 12px; border-radius: 6px; 
+            color: var(--text-sec); font-size: 13px; font-weight: 500; 
+            cursor: pointer; display: flex; align-items: center; gap: 10px; 
+            transition: 0.2s;
         }
-        .nav-item:hover { background: var(--bg-glass-hover); color: white; }
-        .nav-item.active { 
-            background: linear-gradient(90deg, rgba(0, 240, 255, 0.1) 0%, transparent 100%);
-            border-left: 1px solid var(--neon-cyan);
-            color: white; 
-        }
-        .nav-item svg { width: 20px; height: 20px; opacity: 0.7; }
-        .nav-item.active svg { opacity: 1; color: var(--neon-cyan); filter: drop-shadow(0 0 5px var(--neon-cyan)); }
+        .nav-item:hover { background: var(--bg-hover); color: var(--text-main); }
+        .nav-item.active { background: var(--bg-hover); color: white; border-left: 2px solid var(--accent-cyan); }
+        .nav-item svg { width: 16px; height: 16px; opacity: 0.7; }
+        .nav-item.active svg { opacity: 1; color: var(--accent-cyan); }
 
-        /* --- 5. MAIN --- */
-        main { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        /* --- 4. MAIN AREA --- */
+        main { flex: 1; display: flex; flex-direction: column; position: relative; }
         
         header.topbar { 
-            height: 80px; border-bottom: 1px solid var(--border-glass); 
+            height: 64px; border-bottom: 1px solid var(--border-subtle); 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 0 40px; background: transparent; 
+            padding: 0 32px; background: var(--bg-body); 
         }
 
-        .view-container { flex: 1; overflow-y: auto; padding: 40px; }
+        .view-container { flex: 1; overflow-y: auto; padding: 32px; }
         .hidden { display: none !important; }
 
-        /* --- 6. DASHBOARD CARDS & CHARTS --- */
-        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 32px; }
+        /* --- 5. DASHBOARD & CARDS --- */
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
         .kpi-card { 
-            padding: 24px; border-radius: 16px; 
-            display: flex; flex-direction: column; gap: 8px;
-            transition: 0.3s;
+            background: var(--bg-card); border: 1px solid var(--border-subtle); 
+            padding: 20px; border-radius: 8px; display: flex; flex-direction: column; gap: 4px;
         }
-        .kpi-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.2); }
+        .kpi-title { font-size: 11px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.5px; }
+        .kpi-val { font-size: 24px; font-weight: 600; color: white; margin-top: 4px; }
+        .kpi-trend { font-size: 12px; display: flex; align-items: center; gap: 4px; margin-top: 2px; }
         
-        .kpi-title { font-size: 13px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 1px; }
-        .kpi-val { font-size: 32px; font-weight: 700; color: white; text-shadow: 0 0 20px rgba(255,255,255,0.1); }
-        .kpi-trend { font-size: 13px; display: flex; align-items: center; gap: 4px; }
-        .trend-up { color: var(--neon-green); }
-        .trend-down { color: var(--neon-purple); }
-
-        /* CHART CONTAINER */
         .chart-wrapper {
-            padding: 24px; border-radius: 16px; height: 400px; position: relative;
+            background: var(--bg-card); border: 1px solid var(--border-subtle);
+            padding: 24px; border-radius: 8px; height: 350px; position: relative;
         }
 
-        /* --- 7. ADS TABLE --- */
-        .table-container { border-radius: 16px; overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        /* --- 6. ADS TABLE PRO --- */
+        .table-container { border: 1px solid var(--border-subtle); border-radius: 8px; overflow: hidden; background: var(--bg-card); }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
         th { 
-            background: rgba(0,0,0,0.3); padding: 18px 24px; 
-            color: var(--text-sec); font-weight: 600; font-size: 12px; 
-            text-transform: uppercase; text-align: left;
+            background: var(--bg-hover); padding: 12px 16px; 
+            color: var(--text-sec); font-weight: 500; font-size: 11px; 
+            text-transform: uppercase; text-align: left; border-bottom: 1px solid var(--border-subtle);
         }
-        td { padding: 20px 24px; border-bottom: 1px solid var(--border-glass); color: white; }
-        tr:hover td { background: rgba(255,255,255,0.02); }
+        td { padding: 14px 16px; border-bottom: 1px solid var(--border-subtle); color: var(--text-main); vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: var(--bg-hover); }
         
-        .status-badge { 
-            padding: 6px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; 
-            text-transform: uppercase; display: inline-flex; align-items: center; gap: 6px;
+        .status-pill { 
+            padding: 2px 8px; border-radius: 100px; font-size: 10px; font-weight: 600; 
+            text-transform: uppercase; border: 1px solid transparent;
         }
-        .st-active { background: rgba(0, 255, 148, 0.1); color: var(--neon-green); border: 1px solid rgba(0, 255, 148, 0.2); }
-        .st-paused { background: rgba(255, 255, 255, 0.1); color: var(--text-sec); border: 1px solid rgba(255, 255, 255, 0.1); }
-        
-        .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+        .st-active { background: rgba(34, 197, 94, 0.1); color: var(--accent-green); border-color: rgba(34, 197, 94, 0.2); }
+        .st-paused { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border-color: rgba(239, 68, 68, 0.2); }
 
-        /* --- 8. AI COPILOT --- */
+        /* --- 7. AI COPILOT --- */
         .ai-sidebar { 
-            position: fixed; top: 0; right: -420px; width: 420px; height: 100%; 
-            background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(30px);
-            border-left: 1px solid var(--border-glass); 
-            z-index: 100; transition: right 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-            display: flex; flex-direction: column; box-shadow: -30px 0 60px rgba(0,0,0,0.5);
+            position: fixed; top: 0; right: -400px; width: 400px; height: 100%; 
+            background: #080808; border-left: 1px solid var(--border-subtle); 
+            z-index: 100; transition: right 0.3s ease; display: flex; flex-direction: column;
+            box-shadow: -10px 0 40px rgba(0,0,0,0.8);
         }
         .ai-sidebar.open { right: 0; }
         
-        .chat-area { flex: 1; padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
-        .msg { padding: 16px; border-radius: 12px; font-size: 14px; line-height: 1.6; max-width: 90%; }
-        .msg-ai { background: rgba(112, 0, 255, 0.15); border: 1px solid rgba(112, 0, 255, 0.3); color: #e0e7ff; align-self: flex-start; border-bottom-left-radius: 2px; }
-        .msg-user { background: rgba(255,255,255,0.1); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .ai-header { padding: 20px; border-bottom: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; }
+        .chat-area { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        
+        .msg { padding: 12px 16px; border-radius: 8px; font-size: 13px; line-height: 1.5; max-width: 90%; }
+        .msg-ai { background: var(--bg-hover); color: #d1d5db; align-self: flex-start; border: 1px solid var(--border-subtle); }
+        .msg-user { background: var(--accent-cyan); color: black; align-self: flex-end; font-weight: 500; }
+
+        /* --- 8. MODAL CAMPAÑA --- */
+        #campaign-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center; }
+        .modal-box { background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 24px; border-radius: 12px; width: 400px; }
 
     </style>
 </head>
 <body>
 
+    <div id="campaign-modal">
+        <div class="modal-box">
+            <h3 style="margin-bottom: 16px;">Nueva Campaña</h3>
+            <label style="font-size:12px; color:var(--text-sec); display:block; margin-bottom:4px;">Nombre de la campaña</label>
+            <input type="text" class="input-field" placeholder="Ej: Black Friday Sales" style="margin-bottom: 16px;">
+            
+            <label style="font-size:12px; color:var(--text-sec); display:block; margin-bottom:4px;">Presupuesto Diario</label>
+            <input type="number" class="input-field" placeholder="$ 0.00" style="margin-bottom: 24px;">
+            
+            <div style="display:flex; justify-content:flex-end; gap:8px;">
+                <button class="btn btn-secondary" onclick="document.getElementById('campaign-modal').style.display='none'">Cancelar</button>
+                <button class="btn btn-primary" onclick="alert('Campaña creada (Simulación)'); document.getElementById('campaign-modal').style.display='none'">Lanzar</button>
+            </div>
+        </div>
+    </div>
+
     <aside class="sidebar">
         <div class="brand">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00f0ff" stroke-width="2" stroke-linejoin="round"/><path d="M2 17L12 22L22 17" stroke="#00f0ff" stroke-width="2" stroke-linejoin="round"/><path d="M2 12L12 17L22 12" stroke="#00f0ff" stroke-width="2" stroke-linejoin="round"/></svg>
-            Abundance
+            <div class="brand-dot"></div> Abundance
         </div>
         <nav class="nav-menu">
             <div class="nav-item active" onclick="nav('dash', this)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
                 Dashboard
             </div>
             <div class="nav-item" onclick="nav('ads', this)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path></svg>
                 Ads Manager
             </div>
             <div class="nav-item" onclick="nav('crm', this)">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                Clientes (CRM)
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                Clientes
             </div>
-            <div class="nav-item" style="margin-top:auto">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                Settings
+            <div class="nav-item" onclick="nav('reports', this)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
+                Reportes
             </div>
         </nav>
     </aside>
 
     <main>
         <header class="topbar">
-            <h2 id="page-title" style="font-size:18px; font-weight:600; letter-spacing:0.5px;">Dashboard Global</h2>
-            <div style="display:flex; gap:16px;">
-                <button class="btn">Feb 2026 ▾</button>
+            <h2 id="page-title" style="font-size:14px; font-weight:500; color:var(--text-sec);">Resumen General</h2>
+            
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <div style="position:relative;">
+                    <button class="btn btn-secondary" onclick="toggleCalendar()">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        <span id="selected-date">Este Mes</span>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div id="calendar-dropdown" class="dropdown-menu">
+                        <div class="dropdown-item active" onclick="selectDate('Este Mes', this)">Este Mes</div>
+                        <div class="dropdown-item" onclick="selectDate('Mes Pasado', this)">Mes Pasado</div>
+                        <div class="dropdown-item" onclick="selectDate('Último Trimestre', this)">Último Trimestre</div>
+                    </div>
+                </div>
+
                 <button class="btn btn-primary" onclick="toggleAI()">
-                    <svg width="16" height="16" fill="none" stroke="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
-                    Gemini Copilot
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+                    Copilot
                 </button>
             </div>
         </header>
 
         <div id="view-dash" class="view-container">
             <div class="kpi-grid">
-                <div class="glass-panel kpi-card">
-                    <div class="kpi-title">Inversión (Mes)</div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Inversión (Ad Spend)</div>
                     <div class="kpi-val">$12,450</div>
-                    <div class="kpi-trend trend-up">▲ 12% vs Enero</div>
+                    <div class="kpi-trend" style="color:var(--accent-green)">+12% vs. periodo anterior</div>
                 </div>
-                <div class="glass-panel kpi-card">
+                <div class="kpi-card">
                     <div class="kpi-title">ROAS Global</div>
                     <div class="kpi-val">4.2x</div>
-                    <div class="kpi-trend trend-up">▲ 0.3 pts</div>
+                    <div class="kpi-trend" style="color:var(--accent-green)">+0.5 pts</div>
                 </div>
-                <div class="glass-panel kpi-card">
-                    <div class="kpi-title">Leads Totales</div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Leads / Conversiones</div>
                     <div class="kpi-val">845</div>
-                    <div class="kpi-trend trend-down">▼ Costo x Lead subió 2%</div>
+                    <div class="kpi-trend" style="color:var(--text-sec)">-2% (Estable)</div>
                 </div>
-                <div class="glass-panel kpi-card">
-                    <div class="kpi-title">Ingresos Generados</div>
+                <div class="kpi-card">
+                    <div class="kpi-title">Ingreso Generado</div>
                     <div class="kpi-val">$52,290</div>
-                    <div class="kpi-trend trend-up">▲ Record Histórico</div>
+                    <div class="kpi-trend" style="color:var(--accent-green)">Record histórico</div>
                 </div>
             </div>
 
-            <div class="glass-panel chart-wrapper">
+            <div class="chart-wrapper">
                 <canvas id="revenueChart"></canvas>
             </div>
         </div>
 
         <div id="view-ads" class="view-container hidden">
-            <div style="display:flex; justify-content:space-between; margin-bottom:24px;">
-                <div class="glass-panel" style="padding:4px; border-radius:8px; display:flex;">
-                    <button class="btn" style="border:none; background:rgba(255,255,255,0.1);">Meta Ads</button>
-                    <button class="btn" style="border:none; background:transparent; color:var(--text-sec);">Google Ads</button>
+            <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+                <div class="tab-group">
+                    <button id="tab-meta" class="tab active" onclick="switchAdsTab('meta')">Meta Ads</button>
+                    <button id="tab-google" class="tab" onclick="switchAdsTab('google')">Google Ads</button>
                 </div>
-                <button class="btn btn-primary">+ Crear Campaña</button>
+                <button class="btn btn-primary" onclick="document.getElementById('campaign-modal').style.display='flex'">+ Crear Campaña</button>
             </div>
 
-            <div class="glass-panel table-container">
+            <div class="table-container">
                 <table>
                     <thead>
                         <tr>
                             <th>Status</th>
-                            <th>Campaña</th>
+                            <th>Nombre Campaña</th>
                             <th>Presupuesto</th>
                             <th>Resultados</th>
                             <th>Costo / Res</th>
-                            <th>ROAS</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td><span class="status-badge st-active"><div class="dot"></div>Activa</span></td>
-                            <td style="font-weight:600;">Prospecting - VSL - Cold</td>
-                            <td>$100 / día</td>
-                            <td>45 Leads</td>
-                            <td>$2.20</td>
-                            <td style="color:var(--neon-green); font-weight:700;">4.5x</td>
-                        </tr>
-                        <tr>
-                            <td><span class="status-badge st-active"><div class="dot"></div>Activa</span></td>
-                            <td style="font-weight:600;">Retargeting - Checkout 7D</td>
-                            <td>$50 / día</td>
-                            <td>12 Ventas</td>
-                            <td>$15.00</td>
-                            <td style="color:var(--neon-green); font-weight:700;">8.2x</td>
-                        </tr>
-                        <tr>
-                            <td><span class="status-badge st-paused"><div class="dot"></div>Pausada</span></td>
-                            <td style="font-weight:600;">Test Creativos - UGC Feb</td>
-                            <td>$20 / día</td>
-                            <td>2 Leads</td>
-                            <td>$45.00</td>
-                            <td style="color:var(--neon-purple); font-weight:700;">0.5x</td>
-                        </tr>
-                    </tbody>
+                    <tbody id="ads-table-body">
+                        </tbody>
                 </table>
             </div>
         </div>
 
         <div id="view-crm" class="view-container hidden">
-            <h2 style="margin-bottom:20px;">Clientes</h2>
-            <div class="glass-panel" style="padding:40px; text-align:center; color:var(--text-sec);">
-                Conecta Firebase para gestionar organizaciones reales.
+            <h2 style="margin-bottom:20px;">Clientes Activos</h2>
+            <div class="table-container">
+                <table>
+                    <thead><tr><th>Cliente</th><th>Plan</th><th>Estado</th></tr></thead>
+                    <tbody>
+                        <tr><td>Empresa A</td><td>Agency Pro</td><td><span class="status-pill st-active">Activo</span></td></tr>
+                        <tr><td>Empresa B</td><td>Starter</td><td><span class="status-pill st-paused">Pendiente</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="view-reports" class="view-container hidden">
+            <h2 style="margin-bottom:20px;">Reportes Generados</h2>
+            <div style="padding:40px; border:1px dashed var(--border-subtle); text-align:center; color:var(--text-sec); border-radius:8px;">
+                No hay reportes recientes. Genera uno nuevo.
+                <br><br>
+                <button class="btn btn-secondary" style="margin:0 auto;" onclick="alert('Generando PDF...')">Generar Reporte PDF</button>
             </div>
         </div>
 
     </main>
 
     <aside class="ai-sidebar" id="ai-panel">
-        <div style="padding:24px; border-bottom:1px solid var(--border-glass); display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-weight:700; color:white; display:flex; gap:10px; align-items:center;">
-                <span style="color:var(--neon-cyan)">✦</span> Gemini Copilot
-            </div>
-            <button onclick="toggleAI()" style="background:none; border:none; color:white; cursor:pointer;">✕</button>
+        <div class="ai-header">
+            <div style="font-weight:600; color:white;">Gemini Copilot</div>
+            <button onclick="toggleAI()" style="background:none; border:none; color:var(--text-sec); cursor:pointer;">✕</button>
         </div>
         <div class="chat-area" id="chat-feed">
-            <div class="msg msg-ai">Hola. He analizado tus campañas. El ROAS global subió un 12% este mes, impulsado principalmente por la campaña de "Retargeting". ¿Quieres ver un desglose por creativo?</div>
+            <div class="msg msg-ai">Hola. Estoy conectado a tus cuentas de Meta y Google. ¿Qué métrica quieres analizar hoy?</div>
         </div>
-        <div style="padding:24px; border-top:1px solid var(--border-glass);">
+        <div style="padding:20px; border-top:1px solid var(--border-subtle);">
             <div style="display:flex; gap:10px;">
-                <input id="ai-input" class="input-field" placeholder="Pregunta sobre tus métricas..." onkeypress="if(event.key==='Enter') sendMsg()">
+                <input id="ai-input" class="input-field" placeholder="Escribe aquí..." onkeypress="if(event.key==='Enter') sendMsg()">
                 <button onclick="sendMsg()" class="btn btn-primary" style="padding:0 12px;">→</button>
             </div>
         </div>
     </aside>
 
     <script>
-        // NAVIGATION
+        // --- 1. NAVIGATION & UI LOGIC ---
         function nav(viewId, el) {
             document.querySelectorAll('.view-container').forEach(d => d.classList.add('hidden'));
             document.getElementById('view-'+viewId).classList.remove('hidden');
@@ -344,43 +379,97 @@
             document.querySelectorAll('.nav-item').forEach(d => d.classList.remove('active'));
             if(el) el.classList.add('active');
 
-            const titles = {'dash':'Dashboard Global', 'ads':'Ads Manager Pro', 'crm':'CRM Clientes'};
+            const titles = {'dash':'Resumen General', 'ads':'Gestor de Campañas', 'crm':'CRM Clientes', 'reports':'Reportes'};
             document.getElementById('page-title').innerText = titles[viewId];
         }
 
-        // AI TOGGLE
+        // --- 2. CALENDAR LOGIC ---
+        function toggleCalendar() {
+            document.getElementById('calendar-dropdown').classList.toggle('show');
+        }
+        function selectDate(text, element) {
+            document.getElementById('selected-date').innerText = text;
+            document.querySelectorAll('.dropdown-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById('calendar-dropdown').classList.remove('show');
+            alert("Filtrando datos por: " + text); // Feedback visual
+        }
+
+        // --- 3. ADS MANAGER LOGIC ---
+        const metaData = [
+            {id:1, name:'Prospecting - Cold Traffic', budget:'$100/d', res:'45 Leads', cpr:'$2.20', status:'active'},
+            {id:2, name:'Retargeting - Checkout', budget:'$50/d', res:'12 Sales', cpr:'$15.00', status:'active'},
+            {id:3, name:'Test Creativos - Feb', budget:'$20/d', res:'2 Leads', cpr:'$45.00', status:'paused'}
+        ];
+        
+        const googleData = [
+            {id:4, name:'Search - Brand Keywords', budget:'$50/d', res:'80 Clics', cpr:'$0.60', status:'active'},
+            {id:5, name:'YouTube - Awareness', budget:'$30/d', res:'5k Views', cpr:'$0.02', status:'active'}
+        ];
+
+        function renderTable(data) {
+            const tbody = document.getElementById('ads-table-body');
+            tbody.innerHTML = data.map(item => `
+                <tr id="row-${item.id}">
+                    <td><span class="status-pill ${item.status === 'active' ? 'st-active' : 'st-paused'}">${item.status === 'active' ? 'Activo' : 'Pausado'}</span></td>
+                    <td style="font-weight:500;">${item.name}</td>
+                    <td style="color:var(--text-sec);">${item.budget}</td>
+                    <td>${item.res}</td>
+                    <td>${item.cpr}</td>
+                    <td><button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="toggleStatus(${item.id}, this)">${item.status === 'active' ? 'Pausar' : 'Activar'}</button></td>
+                </tr>
+            `).join('');
+        }
+
+        function switchAdsTab(platform) {
+            document.getElementById('tab-meta').className = platform === 'meta' ? 'tab active' : 'tab';
+            document.getElementById('tab-google').className = platform === 'google' ? 'tab active' : 'tab';
+            renderTable(platform === 'meta' ? metaData : googleData);
+        }
+
+        function toggleStatus(id, btn) {
+            // Simulación visual de cambio de estado
+            const row = document.getElementById(`row-${id}`);
+            const pill = row.querySelector('.status-pill');
+            
+            if(pill.classList.contains('st-active')) {
+                pill.className = 'status-pill st-paused';
+                pill.innerText = 'Pausado';
+                btn.innerText = 'Activar';
+            } else {
+                pill.className = 'status-pill st-active';
+                pill.innerText = 'Activo';
+                btn.innerText = 'Pausar';
+            }
+        }
+
+        // --- 4. AI LOGIC ---
         function toggleAI() {
             document.getElementById('ai-panel').classList.toggle('open');
         }
 
-        // MOCK AI CHAT
         function sendMsg() {
             const input = document.getElementById('ai-input');
             const feed = document.getElementById('chat-feed');
             if(!input.value.trim()) return;
             
-            // User Msg
             feed.innerHTML += `<div class="msg msg-user">${input.value}</div>`;
-            const userQ = input.value.toLowerCase();
             input.value = '';
             feed.scrollTop = feed.scrollHeight;
 
-            // Mock Response Logic
             setTimeout(() => {
-                let response = "Interesante pregunta. Déjame analizar los datos...";
-                if(userQ.includes("roas") || userQ.includes("rendimiento")) response = "Tu ROAS actual es 4.2x. La campaña 'Prospecting' es la más eficiente con un CPA de $2.20.";
-                if(userQ.includes("crear") || userQ.includes("campaña")) response = "Puedo ayudarte a estructurar la campaña. ¿El objetivo es Leads o Ventas?";
-                
-                feed.innerHTML += `<div class="msg msg-ai">${response}</div>`;
+                feed.innerHTML += `<div class="msg msg-ai">Entendido. Estoy procesando esa solicitud con los datos actuales...</div>`;
                 feed.scrollTop = feed.scrollHeight;
             }, 1000);
         }
 
-        // INIT CHART.JS
+        // --- 5. INITIALIZATION ---
+        // Render Initial Chart
         const ctx = document.getElementById('revenueChart').getContext('2d');
+        // Gradiente vertical para la línea
         const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(0, 240, 255, 0.5)'); // Cyan Glow
-        gradient.addColorStop(1, 'rgba(0, 240, 255, 0)');
+        gradient.addColorStop(0, 'rgba(0, 199, 183, 0.2)');
+        gradient.addColorStop(1, 'rgba(0, 199, 183, 0)');
 
         new Chart(ctx, {
             type: 'line',
@@ -388,14 +477,14 @@
                 labels: ['1 Feb', '5 Feb', '10 Feb', '15 Feb', '20 Feb', '25 Feb'],
                 datasets: [{
                     label: 'Ingresos ($)',
-                    data: [12000, 19000, 15000, 28000, 42000, 52000],
-                    borderColor: '#00f0ff',
+                    data: [12000, 15000, 14000, 22000, 38000, 52000],
+                    borderColor: '#ffffff', // Línea blanca minimalista
                     backgroundColor: gradient,
                     borderWidth: 2,
-                    pointBackgroundColor: '#000',
-                    pointBorderColor: '#00f0ff',
-                    fill: true,
-                    tension: 0.4
+                    pointRadius: 0, // Sin puntos para look limpio
+                    pointHoverRadius: 6,
+                    tension: 0.4,
+                    fill: true
                 }]
             },
             options: {
@@ -403,11 +492,21 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } },
-                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#94a3b8' } }
+                    x: { grid: { display: false }, ticks: { color: '#555' } },
+                    y: { grid: { color: '#222' }, ticks: { color: '#555' } }
                 }
             }
         });
+
+        // Load Default Ads Data
+        renderTable(metaData);
+
+        // Close dropdowns on click outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.btn-secondary') && !event.target.matches('.btn-secondary *')) {
+                document.getElementById('calendar-dropdown').classList.remove('show');
+            }
+        }
     </script>
 </body>
 </html>
