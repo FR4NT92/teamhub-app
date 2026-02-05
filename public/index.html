@@ -40,13 +40,12 @@
             background-image: radial-gradient(circle at 50% -10%, rgba(59, 130, 246, 0.15), transparent 40%);
         }
 
-        /* --- BOTONES LIQUID GLASS (CORREGIDO) --- */
+        /* --- BOTONES LIQUID GLASS --- */
         .btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
             height: 36px; padding: 0 16px;
             border-radius: 9999px; font-weight: 500; font-size: 13px; cursor: pointer;
             transition: all 0.3s var(--ease);
-            /* Base Glass */
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--border-glass);
@@ -55,9 +54,8 @@
         }
         .btn:hover { background: var(--bg-glass-hover); color: white; border-color: var(--border-highlight); transform: translateY(-1px); }
         
-        /* Botón Primario Liquid Glass (Ya no es blanco sólido) */
         .btn-primary { 
-            background: rgba(255, 255, 255, 0.1); /* Semi-transparente */
+            background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.25);
             color: white; 
             box-shadow: 0 0 20px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.1);
@@ -110,7 +108,6 @@
             transition: all 0.3s ease;
         }
         
-        /* Efecto Hover: Bordes de colores */
         .ai-float:hover { 
             border-color: transparent;
             background-image: linear-gradient(rgba(10, 10, 15, 0.9), rgba(10, 10, 15, 0.9)), linear-gradient(45deg, #3B82F6, #9333EA, #EC4899);
@@ -120,18 +117,15 @@
             transform: scale(1.05);
         }
 
-        /* Efecto Click/Active: Icono se rellena */
         .ai-float svg { transition: all 0.3s ease; }
         .ai-float:active svg, .ai-float.active svg { 
             fill: white; 
             filter: drop-shadow(0 0 8px white);
         }
 
-        /* Drawer & Modals */
         .drawer { position: fixed; top: 0; right: -450px; width: 450px; height: 100%; background: #0A0A0A; border-left: 1px solid var(--border-glass); z-index: 200; transition: right 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; box-shadow: -20px 0 100px rgba(0,0,0,0.8); }
         .drawer.open { right: 0; }
         
-        /* Calendar Dropdown (Recuperado) */
         .dropdown-menu {
             position: absolute; top: 110%; right: 0;
             background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(12px);
@@ -286,7 +280,7 @@
                             <h3 style="font-size:16px;">Access Control (Whitelist)</h3>
                             <p style="color:var(--text-muted); font-size:12px;">Solo los usuarios listados aquí pueden loguearse.</p>
                         </div>
-                        <button class="btn btn-primary" onclick="App.inviteUser()">+ Autorizar Email</button>
+                        <button id="btn-invite-user" class="btn btn-primary" onclick="App.inviteUser()">+ Autorizar Email</button>
                     </div>
                 </div>
                 <div class="table-container">
@@ -383,9 +377,9 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
         // 🟢 CONFIGURACIÓN API KEY
-        const OPENAI_API_KEY = "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"; // PEGA TU KEY AQUÍ
+        const OPENAI_API_KEY = "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"; 
 
-        // 🛡️ SUPER ADMIN (Pon tu email)
+        // 🛡️ SUPER ADMINS (LISTA DE PODER)
         const SUPER_ADMINS = ["frantruppa@gmail.com"]; 
 
         const firebaseConfig = {
@@ -412,9 +406,15 @@
                         if (await App.checkAccess(user)) {
                             App.user = user;
                             UI.closeLogin();
+                            
+                            // 🔒 CONTROL DE INTERFAZ: Si NO es super admin, ocultar botón invitar
+                            if (!SUPER_ADMINS.includes(user.email)) {
+                                document.getElementById('btn-invite-user').style.display = 'none';
+                            }
+
                             App.listenToCampaigns(); 
                             App.listenToTasks();
-                            App.listenToTeam();
+                            App.listenToTeam(); // Aquí controlaremos el botón de eliminar
                             document.getElementById('org-name').innerText = "Abundance Team: " + user.displayName;
                         } else {
                             alert("Acceso denegado. Contacta a un administrador.");
@@ -439,30 +439,37 @@
             },
 
             inviteUser: async () => {
+                if (!SUPER_ADMINS.includes(App.user.email)) return alert("Solo SuperAdmins pueden invitar.");
                 const email = prompt("Email del nuevo miembro (Gmail):");
                 if(email) await setDoc(doc(App.db, "allowed_users", email.trim()), { email: email.trim(), role: 'member', addedAt: serverTimestamp() });
             },
 
             removeUser: async (email) => {
+                if (!SUPER_ADMINS.includes(App.user.email)) return alert("Acción no autorizada.");
                 if(email === App.user.email) return alert("No puedes eliminarte a ti mismo.");
                 if(confirm(`¿Seguro que quieres eliminar el acceso a ${email}?`)) {
                     await deleteDoc(doc(App.db, "allowed_users", email));
                 }
             },
 
+            // 🛡️ RENDERIZADO SEGURO DE LA TABLA DE EQUIPO
             listenToTeam: () => {
                 onSnapshot(query(collection(App.db, "allowed_users")), (snap) => {
                     const users = snap.docs.map(d => d.data());
                     const tbody = document.getElementById('team-list-body');
+                    const isSuperAdmin = SUPER_ADMINS.includes(App.user.email); // Verificar Rol
+                    
                     if(tbody) {
                         tbody.innerHTML = users.map(u => `
                             <tr>
                                 <td>${u.email}</td>
                                 <td>${u.role}</td>
                                 <td>
-                                    <button class="btn btn-danger" style="height:28px; padding:0 8px;" onclick="App.removeUser('${u.email}')">
+                                    ${ isSuperAdmin ? 
+                                    `<button class="btn btn-danger" style="height:28px; padding:0 8px;" onclick="App.removeUser('${u.email}')">
                                         <i data-lucide="trash" class="icon" style="width:14px;"></i>
-                                    </button>
+                                    </button>` 
+                                    : '<span style="color:#444; font-size:11px;">Restringido</span>' }
                                 </td>
                             </tr>
                         `).join('');
@@ -585,11 +592,10 @@
             },
             toggleDrawer: () => {
                 document.getElementById('ai-drawer').classList.toggle('open');
-                document.getElementById('alfred-btn').classList.toggle('active'); // Para pintar la estrella
+                document.getElementById('alfred-btn').classList.toggle('active');
             },
             toggleModal: (id) => document.getElementById(id).classList.toggle('open'),
             closeLogin: () => document.getElementById('login-modal').classList.remove('open'),
-            
             toggleCalendar: (e) => { e.stopPropagation(); document.getElementById('calendar-menu').classList.toggle('show'); },
             setRange: (txt, el) => {
                 document.getElementById('calendar-label').innerText = txt;
@@ -597,7 +603,6 @@
                 el.classList.add('active');
                 document.getElementById('calendar-menu').classList.remove('show');
             },
-
             initMainChart: () => {
                 const ctx = document.getElementById('mainChart').getContext('2d');
                 new Chart(ctx, { type: 'line', data: { labels: ['S1', 'S2', 'S3', 'S4'], datasets: [{ label: 'Abundance Leads', data: [20, 45, 30, 60], borderColor: '#3B82F6', tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display:false} }, scales: { x: { grid: {display:false} }, y: { grid: {color:'#333'} } } } });
