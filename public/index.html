@@ -118,34 +118,26 @@
         .clickable-row { cursor: pointer; transition: 0.2s; }
         .clickable-row:hover td { background: rgba(59, 130, 246, 0.05) !important; color: white; }
 
-        /* --- DASHBOARD WIDGETS (LIQUID GLASS FIX) --- */
-        .quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
-        .action-card { background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); border-radius: 16px; padding: 20px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 12px; }
-        /* EFECTO HOVER BLANCO/GRIS ESPECTRAL */
-        .action-card:hover { 
-            background: rgba(255,255,255,0.1); 
-            border-color: rgba(255,255,255,0.3); 
-            transform: translateY(-2px); 
-            box-shadow: 0 10px 30px rgba(255,255,255,0.05);
-        }
-        .action-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: center; color: white; }
+        /* --- DASHBOARD WIDGETS --- */
+        .dash-section-title { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 16px; display:flex; align-items:center; gap:8px; }
+        .dash-separator { height: 1px; background: var(--border-glass); margin: 32px 0; }
 
-        /* Dropdown Calendario */
-        .dropdown-menu {
-            position: absolute; top: 110%; right: 0; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(12px);
-            border: 1px solid var(--border-glass); border-radius: 16px; padding: 6px; width: 180px; display: none; flex-direction: column; gap: 2px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6); z-index: 50;
-        }
-        .dropdown-menu.show { display: flex; animation: fadeIn 0.2s; }
-        .dropdown-item { padding: 10px 16px; font-size: 13px; color: var(--text-muted); cursor: pointer; border-radius: 10px; transition: 0.2s; }
-        .dropdown-item:hover { background: rgba(255,255,255,0.05); color: white; }
-        .dropdown-item.active { background: var(--accent-primary); color: white; font-weight: 500; }
+        .quick-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 0; }
+        .action-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 16px; padding: 24px; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+        .action-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .action-icon { width: 48px; height: 48px; border-radius: 14px; background: rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: center; color: white; margin-bottom: 4px; }
 
         .ai-float { position: fixed; bottom: 30px; right: 30px; z-index: 100; background: rgba(10, 10, 15, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.2); padding: 12px 24px; border-radius: 100px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.3s ease; }
         .ai-float:hover { border-color: transparent; background-image: linear-gradient(rgba(10, 10, 15, 0.9), rgba(10, 10, 15, 0.9)), linear-gradient(45deg, #3B82F6, #9333EA, #EC4899); background-origin: border-box; background-clip: padding-box, border-box; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); transform: scale(1.05); }
         .drawer { position: fixed; top: 0; right: -450px; width: 450px; height: 100%; background: #0A0A0A; border-left: 1px solid var(--border-glass); z-index: 200; transition: right 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; box-shadow: -20px 0 100px rgba(0,0,0,0.8); }
         .drawer.open { right: 0; }
         
+        .dropdown-menu { position: absolute; top: 110%; right: 0; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(12px); border: 1px solid var(--border-glass); border-radius: 16px; padding: 6px; width: 180px; display: none; flex-direction: column; gap: 2px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); z-index: 50; }
+        .dropdown-menu.show { display: flex; animation: fadeIn 0.2s; }
+        .dropdown-item { padding: 10px 16px; font-size: 13px; color: var(--text-muted); cursor: pointer; border-radius: 10px; transition: 0.2s; }
+        .dropdown-item:hover { background: rgba(255,255,255,0.05); color: white; }
+        .dropdown-item.active { background: var(--accent-primary); color: white; font-weight: 500; }
+
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 300; display: none; align-items: center; justify-content: center; }
         .modal-overlay.open { display: flex; animation: fadeIn 0.2s; }
         .modal-box { background: #111; border: 1px solid var(--border-glass); padding: 32px; border-radius: 24px; width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
@@ -172,16 +164,16 @@
 
     <div id="ai-drawer" class="drawer">
         <div style="padding: 24px; border-bottom: 1px solid var(--border-glass); display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-weight: 600; color:white;">Alfred Copilot</div>
+            <div style="font-weight: 600; color:white;">Alfred Agent (Beta)</div>
             <button class="btn" style="width:32px; padding:0;" onclick="UI.toggleDrawer()">✕</button>
         </div>
         <div id="chat-content" style="flex:1; padding:24px; overflow-y:auto; font-size:14px; line-height:1.6; color:var(--text-muted);">
             <div style="background:rgba(255,255,255,0.05); padding:16px; border-radius:12px; margin-bottom:12px; border:1px solid var(--border-glass);">
-                Hola. Soy Alfred. ¿Necesitas ayuda con las tareas o campañas de hoy?
+                Hola. Soy Alfred. Tengo control sobre la app. Puedes pedirme "Ir a configuración", "Analizar anuncios" o crear tareas.
             </div>
         </div>
         <div style="padding:24px; border-top:1px solid var(--border-glass); display:flex; gap:8px;">
-            <input id="ai-input" class="input-glass" placeholder="Escribe aquí...">
+            <input id="ai-input" class="input-glass" placeholder="Ej: Crea tarea 'Revisar Copy'...">
             <button class="btn btn-primary" style="width:40px; padding:0;" onclick="App.sendMessage()">→</button>
         </div>
     </div>
@@ -205,7 +197,7 @@
             </div>
             <div id="ads-submenu" class="submenu">
                 <div class="submenu-item active" onclick="App.filterAds('all', this)">Ver Todo</div>
-                </div>
+            </div>
 
             <div class="nav-item" onclick="UI.nav('reports')"><i data-lucide="file-text" class="icon"></i> Reportes</div>
             <div class="nav-item" onclick="UI.nav('settings')"><i data-lucide="settings" class="icon"></i> Configuración</div>
@@ -243,45 +235,63 @@
             
             <section id="view-dash" class="view-section active">
                 
+                <div class="dash-section-title"><i data-lucide="zap" class="icon"></i> Acciones Rápidas</div>
                 <div class="quick-actions">
                     <div class="action-card" onclick="UI.toggleModal('task-modal')">
                         <div class="action-icon"><i data-lucide="plus"></i></div>
-                        <div>
-                            <div style="font-weight:600;">Crear Tarea</div>
-                            <div style="font-size:11px; color:var(--text-muted);">Asignar al equipo</div>
-                        </div>
+                        <div style="font-weight:600;">Crear Tarea</div>
+                        <div style="font-size:11px; color:var(--text-muted);">Asignar al equipo</div>
                     </div>
                     <div class="action-card" onclick="App.syncAdsData()">
                         <div class="action-icon"><i data-lucide="refresh-cw"></i></div>
-                        <div>
-                            <div style="font-weight:600;">Sincronizar Datos</div>
-                            <div style="font-size:11px; color:var(--text-muted);">Actualizar métricas Meta</div>
-                        </div>
+                        <div style="font-weight:600;">Sincronizar Meta</div>
+                        <div style="font-size:11px; color:var(--text-muted);">Actualizar métricas</div>
+                    </div>
+                    <div class="action-card" onclick="UI.nav('reports')">
+                        <div class="action-icon"><i data-lucide="download"></i></div>
+                        <div style="font-weight:600;">Generar Reporte</div>
+                        <div style="font-size:11px; color:var(--text-muted);">Descargar PDF mensual</div>
                     </div>
                 </div>
 
+                <div class="dash-separator"></div>
+
+                <div class="dash-section-title"><i data-lucide="activity" class="icon"></i> Pulso de la Agencia</div>
                 <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:20px; margin-bottom:24px;">
                     <div class="card" style="padding:20px;">
-                        <div style="font-size:11px; color:var(--text-muted);">CLIENTES ACTIVOS</div>
-                        <div style="font-size:20px; font-weight:700; margin-top:4px;" id="kpi-projects">--</div>
+                        <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Clientes Activos</div>
+                        <div style="font-size:24px; font-weight:700; margin-top:4px;" id="kpi-projects">--</div>
                     </div>
                     <div class="card" style="padding:20px;">
-                        <div style="font-size:11px; color:var(--text-muted);">TAREAS PENDIENTES</div>
-                        <div style="font-size:20px; font-weight:700; margin-top:4px;" id="kpi-tasks">--</div>
+                        <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Tareas Pendientes</div>
+                        <div style="font-size:24px; font-weight:700; margin-top:4px;" id="kpi-tasks">--</div>
                     </div>
                     <div class="card" style="padding:20px;">
-                        <div style="font-size:11px; color:var(--text-muted);">GASTO TOTAL (MES)</div>
-                        <div style="font-size:20px; font-weight:700; margin-top:4px;">$3,450</div>
+                        <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Inversión (Mes)</div>
+                        <div style="font-size:24px; font-weight:700; margin-top:4px;">$3,450</div>
                     </div>
                     <div class="card" style="padding:20px;">
-                        <div style="font-size:11px; color:var(--text-muted);">ROAS GLOBAL</div>
-                        <div style="font-size:20px; font-weight:700; margin-top:4px; color:var(--success);">3.8x</div>
+                        <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">ROAS Global</div>
+                        <div style="font-size:24px; font-weight:700; margin-top:4px; color:var(--success);">3.8x</div>
                     </div>
                 </div>
 
-                <div class="card" style="height:320px; padding-bottom:30px;">
-                    <h4 style="margin-bottom:16px; font-size:12px; color:var(--text-muted); text-transform:uppercase;">Rendimiento General</h4>
-                    <canvas id="mainChart"></canvas>
+                <div style="display:grid; grid-template-columns: 1fr 300px; gap:20px;">
+                    <div class="card" style="height:320px; padding-bottom:30px;">
+                        <h4 style="margin-bottom:16px; font-size:12px; color:var(--text-muted); text-transform:uppercase;">Tendencia de Leads</h4>
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                    <div class="card">
+                        <h4 style="margin-bottom:16px; font-size:12px; color:var(--text-muted); text-transform:uppercase;">Atención Requerida</h4>
+                        <div style="font-size:13px; color:white; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border-glass);">
+                            <span style="color:var(--warning)">●</span> Revisar Campaña Pepsi
+                            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">ROAS bajo (1.2x)</div>
+                        </div>
+                        <div style="font-size:13px; color:white;">
+                            <span style="color:var(--danger)">●</span> Cierre de Mes
+                            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Enviar facturas pendientes</div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -300,7 +310,6 @@
                     <div style="display:flex; background:rgba(255,255,255,0.05); border-radius:99px; padding:4px;">
                         <button class="btn" style="background:rgba(255,255,255,0.1); color:white; border:none; height:32px;">All Clients</button>
                         <button class="btn" style="background:transparent; border:none; height:32px;">Meta Ads</button>
-                        <button class="btn" style="background:transparent; border:none; height:32px;">Google Ads</button>
                     </div>
                     <button class="btn btn-primary" onclick="App.syncAdsData()"><i data-lucide="refresh-cw" class="icon"></i> Sincronizar</button>
                 </div>
@@ -325,9 +334,7 @@
                 <div class="table-container">
                     <table>
                         <thead><tr><th>Usuario</th><th>Rol</th><th>Acciones</th></tr></thead>
-                        <tbody id="team-list-body">
-                            <tr><td colspan="3" style="padding:20px; text-align:center;">Cargando lista...</td></tr>
-                        </tbody>
+                        <tbody id="team-list-body"></tbody>
                     </table>
                 </div>
             </section>
@@ -359,12 +366,10 @@
             <label style="font-size:12px; color:var(--text-muted); margin-top:16px; display:block;">Título</label>
             <input id="new-task-title" class="input-glass" style="margin-bottom:16px;" placeholder="Ej: Configurar Pixel">
             <label style="font-size:12px; color:var(--text-muted); display:block;">Descripción</label>
-            <textarea id="new-task-desc" class="input-glass" style="margin-bottom:16px;" placeholder="Detalles para el equipo..."></textarea>
+            <textarea id="new-task-desc" class="input-glass" style="margin-bottom:16px;" placeholder="Detalles..."></textarea>
             <label style="font-size:12px; color:var(--text-muted); display:block;">Asignar a</label>
             <div style="display:flex; gap:10px; margin-bottom:24px;">
-                <select id="new-task-assignee" class="input-glass" style="appearance: none;">
-                    <option value="" disabled selected>Seleccionar miembro...</option>
-                </select>
+                <select id="new-task-assignee" class="input-glass" style="appearance: none;"><option value="" disabled selected>Cargando...</option></select>
             </div>
             <button class="btn btn-primary" style="width:100%" onclick="App.createTask()">Guardar Tarea</button>
             <button class="btn" style="width:100%; margin-top:10px;" onclick="UI.toggleModal('task-modal')">Cancelar</button>
@@ -395,7 +400,7 @@
         import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        const OPENAI_API_KEY = ""; 
+        const OPENAI_API_KEY = ""; // VACIAR para producción
         const SUPER_ADMINS = ["frantruppa@gmail.com"]; 
 
         const firebaseConfig = {
@@ -441,42 +446,69 @@
                 lucide.createIcons();
             },
 
-            // --- SINCRONIZACIÓN FAKE (PREPARACIÓN PARA API REAL) ---
-            syncAdsData: () => {
-                const btn = document.querySelector('.action-card i[data-lucide="refresh-cw"]') || document.querySelector('.btn-primary i[data-lucide="refresh-cw"]');
-                if(btn) btn.classList.add('spin-anim'); // Habría que agregar CSS para rotar
-                alert("Conectando con Meta API... (Datos actualizados)");
-                // Aquí iría el fetch a /api/ads
+            // --- AGENTE IA CON NAVEGACIÓN ---
+            sendMessage: async () => {
+                const i=document.getElementById('ai-input'), c=document.getElementById('chat-content'), t=i.value; if(!t)return;
+                c.innerHTML+=`<div style="text-align:right;margin-bottom:10px;color:white;">${t}</div>`; i.value=''; c.scrollTop=c.scrollHeight;
+                const tid="th-"+Date.now(); c.innerHTML+=`<div id="${tid}" style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;color:#999;">Analizando...</div>`; c.scrollTop=c.scrollHeight;
+                
+                try {
+                    // System Prompt mejorado para que actúe como agente
+                    const ctx = `
+                        Eres Alfred, el Agente Operativo de Abundance OS.
+                        TU CAPACIDAD: Además de responder, puedes navegar por la app.
+                        SI EL USUARIO PIDE IR A UN LUGAR, RESPONDE SOLO CON EL CÓDIGO:
+                        - [NAV:settings] para configuración
+                        - [NAV:ads] para ads manager
+                        - [NAV:reports] para reportes
+                        - [NAV:tasks] para tareas
+                        
+                        SI NO PIDE NAVEGAR, responde normal con estos datos:
+                        Campañas: ${JSON.stringify(App.dataCache.campaigns.map(x=>x.name))}
+                    `;
+                    
+                    let d;
+                    if(OPENAI_API_KEY) {
+                        const r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${OPENAI_API_KEY}`},body:JSON.stringify({model:"gpt-3.5-turbo",messages:[{role:"system",content:ctx},{role:"user",content:t}]})});
+                        d=await r.json();
+                    } else {
+                        const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:t,context:ctx})});
+                        d=await r.json();
+                    }
+                    if(d.error) throw new Error(d.error);
+                    
+                    const reply = d.choices[0].message.content;
+                    
+                    // EJECUTOR DE COMANDOS (AGENTE)
+                    if(reply.includes('[NAV:')) {
+                        const target = reply.match(/\[NAV:(.*?)\]/)[1];
+                        UI.nav(target);
+                        document.getElementById(tid).innerText = `Entendido. Navegando a ${target}...`;
+                    } else {
+                        document.getElementById(tid).innerText = reply;
+                    }
+                    document.getElementById(tid).style.color="white";
+
+                } catch(e) { document.getElementById(tid).innerText="Error de conexión."; document.getElementById(tid).style.color="red"; }
             },
 
-            // SIDEBAR LOGIC
+            syncAdsData: () => { alert("Sincronizando con Meta Business API... (Simulado)"); },
+
             updateSidebarClients: (campaigns) => {
                 const clients = new Set();
-                campaigns.forEach(c => {
-                    const parts = c.name.split('-');
-                    if(parts.length > 1) clients.add(parts[0].trim());
-                    else clients.add(c.name);
-                });
+                campaigns.forEach(c => { const parts = c.name.split('-'); if(parts.length > 1) clients.add(parts[0].trim()); else clients.add(c.name); });
                 const menu = document.getElementById('ads-submenu');
                 menu.innerHTML = `<div class="submenu-item active" onclick="App.filterAds('all', this)">Ver Todo</div>`;
-                clients.forEach(client => {
-                    menu.innerHTML += `<div class="submenu-item" onclick="App.filterAds('${client}', this)">${client}</div>`;
-                });
+                clients.forEach(client => { menu.innerHTML += `<div class="submenu-item" onclick="App.filterAds('${client}', this)">${client}</div>`; });
             },
 
             filterAds: (clientName, el) => {
-                document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active'));
-                el.classList.add('active');
+                document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active')); el.classList.add('active');
                 const all = App.dataCache.campaigns;
                 let filtered = all;
-                if(clientName !== 'all') {
-                    filtered = all.filter(c => c.name.includes(clientName));
-                    document.getElementById('page-title').innerText = "Cliente: " + clientName;
-                } else {
-                    document.getElementById('page-title').innerText = "Ads Manager: Todos";
-                }
-                App.renderAdsTable(filtered);
-                UI.nav('ads');
+                if(clientName !== 'all') { filtered = all.filter(c => c.name.includes(clientName)); document.getElementById('page-title').innerText = "Cliente: " + clientName; } 
+                else { document.getElementById('page-title').innerText = "Ads Manager: Todos"; }
+                App.renderAdsTable(filtered); UI.nav('ads');
             },
 
             renderAdsTable: (data) => {
@@ -535,7 +567,6 @@
                 });
             },
 
-            // UTILS
             toggleDetails: (id) => { const el = document.getElementById(id); el.style.display = el.style.display==='none'?'block':'none'; },
             cycleStatus: async (id, st) => { let n='pending'; if(st==='pending')n='in_process'; else if(st==='in_process')n='done'; await updateDoc(doc(App.db, "tasks", id), { status: n }); },
             createTask: async () => { 
@@ -560,25 +591,6 @@
             askCampaignAnalysis: () => { const c=App.dataCache.currentDetail; UI.toggleModal('campaign-detail-modal'); UI.toggleDrawer(); document.getElementById('ai-input').value=`Analiza campaña "${c.name}"...`; App.sendMessage(); },
             askTaskHelp: (id) => { const t=App.dataCache.tasks.find(x=>x.id===id); UI.toggleDrawer(); document.getElementById('ai-input').value=`Ayuda con tarea: ${t.title}...`; App.sendMessage(); },
 
-            sendMessage: async () => {
-                const i=document.getElementById('ai-input'), c=document.getElementById('chat-content'), t=i.value; if(!t)return;
-                c.innerHTML+=`<div style="text-align:right;margin-bottom:10px;color:white;">${t}</div>`; i.value=''; c.scrollTop=c.scrollHeight;
-                const tid="th-"+Date.now(); c.innerHTML+=`<div id="${tid}" style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;color:#999;">Pensando...</div>`; c.scrollTop=c.scrollHeight;
-                try {
-                    const ctx = `SOY ALFRED, EXPERTO EN MARKETING. DATOS: Campañas: ${JSON.stringify(App.dataCache.campaigns.map(x=>x.name))}. Tareas: ${JSON.stringify(App.dataCache.tasks.map(x=>x.title))}.`;
-                    let d;
-                    if(OPENAI_API_KEY) {
-                        const r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${OPENAI_API_KEY}`},body:JSON.stringify({model:"gpt-3.5-turbo",messages:[{role:"system",content:ctx},{role:"user",content:t}]})});
-                        d=await r.json();
-                    } else {
-                        const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:t,context:ctx})});
-                        d=await r.json();
-                    }
-                    if(d.error) throw new Error(d.error);
-                    document.getElementById(tid).innerText=d.choices[0].message.content; document.getElementById(tid).style.color="white";
-                } catch(e) { document.getElementById(tid).innerText="Error de conexión."; document.getElementById(tid).style.color="red"; }
-            },
-
             login: async()=>{try{await signInWithPopup(App.auth,new GoogleAuthProvider())}catch(e){alert(e)}},
             logout: async()=>{await signOut(App.auth);location.reload()},
             downloadPDF: ()=>{html2pdf().from(document.getElementById('view-dash')).save('Abundance_Report.pdf')}
@@ -591,7 +603,7 @@
             closeLogin: () => document.getElementById('login-modal').classList.remove('open'),
             toggleCalendar: (e) => { e.stopPropagation(); document.getElementById('calendar-menu').classList.toggle('show'); },
             setRange: (t,e) => { document.getElementById('calendar-label').innerText=t; document.getElementById('calendar-menu').classList.remove('show'); },
-            toggleSubmenu: (id) => { document.getElementById(id).classList.toggle('open'); },
+            toggleSubmenu: (id) => { const el = document.getElementById(id); el.classList.toggle('open'); },
             initMainChart: () => { new Chart(document.getElementById('mainChart').getContext('2d'), { type:'line',data:{labels:['S1','S2','S3','S4'],datasets:[{label:'Leads',data:[20,45,30,60],borderColor:'#3B82F6',tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#333'}}}}}); },
             initDetailChart: (n) => { const c=document.getElementById('detailChart').getContext('2d'); if(App.charts.detail)App.charts.detail.destroy(); App.charts.detail=new Chart(c,{type:'bar',data:{labels:['L','M','M','J','V'],datasets:[{label:n,data:[12,19,3,5,2],backgroundColor:'#10B981',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#333'}}}}}); }
         };
