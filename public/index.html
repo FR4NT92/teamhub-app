@@ -318,13 +318,17 @@
         </div>
     </div>
 
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { 
+            getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, updateDoc, serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { 
+            getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut 
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-       // TUS CREDENCIALES
-        const firebaseConfig = {  // <--- FALTABA ESTA LÍNEA DE APERTURA
+        // CONFIGURACIÓN DE PROD (Tu Backend Real)
+        const firebaseConfig = {
             apiKey: "AIzaSyDGWfj8yoNEBGnKr-5PNh5w9iPeVu8ijk8",
             authDomain: "abundance-98670.firebaseapp.com",
             projectId: "abundance-98670",
@@ -332,60 +336,160 @@
             messagingSenderId: "269658460750",
             appId: "1:269658460750:web:e0953ac63e983b33d2a91f"
         };
+
         const App = {
-            mode: 'demo', db: null, auth: null,
+            db: null,
+            auth: null,
+            user: null, // Aquí guardaremos quién está logueado
+            
             init: () => {
-                try {
-                    const app = initializeApp(firebaseConfig);
-                    App.db = getFirestore(app);
-                    App.auth = getAuth(app);
-                    App.mode = 'live';
-                    console.log("🔥 Firebase Live Mode");
-                    onAuthStateChanged(App.auth, (user) => { if(user) UI.closeLogin(); });
-                } catch(e) { console.warn("⚠️ Modo Demo (Sin Firebase)"); }
+                const app = initializeApp(firebaseConfig);
+                App.db = getFirestore(app);
+                App.auth = getAuth(app);
                 
-                App.renderAds(MockData.campaigns);
+                // Observador de Estado (El Portero de la Discoteca)
+                onAuthStateChanged(App.auth, (user) => {
+                    if (user) {
+                        console.log("🟢 Usuario Autenticado:", user.email);
+                        App.user = user;
+                        UI.closeLogin();
+                        App.listenToCampaigns(); // Iniciar flujo de datos REALES
+                    } else {
+                        console.log("🔴 Sin sesión");
+                        document.getElementById('login-modal').classList.add('open');
+                    }
+                });
+
                 UI.initCharts();
                 lucide.createIcons();
             },
+
             login: async () => {
-                if(App.mode === 'demo') { UI.closeLogin(); } 
-                else { try { await signInWithPopup(App.auth, new GoogleAuthProvider()); } catch(e) { alert("Error: " + e.message); } }
+                try {
+                    await signInWithPopup(App.auth, new GoogleAuthProvider());
+                } catch (e) {
+                    alert("Error de acceso: " + e.message);
+                }
             },
+
+            logout: async () => {
+                await signOut(App.auth);
+                location.reload();
+            },
+
+            // --- LÓGICA DE BASE DE DATOS (BACKEND REAL) ---
+
+            // 1. ESCUCHAR DATOS (READ)
+            listenToCampaigns: () => {
+                if (!App.user) return;
+                
+                // Query: Dame solo LAS MÍAS, ordenadas por fecha
+                const q = query(
+                    collection(App.db, "campaigns"),
+                    where("uid", "==", App.user.uid), 
+                    orderBy("createdAt", "desc")
+                );
+
+                // El "Socket" en tiempo real
+                onSnapshot(q, (snapshot) => {
+                    const campaigns = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+                    console.log("📡 Datos recibidos:", campaigns);
+                    App.renderAds(campaigns);
+                });
+            },
+
+            // 2. CREAR DATOS (CREATE)
             createCampaign: async () => {
                 const name = document.getElementById('new-camp-name').value;
                 const budget = document.getElementById('new-camp-budget').value;
-                if(!name || !budget) return alert("Faltan datos");
-                MockData.campaigns.unshift({ id: Date.now(), name, budget: `$${budget}/d`, results: '0', status: 'active' });
-                App.renderAds(MockData.campaigns);
-                UI.toggleModal('campaign-modal');
-                document.getElementById('new-camp-name').value = '';
+
+                if (!name || !budget) return alert("Completa los campos");
+
+                try {
+                    await addDoc(collection(App.db, "campaigns"), {
+                        uid: App.user.uid, // ¡CRUCIAL! Dueño del dato
+                        name: name,
+                        budget: `$${budget}/d`,
+                        results: '0', // Por ahora 0, luego vendrá de Meta API
+                        status: 'active',
+                        createdAt: serverTimestamp()
+                    });
+                    
+                    UI.toggleModal('campaign-modal');
+                    document.getElementById('new-camp-name').value = '';
+                } catch (e) {
+                    console.error("Error al crear:", e);
+                    alert("No se pudo guardar en la nube.");
+                }
             },
-            toggleStatus: (id) => {
-                const camp = MockData.campaigns.find(c => c.id == id);
-                if(camp) { camp.status = camp.status === 'active' ? 'paused' : 'active'; App.renderAds(MockData.campaigns); }
+
+            // 3. ACTUALIZAR ESTADO (UPDATE)
+            toggleStatus: async (docId, currentStatus) => {
+                const newStatus = currentStatus === 'active' ? 'paused' : 'active';
+                const campRef = doc(App.db, "campaigns", docId);
+                
+                // Optimistic UI: No esperamos a la red, cambiamos visualmente (opcional)
+                // Aquí vamos directo a la DB
+                await updateDoc(campRef, {
+                    status: newStatus
+                });
             },
+
+            // --- FRONTEND RENDERING ---
             renderAds: (data) => {
                 const tbody = document.getElementById('ads-body');
+                
+                if(data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">No tienes campañas activas. Crea una.</td></tr>`;
+                    return;
+                }
+
                 tbody.innerHTML = data.map(c => `
                     <tr>
-                        <td><span class="status-pill ${c.status==='active'?'status-on':'status-off'}"><div class="dot"></div> ${c.status}</span></td>
+                        <td>
+                            <span class="status-pill ${c.status === 'active' ? 'status-on' : 'status-off'}">
+                                <div class="dot"></div> ${c.status}
+                            </span>
+                        </td>
                         <td style="font-weight:500; color:white;">${c.name}</td>
                         <td style="color:var(--text-muted);">${c.budget}</td>
                         <td>${c.results}</td>
-                        <td><button class="btn" style="height:28px; font-size:11px;" onclick="App.toggleStatus(${c.id})">${c.status==='active'?'Pausar':'Activar'}</button></td>
+                        <td>
+                            <button class="btn" style="height:28px; font-size:11px;" 
+                                onclick="App.toggleStatus('${c.id}', '${c.status}')">
+                                ${c.status === 'active' ? 'Pausar' : 'Activar'}
+                            </button>
+                        </td>
                     </tr>
                 `).join('');
+                // Reinicializar iconos para los nuevos elementos
+                lucide.createIcons(); 
             },
+
+            // --- IA Placeholder (Próximo paso) ---
             sendMessage: () => {
                 const input = document.getElementById('ai-input');
                 const chat = document.getElementById('chat-content');
-                if(!input.value) return;
-                chat.innerHTML += `<div style="background:white; color:black; padding:16px; border-radius:12px; margin-bottom:12px; align-self:flex-end;">${input.value}</div>`;
+                if (!input.value) return;
+                
+                // User Message
+                chat.innerHTML += `<div style="background:white; color:black; padding:16px; border-radius:12px; margin-bottom:12px; align-self:flex-end; max-width:80%; margin-left:auto;">${input.value}</div>`;
+                
+                // Simulación de respuesta (Hasta que conectemos OpenAI)
+                setTimeout(() => {
+                    chat.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:16px; border-radius:12px; margin-bottom:12px; border:1px solid var(--border-glass); max-width:80%;">
+                        Estoy conectado a tu base de datos en vivo. En el próximo paso, me conectaré a OpenAI para analizar tus campañas reales.
+                    </div>`;
+                    chat.scrollTop = chat.scrollHeight;
+                }, 800);
+
                 input.value = '';
                 chat.scrollTop = chat.scrollHeight;
-                setTimeout(() => { chat.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:16px; border-radius:12px; margin-bottom:12px; border:1px solid var(--border-glass);">Analizando...</div>`; chat.scrollTop = chat.scrollHeight; }, 1000);
             },
+            
             downloadPDF: () => {
                 const el = document.getElementById('view-dash');
                 const btn = document.querySelector('#view-reports .btn-primary');
@@ -408,16 +512,12 @@
             toggleModal: (id) => document.getElementById(id).classList.toggle('open'),
             closeLogin: () => document.getElementById('login-modal').classList.remove('open'),
             
-            // Calendario
             toggleCalendar: (e) => { e.stopPropagation(); document.getElementById('calendar-menu').classList.toggle('show'); },
             setRange: (txt, el) => {
                 document.getElementById('calendar-label').innerText = txt;
                 document.querySelectorAll('.dropdown-item').forEach(d => d.classList.remove('active'));
                 el.classList.add('active');
                 document.getElementById('calendar-menu').classList.remove('show');
-                // Simulación de recarga de datos
-                document.querySelector('.kpi-grid').style.opacity = '0.5';
-                setTimeout(() => document.querySelector('.kpi-grid').style.opacity = '1', 300);
             },
 
             initCharts: () => {
@@ -435,15 +535,12 @@
             }
         };
 
-        // Cerrar calendario al hacer click fuera
         window.addEventListener('click', (e) => { if(!e.target.closest('#calendar-btn')) document.getElementById('calendar-menu').classList.remove('show'); });
-
-        const MockData = { campaigns: [{ id: 1, status: 'active', name: 'Prospecting - VSL', budget: '$100/d', results: '45 Leads' }, { id: 2, status: 'active', name: 'Retargeting - Checkout', budget: '$50/d', results: '12 Sales' }, { id: 3, status: 'paused', name: 'Test Creativos Feb', budget: '$20/d', results: '2 Leads' }] };
-
         window.App = App; window.UI = UI;
         App.init();
     </script>
 </body>
 </html>
+
 
 
