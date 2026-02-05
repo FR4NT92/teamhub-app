@@ -207,6 +207,9 @@
         <div style="flex:1;">
             <div class="nav-item active" onclick="UI.nav('dash')"><i data-lucide="layout-grid" class="icon"></i> Dashboard</div>
             <div class="nav-item" onclick="UI.nav('ads')"><i data-lucide="layers" class="icon"></i> Ads Manager</div>
+           <div class="nav-item active" onclick="UI.nav('dash')"><i data-lucide="layout-grid" class="icon"></i> Dashboard</div>
+<div class="nav-item" onclick="UI.nav('tasks')"><i data-lucide="check-square" class="icon"></i> Tareas (Team)</div>
+            <div class="nav-item" onclick="UI.nav('ads')"><i data-lucide="layers" class="icon"></i> Ads Manager</div>
             <div class="nav-item" onclick="UI.nav('crm')"><i data-lucide="users" class="icon"></i> Equipo & Clientes</div>
             <div class="nav-item" onclick="UI.nav('reports')"><i data-lucide="file-text" class="icon"></i> Reportes</div>
         </div>
@@ -238,6 +241,42 @@
         <div class="content-scroll">
             
             <section id="view-dash" class="view-section active">
+                <section id="view-tasks" class="view-section">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <div>
+            <h3 style="font-size:20px; font-weight:600;">Planificación Semanal</h3>
+            <p style="color:var(--text-muted); font-size:12px;">Sincronizado con todo el equipo Abundance</p>
+        </div>
+        <button class="btn btn-primary" onclick="UI.toggleModal('task-modal')">
+            <i data-lucide="plus" class="icon"></i> Nueva Tarea
+        </button>
+    </div>
+
+    <div class="card" style="padding:0; overflow:hidden;">
+        <div id="tasks-list" style="display:flex; flex-direction:column;">
+            <div style="padding:32px; text-align:center; color:var(--text-muted);">Cargando tareas del equipo...</div>
+        </div>
+    </div>
+</section>
+
+<div id="task-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 style="margin-bottom:24px;">Asignar Tarea al Equipo</h3>
+        <label style="font-size:12px; color:var(--text-muted);">Descripción de la tarea</label>
+        <input id="new-task-title" class="input-glass" style="margin-bottom:16px;" placeholder="Ej: Revisar creativos cliente X">
+        
+        <label style="font-size:12px; color:var(--text-muted);">Asignar a (Iniciales)</label>
+        <div style="display:flex; gap:10px; margin-bottom:24px;">
+            <input id="new-task-assignee" class="input-glass" style="width:80px;" placeholder="Ej: JP">
+            <button class="btn" style="flex:1; border-color:var(--accent-primary); color:var(--accent-primary);" onclick="alert('Próximamente: La IA sugerirá el mejor asignado basándose en carga de trabajo.')">✨ Auto-Asignar con IA</button>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:12px;">
+            <button class="btn" onclick="UI.toggleModal('task-modal')">Cancelar</button>
+            <button class="btn btn-primary" onclick="App.createTask()">Guardar Tarea</button>
+        </div>
+    </div>
+</div>
                 <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:20px; margin-bottom:30px;">
                     <div class="card"><div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">INVERSIÓN</div><div style="font-size:24px; font-weight:700;">$12,450</div></div>
                     <div class="card"><div style="font-size:11px; color:var(--text-muted); margin-bottom:8px;">ROAS</div><div style="font-size:24px; font-weight:700; color:var(--success);">4.2x</div></div>
@@ -319,228 +358,201 @@
     </div>
 
 <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { 
-            getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, updateDoc, serverTimestamp 
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { 
-            getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut 
-        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { 
+        getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { 
+        getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // CONFIGURACIÓN DE PROD (Tu Backend Real)
-        const firebaseConfig = {
-            apiKey: "AIzaSyDGWfj8yoNEBGnKr-5PNh5w9iPeVu8ijk8",
-            authDomain: "abundance-98670.firebaseapp.com",
-            projectId: "abundance-98670",
-            storageBucket: "abundance-98670.firebasestorage.app",
-            messagingSenderId: "269658460750",
-            appId: "1:269658460750:web:e0953ac63e983b33d2a91f"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyDGWfj8yoNEBGnKr-5PNh5w9iPeVu8ijk8",
+        authDomain: "abundance-98670.firebaseapp.com",
+        projectId: "abundance-98670",
+        storageBucket: "abundance-98670.firebasestorage.app",
+        messagingSenderId: "269658460750",
+        appId: "1:269658460750:web:e0953ac63e983b33d2a91f"
+    };
 
-        const App = {
-            db: null,
-            auth: null,
-            user: null, // Aquí guardaremos quién está logueado
+    const App = {
+        db: null, auth: null, user: null,
+        
+        init: () => {
+            const app = initializeApp(firebaseConfig);
+            App.db = getFirestore(app);
+            App.auth = getAuth(app);
             
-            init: () => {
-                const app = initializeApp(firebaseConfig);
-                App.db = getFirestore(app);
-                App.auth = getAuth(app);
-                
-                // Observador de Estado (El Portero de la Discoteca)
-                onAuthStateChanged(App.auth, (user) => {
-                    if (user) {
-                        console.log("🟢 Usuario Autenticado:", user.email);
-                        App.user = user;
-                        UI.closeLogin();
-                        App.listenToCampaigns(); // Iniciar flujo de datos REALES
-                    } else {
-                        console.log("🔴 Sin sesión");
-                        document.getElementById('login-modal').classList.add('open');
-                    }
-                });
-
-                UI.initCharts();
-                lucide.createIcons();
-            },
-
-            login: async () => {
-                try {
-                    await signInWithPopup(App.auth, new GoogleAuthProvider());
-                } catch (e) {
-                    alert("Error de acceso: " + e.message);
+            onAuthStateChanged(App.auth, (user) => {
+                if (user) {
+                    App.user = user;
+                    UI.closeLogin();
+                    // INICIAMOS LOS "LISTENERS" EN TIEMPO REAL
+                    App.listenToCampaigns(); 
+                    App.listenToTasks(); // <--- Nuevo canal de Tareas
+                } else {
+                    document.getElementById('login-modal').classList.add('open');
                 }
-            },
+            });
 
-            logout: async () => {
-                await signOut(App.auth);
-                location.reload();
-            },
+            UI.initCharts();
+            lucide.createIcons();
+        },
 
-            // --- LÓGICA DE BASE DE DATOS (BACKEND REAL) ---
+        login: async () => { try { await signInWithPopup(App.auth, new GoogleAuthProvider()); } catch(e) { alert(e.message); } },
 
-            // 1. ESCUCHAR DATOS (READ)
-            listenToCampaigns: () => {
-                if (!App.user) return;
-                
-                // Query: Dame solo LAS MÍAS, ordenadas por fecha
-                const q = query(
-                    collection(App.db, "campaigns"),
-                    where("uid", "==", App.user.uid), 
-                    orderBy("createdAt", "desc")
-                );
+        // --- GESTIÓN DE TAREAS (PROJECT MANAGER) ---
+        listenToTasks: () => {
+            // NOTA: Quitamos el filtro de UID. Ahora vemos las tareas de TODO el equipo.
+            const q = query(collection(App.db, "tasks"), orderBy("createdAt", "desc"));
+            
+            onSnapshot(q, (snapshot) => {
+                const tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                App.renderTasks(tasks);
+            });
+        },
 
-                // El "Socket" en tiempo real
-                onSnapshot(q, (snapshot) => {
-                    const campaigns = snapshot.docs.map(doc => ({
-                        id: doc.id,
-                        ...doc.data()
-                    }));
-                    console.log("📡 Datos recibidos:", campaigns);
-                    App.renderAds(campaigns);
-                });
-            },
+        createTask: async () => {
+            const title = document.getElementById('new-task-title').value;
+            const assignee = document.getElementById('new-task-assignee').value || "Team";
+            if(!title) return;
 
-            // 2. CREAR DATOS (CREATE)
-            createCampaign: async () => {
-                const name = document.getElementById('new-camp-name').value;
-                const budget = document.getElementById('new-camp-budget').value;
+            await addDoc(collection(App.db, "tasks"), {
+                title, assignee, status: 'pending',
+                createdBy: App.user.email,
+                createdAt: serverTimestamp()
+            });
+            UI.toggleModal('task-modal');
+            document.getElementById('new-task-title').value = '';
+        },
 
-                if (!name || !budget) return alert("Completa los campos");
+        toggleTask: async (id, currentStatus) => {
+            const newStatus = currentStatus === 'pending' ? 'done' : 'pending';
+            await updateDoc(doc(App.db, "tasks", id), { status: newStatus });
+        },
 
-                try {
-                    await addDoc(collection(App.db, "campaigns"), {
-                        uid: App.user.uid, // ¡CRUCIAL! Dueño del dato
-                        name: name,
-                        budget: `$${budget}/d`,
-                        results: '0', // Por ahora 0, luego vendrá de Meta API
-                        status: 'active',
-                        createdAt: serverTimestamp()
-                    });
-                    
-                    UI.toggleModal('campaign-modal');
-                    document.getElementById('new-camp-name').value = '';
-                } catch (e) {
-                    console.error("Error al crear:", e);
-                    alert("No se pudo guardar en la nube.");
-                }
-            },
+        deleteTask: async (id) => {
+            if(confirm("¿Borrar tarea?")) await deleteDoc(doc(App.db, "tasks", id));
+        },
 
-            // 3. ACTUALIZAR ESTADO (UPDATE)
-            toggleStatus: async (docId, currentStatus) => {
-                const newStatus = currentStatus === 'active' ? 'paused' : 'active';
-                const campRef = doc(App.db, "campaigns", docId);
-                
-                // Optimistic UI: No esperamos a la red, cambiamos visualmente (opcional)
-                // Aquí vamos directo a la DB
-                await updateDoc(campRef, {
-                    status: newStatus
-                });
-            },
+        renderTasks: (tasks) => {
+            const container = document.getElementById('tasks-list');
+            if(tasks.length === 0) { container.innerHTML = '<div style="padding:32px; text-align:center; color:var(--text-muted);">No hay tareas pendientes. ¡Buen trabajo equipo!</div>'; return; }
+            
+            container.innerHTML = tasks.map(t => `
+                <div style="padding:16px 24px; border-bottom:1px solid var(--border-glass); display:flex; align-items:center; gap:16px; background:${t.status==='done'?'rgba(255,255,255,0.02)':'transparent'}; transition:0.2s;">
+                    <div onclick="App.toggleTask('${t.id}', '${t.status}')" style="cursor:pointer; width:20px; height:20px; border-radius:6px; border:2px solid ${t.status==='done'?'var(--success)':'var(--border-highlight)'}; display:flex; align-items:center; justify-content:center; background:${t.status==='done'?'rgba(16,185,129,0.2)':'transparent'}">
+                        ${t.status==='done' ? '<i data-lucide="check" style="width:14px; color:var(--success);"></i>' : ''}
+                    </div>
+                    <div style="flex:1; text-decoration:${t.status==='done'?'line-through':'none'}; color:${t.status==='done'?'var(--text-muted)':'white'};">
+                        ${t.title}
+                    </div>
+                    <div style="font-size:11px; padding:4px 8px; background:rgba(255,255,255,0.1); border-radius:6px;">
+                        ${t.assignee}
+                    </div>
+                    <button class="btn" style="width:32px; padding:0; border:none; color:var(--danger);" onclick="App.deleteTask('${t.id}')"><i data-lucide="trash-2" class="icon"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        },
 
-            // --- FRONTEND RENDERING ---
-            renderAds: (data) => {
-                const tbody = document.getElementById('ads-body');
-                
-                if(data.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:20px;">No tienes campañas activas. Crea una.</td></tr>`;
-                    return;
-                }
+        // --- GESTIÓN DE ADS (AD MANAGER) ---
+        listenToCampaigns: () => {
+            // NOTA: También quitamos el filtro UID aquí. Todos ven las campañas de todos.
+            const q = query(collection(App.db, "campaigns"), orderBy("createdAt", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const campaigns = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                App.renderAds(campaigns);
+            });
+        },
 
-                tbody.innerHTML = data.map(c => `
-                    <tr>
-                        <td>
-                            <span class="status-pill ${c.status === 'active' ? 'status-on' : 'status-off'}">
-                                <div class="dot"></div> ${c.status}
-                            </span>
-                        </td>
-                        <td style="font-weight:500; color:white;">${c.name}</td>
-                        <td style="color:var(--text-muted);">${c.budget}</td>
-                        <td>${c.results}</td>
-                        <td>
-                            <button class="btn" style="height:28px; font-size:11px;" 
-                                onclick="App.toggleStatus('${c.id}', '${c.status}')">
-                                ${c.status === 'active' ? 'Pausar' : 'Activar'}
-                            </button>
-                        </td>
-                    </tr>
-                `).join('');
-                // Reinicializar iconos para los nuevos elementos
-                lucide.createIcons(); 
-            },
+        createCampaign: async () => {
+            const name = document.getElementById('new-camp-name').value;
+            const budget = document.getElementById('new-camp-budget').value;
+            if(!name || !budget) return alert("Faltan datos");
 
-            // --- IA Placeholder (Próximo paso) ---
-            sendMessage: () => {
-                const input = document.getElementById('ai-input');
-                const chat = document.getElementById('chat-content');
-                if (!input.value) return;
-                
-                // User Message
-                chat.innerHTML += `<div style="background:white; color:black; padding:16px; border-radius:12px; margin-bottom:12px; align-self:flex-end; max-width:80%; margin-left:auto;">${input.value}</div>`;
-                
-                // Simulación de respuesta (Hasta que conectemos OpenAI)
-                setTimeout(() => {
-                    chat.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:16px; border-radius:12px; margin-bottom:12px; border:1px solid var(--border-glass); max-width:80%;">
-                        Estoy conectado a tu base de datos en vivo. En el próximo paso, me conectaré a OpenAI para analizar tus campañas reales.
-                    </div>`;
-                    chat.scrollTop = chat.scrollHeight;
-                }, 800);
+            await addDoc(collection(App.db, "campaigns"), {
+                name, budget: `$${budget}/d`, results: '0', status: 'active',
+                createdAt: serverTimestamp(), author: App.user.email // Guardamos quién la creó
+            });
+            UI.toggleModal('campaign-modal');
+            document.getElementById('new-camp-name').value = '';
+        },
 
-                input.value = '';
+        toggleStatus: async (docId, currentStatus) => {
+            await updateDoc(doc(App.db, "campaigns", docId), { status: currentStatus === 'active' ? 'paused' : 'active' });
+        },
+
+        renderAds: (data) => {
+            const tbody = document.getElementById('ads-body');
+            if(data.length === 0) { tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px; color:var(--text-muted);">Sin campañas activas.</td></tr>`; return; }
+            tbody.innerHTML = data.map(c => `
+                <tr>
+                    <td><span class="status-pill ${c.status==='active'?'status-on':'status-off'}"><div class="dot"></div> ${c.status}</span></td>
+                    <td style="font-weight:500; color:white;">${c.name}</td>
+                    <td style="color:var(--text-muted);">${c.budget}</td>
+                    <td>${c.results} <button class="btn" style="height:20px; padding:0 6px; font-size:9px; margin-left:8px; border-color:var(--accent-primary); color:var(--accent-primary);" onclick="alert('IA: Analizando rendimiento...')">✨ IA</button></td>
+                    <td><button class="btn" style="height:28px; font-size:11px;" onclick="App.toggleStatus('${c.id}', '${c.status}')">${c.status==='active'?'Pausar':'Activar'}</button></td>
+                </tr>
+            `).join('');
+            lucide.createIcons();
+        },
+
+        // --- UTILIDADES ---
+        sendMessage: () => {
+            const input = document.getElementById('ai-input');
+            const chat = document.getElementById('chat-content');
+            if(!input.value) return;
+            chat.innerHTML += `<div style="background:white; color:black; padding:16px; border-radius:12px; margin-bottom:12px; align-self:flex-end; max-width:80%; margin-left:auto;">${input.value}</div>`;
+            setTimeout(() => {
+                chat.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:16px; border-radius:12px; margin-bottom:12px; border:1px solid var(--border-glass); max-width:80%;">Alfred (IA) está leyendo tus datos de Firebase en tiempo real.</div>`;
                 chat.scrollTop = chat.scrollHeight;
-            },
-            
-            downloadPDF: () => {
-                const el = document.getElementById('view-dash');
-                const btn = document.querySelector('#view-reports .btn-primary');
-                btn.innerText = "⏳ Generando...";
-                const opt = { margin: 10, filename: 'Abundance_Report.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#000000' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } };
-                html2pdf().set(opt).from(el).save().then(() => btn.innerHTML = `<i data-lucide="download" class="icon"></i> Descargar PDF`);
-            }
-        };
+            }, 800);
+            input.value = ''; chat.scrollTop = chat.scrollHeight;
+        },
+        downloadPDF: () => {
+            const el = document.getElementById('view-dash');
+            const btn = document.querySelector('#view-reports .btn-primary');
+            btn.innerText = "⏳ Generando...";
+            const opt = { margin: 10, filename: 'Abundance_Report.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#000000' }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } };
+            html2pdf().set(opt).from(el).save().then(() => btn.innerHTML = `<i data-lucide="download" class="icon"></i> Descargar PDF`);
+        }
+    };
 
-        const UI = {
-            nav: (viewId) => {
-                document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-                document.getElementById('view-'+viewId).classList.add('active');
-                document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-                event.currentTarget.classList.add('active');
-                const titles = { dash: 'Dashboard', ads: 'Ads Manager', crm: 'Clientes', reports: 'Reportes', settings: 'Configuración' };
-                document.getElementById('page-title').innerText = titles[viewId];
-            },
-            toggleDrawer: () => document.getElementById('ai-drawer').classList.toggle('open'),
-            toggleModal: (id) => document.getElementById(id).classList.toggle('open'),
-            closeLogin: () => document.getElementById('login-modal').classList.remove('open'),
-            
-            toggleCalendar: (e) => { e.stopPropagation(); document.getElementById('calendar-menu').classList.toggle('show'); },
-            setRange: (txt, el) => {
-                document.getElementById('calendar-label').innerText = txt;
-                document.querySelectorAll('.dropdown-item').forEach(d => d.classList.remove('active'));
-                el.classList.add('active');
-                document.getElementById('calendar-menu').classList.remove('show');
-            },
+    const UI = {
+        nav: (viewId) => {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-'+viewId).classList.add('active');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            const titles = { dash: 'Dashboard', tasks: 'Tareas de Equipo', ads: 'Ads Manager', crm: 'Clientes', reports: 'Reportes', settings: 'Configuración' };
+            document.getElementById('page-title').innerText = titles[viewId];
+        },
+        toggleDrawer: () => document.getElementById('ai-drawer').classList.toggle('open'),
+        toggleModal: (id) => document.getElementById(id).classList.toggle('open'),
+        closeLogin: () => document.getElementById('login-modal').classList.remove('open'),
+        toggleCalendar: (e) => { e.stopPropagation(); document.getElementById('calendar-menu').classList.toggle('show'); },
+        setRange: (txt, el) => {
+            document.getElementById('calendar-label').innerText = txt;
+            document.querySelectorAll('.dropdown-item').forEach(d => d.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('calendar-menu').classList.remove('show');
+        },
+        initCharts: () => {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)'); gradient.addColorStop(1, 'transparent');
+            new Chart(ctx, { type: 'line', data: { labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'], datasets: [{ label: 'Revenue', data: [12000, 19000, 3000, 5000, 2000, 30000, 45000], borderColor: '#3B82F6', backgroundColor: gradient, borderWidth: 2, pointRadius: 0, pointHoverRadius: 6, fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#666' } }, y: { grid: { color: '#222' }, ticks: { color: '#666' } } } } });
+        }
+    };
 
-            initCharts: () => {
-                const ctx = document.getElementById('mainChart').getContext('2d');
-                const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)'); gradient.addColorStop(1, 'transparent');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                        datasets: [{ label: 'Revenue', data: [12000, 19000, 3000, 5000, 2000, 30000, 45000], borderColor: '#3B82F6', backgroundColor: gradient, borderWidth: 2, pointRadius: 0, pointHoverRadius: 6, fill: true, tension: 0.4 }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#666' } }, y: { grid: { color: '#222' }, ticks: { color: '#666' } } } }
-                });
-            }
-        };
-
-        window.addEventListener('click', (e) => { if(!e.target.closest('#calendar-btn')) document.getElementById('calendar-menu').classList.remove('show'); });
-        window.App = App; window.UI = UI;
-        App.init();
-    </script>
+    window.addEventListener('click', (e) => { if(!e.target.closest('#calendar-btn')) document.getElementById('calendar-menu').classList.remove('show'); });
+    window.App = App; window.UI = UI;
+    App.init();
+</script>
 </body>
 </html>
+
 
 
 
