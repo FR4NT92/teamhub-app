@@ -282,19 +282,19 @@
                 </div>
             </section>
 
-            <section id="view-crm" class="view-section">
+      <section id="view-crm" class="view-section">
                 <div class="card" style="margin-bottom:24px;">
-                    <h3 style="margin-bottom:16px; font-size:16px;">Invitar Cliente / Equipo</h3>
-                    <div style="display:flex; gap:12px;">
-                        <input class="input-glass" placeholder="Email (ej: marketing@cliente.com)">
-                        <button class="btn btn-primary" onclick="alert('Invitación enviada')">Invitar</button>
+                    <h3 style="margin-bottom:16px; font-size:16px;">Invitar Miembro del Equipo</h3>
+                    <div style="display:flex; gap:12px; align-items:center;">
+                        <p style="flex:1; color:var(--text-muted); font-size:12px;">Agrega un email de Google para darle acceso inmediato al Dashboard.</p>
+                        <button class="btn btn-primary" onclick="App.inviteUser()">+ Autorizar Email</button>
                     </div>
                 </div>
                 <div class="table-container">
                     <table>
                         <thead><tr><th>Usuario</th><th>Rol</th><th>Estado</th></tr></thead>
                         <tbody>
-                            <tr><td>admin@abundance.com</td><td><span style="background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:4px; font-size:10px;">OWNER</span></td><td style="color:var(--success)">Activo</td></tr>
+                            <tr><td colspan="3" style="text-align:center; padding:20px;">Cargando equipo...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -359,16 +359,19 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { 
-            getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp 
+            getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp, getDocs, setDoc, getDoc 
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { 
             getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut 
         } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // 🔥 IMPORTANTE: PEGA TU API KEY DE OPENAI AQUÍ PARA QUE ALFRED FUNCIONE
-        const OPENAI_API_KEY = "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"; // Ej: "sk-proj-xxxxxxxxxxxx"
+        // 🟢 CONFIGURACIÓN: TU API KEY DE OPENAI
+        const OPENAI_API_KEY = "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"; 
 
-        // CREDENCIALES FIREBASE (PROD)
+        // 🛡️ SEGURIDAD INICIAL: PON AQUÍ TU EMAIL PARA SER EL SUPER-ADMIN
+        // Si no pones tu email aquí, no podrás entrar la primera vez.
+        const SUPER_ADMINS = ["frantruppa@gmail.com"]; 
+
         const firebaseConfig = {
             apiKey: "AIzaSyDGWfj8yoNEBGnKr-5PNh5w9iPeVu8ijk8",
             authDomain: "abundance-98670.firebaseapp.com",
@@ -380,20 +383,29 @@
 
         const App = {
             db: null, auth: null, user: null,
-            dataCache: { campaigns: [], tasks: [] }, // Memoria para la IA
+            dataCache: { campaigns: [], tasks: [] },
 
             init: () => {
                 const app = initializeApp(firebaseConfig);
                 App.db = getFirestore(app);
                 App.auth = getAuth(app);
                 
-                onAuthStateChanged(App.auth, (user) => {
+                onAuthStateChanged(App.auth, async (user) => {
                     if (user) {
-                        console.log("🟢 Autenticado:", user.email);
-                        App.user = user;
-                        UI.closeLogin();
-                        App.listenToCampaigns(); 
-                        App.listenToTasks(); // Listener de tareas activado
+                        // 🔒 VERIFICACIÓN DE SEGURIDAD (WHITELIST)
+                        const hasAccess = await App.checkAccess(user);
+                        if (hasAccess) {
+                            console.log("🟢 Acceso Concedido:", user.email);
+                            App.user = user;
+                            UI.closeLogin();
+                            App.listenToCampaigns(); 
+                            App.listenToTasks();
+                            App.listenToTeam(); // Nuevo: Ver lista de equipo
+                        } else {
+                            console.warn("🔴 Acceso Denegado:", user.email);
+                            alert("Este email no tiene permisos para acceder a Abundance OS. Contacta al administrador.");
+                            await signOut(App.auth);
+                        }
                     } else {
                         document.getElementById('login-modal').classList.add('open');
                     }
@@ -403,15 +415,69 @@
                 lucide.createIcons();
             },
 
+            // 🛡️ LÓGICA DE WHITELIST
+            checkAccess: async (user) => {
+                // 1. Si es Super Admin (hardcoded), entra siempre y se auto-registra en DB
+                if (SUPER_ADMINS.includes(user.email)) {
+                    await setDoc(doc(App.db, "allowed_users", user.email), { 
+                        email: user.email, role: 'admin', addedAt: serverTimestamp() 
+                    }, { merge: true });
+                    return true;
+                }
+                
+                // 2. Verificar si está en la base de datos
+                const userRef = doc(App.db, "allowed_users", user.email);
+                const userSnap = await getDoc(userRef);
+                return userSnap.exists();
+            },
+
+            inviteUser: async () => {
+                const email = prompt("Ingresa el email GMAIL del miembro del equipo:");
+                if(!email) return;
+                
+                try {
+                    await setDoc(doc(App.db, "allowed_users", email), {
+                        email: email.trim(),
+                        role: 'member',
+                        addedAt: serverTimestamp(),
+                        invitedBy: App.user.email
+                    });
+                    alert(`✅ ${email} autorizado correctamente.`);
+                } catch(e) {
+                    alert("Error al invitar: " + e.message);
+                }
+            },
+
+            listenToTeam: () => {
+                const q = query(collection(App.db, "allowed_users"));
+                onSnapshot(q, (snapshot) => {
+                    const users = snapshot.docs.map(doc => doc.data());
+                    const tbody = document.querySelector('#view-crm tbody');
+                    if(tbody) {
+                        tbody.innerHTML = users.map(u => `
+                            <tr>
+                                <td>${u.email}</td>
+                                <td><span style="background:rgba(255,255,255,0.1); padding:2px 8px; border-radius:4px; font-size:10px;">${u.role.toUpperCase()}</span></td>
+                                <td style="color:var(--success)">Autorizado</td>
+                            </tr>
+                        `).join('');
+                    }
+                });
+            },
+
+            // ... (RESTO DE FUNCIONES LOGIN, LOGOUT IGUAL QUE ANTES) ...
             login: async () => { try { await signInWithPopup(App.auth, new GoogleAuthProvider()); } catch(e) { alert(e.message); } },
             logout: async () => { await signOut(App.auth); location.reload(); },
 
-            // --- GESTIÓN DE TAREAS ---
+            // ... (MANTÉN AQUÍ TUS FUNCIONES createCampaign, listenToCampaigns, listenToTasks, etc. DEL CÓDIGO ANTERIOR) ...
+            // Solo asegúrate de añadir este pequeño botón en la sección CRM para invitar:
+            
+            // --- GESTIÓN DE TAREAS (Igual que antes) ---
             listenToTasks: () => {
                 const q = query(collection(App.db, "tasks"), orderBy("createdAt", "desc"));
                 onSnapshot(q, (snapshot) => {
                     const tasks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    App.dataCache.tasks = tasks; // Guardar para la IA
+                    App.dataCache.tasks = tasks; 
                     App.renderTasks(tasks);
                 });
             },
@@ -451,12 +517,12 @@
                 lucide.createIcons();
             },
 
-            // --- GESTIÓN DE ADS ---
+            // --- GESTIÓN DE ADS (Igual que antes) ---
             listenToCampaigns: () => {
                 const q = query(collection(App.db, "campaigns"), orderBy("createdAt", "desc"));
                 onSnapshot(q, (snapshot) => {
                     const campaigns = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    App.dataCache.campaigns = campaigns; // Guardar para la IA
+                    App.dataCache.campaigns = campaigns; 
                     App.renderAds(campaigns);
                 });
             },
@@ -490,18 +556,16 @@
                 lucide.createIcons();
             },
 
-            // --- INTELIGENCIA ARTIFICIAL (ALFRED + OPENAI) ---
+            // --- IA Y UTILIDADES (Igual que antes) ---
             sendMessage: async () => {
                 const input = document.getElementById('ai-input');
                 const chat = document.getElementById('chat-content');
                 const msg = input.value;
                 if(!msg) return;
 
-                // 1. Mostrar mensaje usuario
                 chat.innerHTML += `<div style="background:white; color:black; padding:16px; border-radius:12px; margin-bottom:12px; align-self:flex-end; max-width:80%; margin-left:auto;">${msg}</div>`;
                 input.value = ''; chat.scrollTop = chat.scrollHeight;
 
-                // 2. Placeholder de "Pensando..."
                 const thinkingId = "thinking-" + Date.now();
                 chat.innerHTML += `<div id="${thinkingId}" style="background:rgba(255,255,255,0.05); padding:16px; border-radius:12px; margin-bottom:12px; border:1px solid var(--border-glass); max-width:80%;">Alfred está analizando tus datos...</div>`;
                 chat.scrollTop = chat.scrollHeight;
@@ -512,38 +576,30 @@
                 }
 
                 try {
-                    // 3. Crear el Contexto del Sistema con los DATOS REALES
                     const contextData = `
-                        ERES ALFRED, UN EXPERTO EN MARKETING DIGITAL Y PROJECT MANAGER.
+                        ERES ALFRED, UN EXPERTO EN MARKETING DIGITAL.
                         ESTADO ACTUAL DE LA AGENCIA:
                         - Campañas Activas: ${JSON.stringify(App.dataCache.campaigns.map(c => `${c.name} (${c.status})`))}
                         - Tareas Pendientes: ${JSON.stringify(App.dataCache.tasks.filter(t => t.status==='pending').map(t => t.title))}
-                        
-                        RESPONDE AL USUARIO DE FORMA BREVE, DIRECTA Y PROFESIONAL.
+                        RESPONDE AL USUARIO DE FORMA BREVE.
                     `;
 
-                    // 4. Llamada a OpenAI
                     const response = await fetch("https://api.openai.com/v1/chat/completions", {
                         method: "POST",
                         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${OPENAI_API_KEY}` },
                         body: JSON.stringify({
-                            model: "gpt-3.5-turbo", // O "gpt-4o" si tienes acceso
-                            messages: [
-                                { role: "system", content: contextData },
-                                { role: "user", content: msg }
-                            ]
+                            model: "gpt-3.5-turbo",
+                            messages: [{ role: "system", content: contextData }, { role: "user", content: msg }]
                         })
                     });
 
                     const data = await response.json();
                     const reply = data.choices[0].message.content;
-
-                    // 5. Mostrar respuesta
                     document.getElementById(thinkingId).innerText = reply;
 
                 } catch (error) {
                     console.error(error);
-                    document.getElementById(thinkingId).innerText = "Error conectando con OpenAI. Revisa la consola.";
+                    document.getElementById(thinkingId).innerText = "Error conectando con OpenAI.";
                 }
             },
             
@@ -595,3 +651,4 @@
     </script>
 </body>
 </html>
+
