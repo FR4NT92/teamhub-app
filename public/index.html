@@ -332,7 +332,13 @@
         <div class="modal-box">
             <h3>Nueva Tarea</h3>
             <input id="new-task-title" class="input-glass" style="margin:16px 0;" placeholder="Descripción...">
-            <input id="new-task-assignee" class="input-glass" style="margin-bottom:24px;" placeholder="Asignado (Iniciales)">
+            <input id="new-task-select" class="input-glass" style="margin-bottom:24px;" placeholder="Asignado (Iniciales)"> 
+            <label style="font-size:12px; color:var(--text-muted);">Asignar a (Email)</label>
+            <div style="display:flex; gap:10px; margin-bottom:24px;">
+                <select id="new-task-assignee" class="input-glass" style="appearance: none;">
+                    <option value="" disabled selected>Seleccionar miembro...</option>
+                </select>
+                </div>
             <button class="btn btn-primary" style="width:100%" onclick="App.createTask()">Guardar</button>
             <button class="btn" style="width:100%; margin-top:10px;" onclick="UI.toggleModal('task-modal')">Cancelar</button>
         </div>
@@ -450,29 +456,66 @@
             },
 
             // 🛡️ RENDERIZADO SEGURO DE LA TABLA DE EQUIPO
+            // A. Actualiza esta función para que TAMBIÉN llene el select de tareas
             listenToTeam: () => {
                 onSnapshot(query(collection(App.db, "allowed_users")), (snap) => {
                     const users = snap.docs.map(d => d.data());
-                    const tbody = document.getElementById('team-list-body');
-                    const isSuperAdmin = SUPER_ADMINS.includes(App.user.email); // Verificar Rol
                     
-                    if(tbody) {
-                        tbody.innerHTML = users.map(u => `
-                            <tr>
-                                <td>${u.email}</td>
-                                <td>${u.role}</td>
-                                <td>
-                                    ${ isSuperAdmin ? 
-                                    `<button class="btn btn-danger" style="height:28px; padding:0 8px;" onclick="App.removeUser('${u.email}')">
-                                        <i data-lucide="trash" class="icon" style="width:14px;"></i>
-                                    </button>` 
-                                    : '<span style="color:#444; font-size:11px;">Restringido</span>' }
-                                </td>
-                            </tr>
-                        `).join('');
-                        lucide.createIcons();
+                    // 1. Llenar tabla (Lo que ya hacías)
+                    const tbody = document.getElementById('team-list-body');
+                    const isSuperAdmin = SUPER_ADMINS.includes(App.user.email);
+                    if(tbody) { /* ... tu código de tabla anterior ... */ }
+
+                    // 2. NUEVO: Llenar el Select del Modal de Tareas
+                    const select = document.getElementById('new-task-assignee');
+                    if(select) {
+                        // Guardamos la opción por defecto
+                        let options = '<option value="" disabled selected>Seleccionar miembro...</option>';
+                        // Agregamos opción para "Todo el equipo"
+                        options += '<option value="team">Todo el Equipo</option>';
+                        // Agregamos usuarios reales
+                        users.forEach(u => {
+                            options += `<option value="${u.email}">${u.email} (${u.role})</option>`;
+                        });
+                        select.innerHTML = options;
                     }
                 });
+            },
+
+            // B. Actualiza la función createTask para enviar el email
+            createTask: async () => {
+                const title = document.getElementById('new-task-title').value;
+                const assigneeEmail = document.getElementById('new-task-assignee').value; // Ahora esto es un email real
+                
+                if(!title || !assigneeEmail) return alert("Por favor completa la tarea y asigna un responsable.");
+
+                // 1. Guardar en Firebase (Base de datos)
+                await addDoc(collection(App.db, "tasks"), {
+                    title, 
+                    assignee: assigneeEmail, // Guardamos el email
+                    status: 'pending', 
+                    createdBy: App.user.email, 
+                    createdAt: serverTimestamp() 
+                });
+
+                // 2. Enviar Notificación por Email (Vía Vercel Backend)
+                // No esperamos (await) a que el email se envíe para cerrar el modal, para que se sienta rápido.
+                if (assigneeEmail !== 'team') { // Solo enviamos si es a una persona específica
+                    fetch('/api/notify', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            to: assigneeEmail,
+                            taskTitle: title,
+                            assignedBy: App.user.email
+                        })
+                    }).catch(err => console.error("Error enviando email:", err));
+                }
+
+                UI.toggleModal('task-modal'); 
+                document.getElementById('new-task-title').value = '';
+                // Resetear select
+                document.getElementById('new-task-assignee').value = "";
             },
 
             listenToCampaigns: () => {
@@ -655,4 +698,5 @@
     </script>
 </body>
 </html>
+
 
