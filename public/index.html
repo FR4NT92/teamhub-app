@@ -23,6 +23,7 @@
             --text-muted: #9CA3AF;
             --accent-primary: #3B82F6; 
             --success: #10B981;
+            --warning: #F59E0B;
             --danger: #EF4444;
             --ease: cubic-bezier(0.25, 1, 0.5, 1);
         }
@@ -71,15 +72,21 @@
         textarea.input-glass { min-height: 80px; resize: vertical; font-family: inherit; }
         .card { background: rgba(15, 15, 15, 0.6); border: 1px solid var(--border-glass); border-radius: 20px; padding: 24px; }
 
-        /* --- SIDEBAR (ANIMADA) --- */
+        /* --- SIDEBAR ANIMADA (Resend Style) --- */
         aside { width: 250px; background: rgba(5, 5, 5, 0.8); border-right: 1px solid var(--border-glass); display: flex; flex-direction: column; padding: 20px 12px; z-index: 20; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; margin-bottom: 2px; }
+        
+        .nav-item { 
+            display: flex; align-items: center; gap: 12px; padding: 10px 12px; 
+            border-radius: 12px; color: var(--text-muted); cursor: pointer; 
+            transition: color 0.2s ease, background 0.2s ease; 
+            margin-bottom: 2px; 
+        }
         .nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
         .nav-item.active { background: rgba(255,255,255,0.08); color: white; font-weight: 500; }
         .nav-item.active .icon { color: var(--accent-primary); }
-        
-        /* Animación Iconos tipo Resend */
-        .nav-item .icon { transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), color 0.2s; }
+
+        /* ✨ Animación de Icono */
+        .nav-item .icon { transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1); }
         .nav-item:hover .icon { transform: translateX(3px); color: white; }
 
         main { flex: 1; display: flex; flex-direction: column; }
@@ -97,7 +104,7 @@
         
         /* Pills & Status */
         .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; text-transform: uppercase; cursor: pointer; user-select: none; transition: all 0.2s; }
-        .status-pill:hover { filter: brightness(1.2); }
+        .status-pill:hover { filter: brightness(1.2); transform: scale(1.02); }
         .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
         
         .status-pending { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.1); }
@@ -324,8 +331,8 @@
             <label style="font-size:12px; color:var(--text-muted); margin-top:16px; display:block;">Título</label>
             <input id="new-task-title" class="input-glass" style="margin-bottom:16px;" placeholder="Ej: Configurar Pixel">
             
-            <label style="font-size:12px; color:var(--text-muted); display:block;">Descripción</label>
-            <textarea id="new-task-desc" class="input-glass" style="margin-bottom:16px;" placeholder="Detalles de la tarea..."></textarea>
+            <label style="font-size:12px; color:var(--text-muted); display:block;">Descripción (Detalles)</label>
+            <textarea id="new-task-desc" class="input-glass" style="margin-bottom:16px;" placeholder="Detalles para el equipo..."></textarea>
             
             <label style="font-size:12px; color:var(--text-muted); display:block;">Asignar a</label>
             <div style="display:flex; gap:10px; margin-bottom:24px;">
@@ -391,7 +398,9 @@
         import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // 🛡️ SUPER ADMINS (LISTA DE PODER)
+        // 🛡️ API KEYS & ADMINS
+        // 🔥 SI QUIERES PROBAR LA IA AHORA, PEGA TU KEY AQUÍ. SI LA DEJAS VACÍA, USARÁ EL BACKEND.
+        const OPENAI_API_KEY = ""; 
         const SUPER_ADMINS = ["frantruppa@gmail.com"]; 
 
         const firebaseConfig = {
@@ -440,7 +449,7 @@
                 lucide.createIcons();
             },
 
-            // --- 1. GESTIÓN DE TAREAS MEJORADA ---
+            // --- 1. GESTIÓN DE TAREAS MEJORADA (PILLS + ACORDEÓN) ---
             listenToTasks: () => {
                 onSnapshot(query(collection(App.db, "tasks"), orderBy("createdAt", "desc")), (snap) => {
                     const tasks = snap.docs.map(d => ({id:d.id, ...d.data()}));
@@ -549,7 +558,61 @@
             },
 
 
-            // --- RESTO DE FUNCIONES (Sin cambios que rompan lógica) ---
+            // --- IA HÍBRIDA (SOLUCIÓN ERROR CONEXIÓN) ---
+            sendMessage: async () => {
+                const input = document.getElementById('ai-input');
+                const chat = document.getElementById('chat-content');
+                const txt = input.value; if(!txt) return;
+                
+                chat.innerHTML += `<div style="text-align:right; margin-bottom:10px; color:white;">${txt}</div>`;
+                input.value = ''; chat.scrollTop = chat.scrollHeight;
+
+                const thinkingId = "thinking-" + Date.now();
+                chat.innerHTML += `<div id="${thinkingId}" style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; margin-bottom:10px; color:var(--text-muted);">Alfred está pensando...</div>`;
+                chat.scrollTop = chat.scrollHeight;
+
+                try {
+                    const contextData = `
+                        ERES ALFRED, UN EXPERTO EN MARKETING DIGITAL Y PROJECT MANAGER.
+                        ESTADO ACTUAL DE LA AGENCIA:
+                        - Campañas Activas: ${JSON.stringify(App.dataCache.campaigns.map(c => `${c.name} (${c.status})`))}
+                        - Tareas Pendientes: ${JSON.stringify(App.dataCache.tasks.filter(t => t.status==='pending').map(t => t.title))}
+                        RESPONDE AL USUARIO DE FORMA BREVE, DIRECTA Y PROFESIONAL.
+                    `;
+
+                    let data;
+                    
+                    // MODO HÍBRIDO: SI HAY KEY, USA CLIENT-SIDE (PARA PRUEBAS). SI NO, USA SERVER (VERCEL).
+                    if (OPENAI_API_KEY) {
+                         const res = await fetch("https://api.openai.com/v1/chat/completions", {
+                            method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${OPENAI_API_KEY}` },
+                            body: JSON.stringify({ 
+                                model: "gpt-3.5-turbo", 
+                                messages: [{ role: "system", content: contextData }, { role: "user", content: txt }]
+                            })
+                        });
+                        data = await res.json();
+                    } else {
+                        // MODO PRODUCCIÓN (VERCEL)
+                        const res = await fetch("/api/chat", {
+                            method: "POST", headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ message: txt, context: contextData })
+                        });
+                        data = await res.json();
+                    }
+
+                    if (data.error) throw new Error(data.error.message || data.error);
+
+                    document.getElementById(thinkingId).innerText = data.choices[0].message.content;
+                    document.getElementById(thinkingId).style.color = "white"; 
+                } catch(e) { 
+                    console.error(e);
+                    document.getElementById(thinkingId).innerText = "Error: " + e.message + " (Si estás probando local, pega tu API KEY en el código)";
+                    document.getElementById(thinkingId).style.color = "var(--danger)";
+                }
+            },
+
+            // --- RESTO DE FUNCIONES ---
             checkAccess: async (user) => {
                 if (SUPER_ADMINS.includes(user.email)) {
                     await setDoc(doc(App.db, "allowed_users", user.email), { email: user.email, role: 'admin', addedAt: serverTimestamp() }, { merge: true });
@@ -647,44 +710,6 @@
                 UI.toggleModal('campaign-modal');
             },
             toggleStatus: async (id, st) => await updateDoc(doc(App.db, "campaigns", id), { status: st==='active'?'paused':'active' }),
-            
-            sendMessage: async () => {
-                const input = document.getElementById('ai-input');
-                const chat = document.getElementById('chat-content');
-                const txt = input.value; if(!txt) return;
-                
-                chat.innerHTML += `<div style="text-align:right; margin-bottom:10px; color:white;">${txt}</div>`;
-                input.value = ''; chat.scrollTop = chat.scrollHeight;
-
-                const thinkingId = "thinking-" + Date.now();
-                chat.innerHTML += `<div id="${thinkingId}" style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; margin-bottom:10px; color:var(--text-muted);">Alfred está pensando...</div>`;
-                chat.scrollTop = chat.scrollHeight;
-
-                try {
-                    const contextData = `
-                        ERES ALFRED, UN EXPERTO EN MARKETING DIGITAL Y PROJECT MANAGER.
-                        ESTADO ACTUAL DE LA AGENCIA:
-                        - Campañas Activas: ${JSON.stringify(App.dataCache.campaigns.map(c => `${c.name} (${c.status})`))}
-                        - Tareas Pendientes: ${JSON.stringify(App.dataCache.tasks.filter(t => t.status==='pending').map(t => t.title))}
-                        RESPONDE AL USUARIO DE FORMA BREVE, DIRECTA Y PROFESIONAL.
-                    `;
-
-                    const res = await fetch("/api/chat", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ message: txt, context: contextData })
-                    });
-                    const data = await res.json();
-                    if (data.error) throw new Error(data.error);
-
-                    document.getElementById(thinkingId).innerText = data.choices[0].message.content;
-                    document.getElementById(thinkingId).style.color = "white"; 
-                } catch(e) { 
-                    console.error(e);
-                    document.getElementById(thinkingId).innerText = "Error: No pude conectar con el servidor.";
-                    document.getElementById(thinkingId).style.color = "var(--danger)";
-                }
-            },
 
             login: async () => { try { await signInWithPopup(App.auth, new GoogleAuthProvider()); } catch(e) { alert(e.message); } },
             logout: async () => { await signOut(App.auth); location.reload(); },
