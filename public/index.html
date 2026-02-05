@@ -376,9 +376,6 @@
         import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // 🟢 CONFIGURACIÓN API KEY
-        const OPENAI_API_KEY = "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"; 
-
         // 🛡️ SUPER ADMINS (LISTA DE PODER)
         const SUPER_ADMINS = ["frantruppa@gmail.com"]; 
 
@@ -556,23 +553,49 @@
                 const chat = document.getElementById('chat-content');
                 const txt = input.value; if(!txt) return;
                 
+                // UI: Mostrar mensaje del usuario
                 chat.innerHTML += `<div style="text-align:right; margin-bottom:10px; color:white;">${txt}</div>`;
                 input.value = ''; chat.scrollTop = chat.scrollHeight;
 
-                if(!OPENAI_API_KEY) { chat.innerHTML += `<div style="color:var(--danger)">Configura API Key en código.</div>`; return; }
+                // UI: Placeholder pensando...
+                const thinkingId = "thinking-" + Date.now();
+                chat.innerHTML += `<div id="${thinkingId}" style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; margin-bottom:10px; color:var(--text-muted);">Alfred está pensando...</div>`;
+                chat.scrollTop = chat.scrollHeight;
 
                 try {
-                    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-                        method: "POST", headers: {"Content-Type":"application/json", "Authorization":`Bearer ${OPENAI_API_KEY}`},
-                        body: JSON.stringify({ model: "gpt-3.5-turbo", messages: [
-                            {role: "system", content: "Eres Alfred, un experto en marketing digital analizando datos de una agencia."},
-                            {role: "user", content: txt}
-                        ]})
+                    // CONTEXTO: Le damos "memoria" a la IA sobre el estado actual
+                    const contextData = `
+                        ERES ALFRED, UN EXPERTO EN MARKETING DIGITAL Y PROJECT MANAGER.
+                        ESTADO ACTUAL DE LA AGENCIA:
+                        - Campañas Activas: ${JSON.stringify(App.dataCache.campaigns.map(c => `${c.name} (${c.status})`))}
+                        - Tareas Pendientes: ${JSON.stringify(App.dataCache.tasks.filter(t => t.status==='pending').map(t => t.title))}
+                        RESPONDE AL USUARIO DE FORMA BREVE, DIRECTA Y PROFESIONAL.
+                    `;
+
+                    // 🚀 LLAMADA SEGURA AL BACKEND (VERCEL)
+                    // Ya no llamamos a OpenAI directamente, llamamos a "nuestra" API interna
+                    const res = await fetch("/api/chat", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ 
+                            message: txt,
+                            context: contextData
+                        })
                     });
+
                     const data = await res.json();
-                    chat.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; margin-bottom:10px;">${data.choices[0].message.content}</div>`;
-                    chat.scrollTop = chat.scrollHeight;
-                } catch(e) { console.error(e); }
+                    
+                    if (data.error) throw new Error(data.error);
+
+                    // Reemplazar mensaje de "pensando" por la respuesta real
+                    document.getElementById(thinkingId).innerText = data.choices[0].message.content;
+                    document.getElementById(thinkingId).style.color = "white"; // Restaurar color
+                    
+                } catch(e) { 
+                    console.error(e);
+                    document.getElementById(thinkingId).innerText = "Error: No pude conectar con el servidor.";
+                    document.getElementById(thinkingId).style.color = "var(--danger)";
+                }
             },
 
             login: async () => { try { await signInWithPopup(App.auth, new GoogleAuthProvider()); } catch(e) { alert(e.message); } },
@@ -632,3 +655,4 @@
     </script>
 </body>
 </html>
+
