@@ -1,14 +1,22 @@
-// api/memory.js
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
+  // 1. Solo permitimos solicitudes POST (enviar datos)
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
+  }
 
+  // 2. Obtenemos los datos que enviaste desde el Frontend
   const { text, client } = req.body;
-  const apiKey = process.env.SUPERMEMORY_API_KEY; // Necesitas esta key en Vercel
+  
+  // 3. Obtenemos la llave secreta de Vercel
+  const apiKey = process.env.SUPERMEMORY_API_KEY;
 
-  if (!apiKey) return res.status(500).json({ error: 'Falta configuración de memoria' });
+  // 4. Validación de seguridad
+  if (!apiKey) {
+    return res.status(500).json({ error: 'Server Error: Falta configurar SUPERMEMORY_API_KEY en Vercel.' });
+  }
 
   try {
-    // Esta es la llamada REAL a Supermemory para guardar el dato
+    // 5. Enviamos el dato a Supermemory.ai
     const response = await fetch("https://api.supermemory.ai/v1/add", {
       method: "POST",
       headers: {
@@ -17,12 +25,14 @@ export default async function handler(req, res) {
       },
       body: JSON.stringify({
         content: text,
-        metadata: { client: client || "General" } // Etiquetamos el recuerdo
+        metadata: { client: client || "General" }
       })
     });
 
     const data = await response.json();
-    return res.status(200).json({ success: true, id: data.id });
+
+    // 6. Respondemos al Frontend
+    return res.status(200).json({ success: true, data });
 
   } catch (error) {
     return res.status(500).json({ error: error.message });
