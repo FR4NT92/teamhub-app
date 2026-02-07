@@ -1,20 +1,22 @@
 export default async function handler(req, res) {
+  // Solo aceptamos POST
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
   const openaiKey = process.env.OPENAI_API_KEY;
-  const supermemoryKey = process.env.SUPERMEMORY_API_KEY; // ¡Nueva Variable!
+  const supermemoryKey = process.env.SUPERMEMORY_API_KEY;
 
   if (!openaiKey) return res.status(500).json({ error: 'Server Error: OpenAI Key missing' });
 
   const { message, context, model = "gpt-3.5-turbo" } = req.body;
 
   try {
-    let systemPrompt = context;
+    let finalSystemPrompt = context || "Eres Alfred, un asistente experto.";
 
-    // 🧠 LÓGICA SUPERMEMORY (Si hay clave configurada)
+    // 🧠 1. INTENTAR RECORDAR (Consultar Supermemory)
+    // Solo si la clave existe en Vercel
     if (supermemoryKey) {
       try {
-        console.log("Consultando Supermemory...");
+        console.log("🔍 Consultando Supermemory...");
         const memoryRes = await fetch("https://api.supermemory.ai/v1/search", {
           method: "POST",
           headers: {
@@ -26,20 +28,20 @@ export default async function handler(req, res) {
         
         if (memoryRes.ok) {
           const memories = await memoryRes.json();
-          // Asumimos que la respuesta tiene un array de resultados
-          const memoryText = memories.results ? memories.results.map(m => m.content).join("\n---\n") : "";
+          // Extraemos el texto de los resultados (ajustar según la respuesta exacta de Supermemory)
+          const retrievedText = memories.results ? memories.results.map(m => m.content).join("\n---\n") : "";
           
-          if (memoryText) {
-            systemPrompt += `\n\nINFORMACIÓN DE LA BASE DE CONOCIMIENTO (SOPs/HISTORIAL):\n${memoryText}\nUsa esta información para responder con precisión.`;
+          if (retrievedText) {
+            console.log("✅ Memoria encontrada");
+            finalSystemPrompt += `\n\n[MEMORIA RECUPERADA DE LA BASE DE DATOS]:\n${retrievedText}\n\nUsa esta información para responder si es relevante.`;
           }
         }
       } catch (memError) {
-        console.error("Error consultando memoria:", memError);
-        // No fallamos todo, solo ignoramos la memoria si falla
+        console.warn("⚠️ Fallo al consultar memoria (se continuará sin ella):", memError.message);
       }
     }
 
-    // 🤖 LLAMADA A OPENAI
+    // 🤖 2. PENSAR (Consultar OpenAI)
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -49,7 +51,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: model,
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: finalSystemPrompt },
           { role: "user", content: message }
         ]
       })
