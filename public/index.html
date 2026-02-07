@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Abundance OS | Enterprise System</title>
+    <title>Abundance OS | Operation System</title>
     <link rel="icon" href="ISO.png">
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -356,11 +356,11 @@
                             </select>
                         </div>
                         
-                        <div class="dropzone" onclick="alert('Simulación: Subida a Supermemory (PDF/DOC)')">
-                            <i data-lucide="upload-cloud" style="width:32px; height:32px; margin-bottom:12px;"></i>
-                            <div style="font-weight:600; color:white;">Arrastra Documentos (SOPs, Guías)</div>
-                            <div style="font-size:11px; margin-top:8px;">Alimenta la memoria de Alfred.</div>
-                        </div>
+                        <div class="dropzone" id="real-dropzone" ondrop="App.handleFileDrop(event)" ondragover="event.preventDefault()">
+    <i data-lucide="upload-cloud" style="width:32px; height:32px; margin-bottom:12px;"></i>
+    <div style="font-weight:600; color:white;">Arrastra archivos de texto aquí</div>
+    <div style="font-size:11px; margin-top:8px;">Soporta .txt, .md, .csv (El texto se extraerá automáticamente)</div>
+</div>
 
                         <div style="margin-top:24px;">
                             <label style="font-size:11px; color:var(--text-muted);">Nota Rápida de Memoria:</label>
@@ -454,6 +454,31 @@
                 UI.initMainChart();
                 document.addEventListener('keyup', (e) => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(el => el.classList.remove('open')); });
             },
+
+    // Función para leer archivos reales arrastrados
+    handleFileDrop: (event) => {
+        event.preventDefault(); // Evita que el navegador abra el archivo
+        const files = event.dataTransfer.files;
+        
+        if (files.length > 0) {
+            const file = files[0];
+            const reader = new FileReader();
+            
+            // Cuando termine de leer el archivo...
+            reader.onload = (e) => {
+                const text = e.target.result;
+                // 1. Poner el texto en el área de texto
+                const textArea = document.querySelector('#view-settings textarea');
+                textArea.value = `[Archivo: ${file.name}]\n\n${text}`;
+                
+                // 2. Avisar al usuario
+                alert(`✅ Archivo "${file.name}" leído. Revisa el texto y dale a "Memorizar Realmente" para guardarlo.`);
+            };
+            
+            // Intentar leer como texto
+            reader.readAsText(file);
+        }
+    },
 
             // --- LÓGICA DE MEMORIA REAL (V15.0) ---
             saveMemory: async () => {
@@ -701,3 +726,4 @@
     </script>
 </body>
 </html>
+
