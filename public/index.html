@@ -367,7 +367,7 @@
                             <label style="font-size:11px; color:var(--text-muted);">Nota Rápida de Memoria:</label>
                             <textarea class="input-glass" style="margin-top:8px; height:120px;" placeholder="Ej: Para Coca-Cola, el objetivo de Q1 es leads B2B..."></textarea>
                             <div style="display:flex; justify-content:flex-end; margin-top:12px;">
-                                <button class="btn btn-primary" onclick="alert('Guardado en memoria de Agente.')">Memorizar</button>
+                                <button class="btn btn-primary" onclick="App.saveMemory()">Memorizar Realmente</button>
                             </div>
                         </div>
                     </div>
@@ -419,7 +419,7 @@
         import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        const OPENAI_API_KEY = ""; 
+        const OPENAI_API_KEY = "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"; 
         const SUPER_ADMINS = ["frantruppa@gmail.com"]; 
 
         const firebaseConfig = {
@@ -454,6 +454,41 @@
                 lucide.createIcons();
                 UI.initMainChart();
                 document.addEventListener('keyup', (e) => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(el => el.classList.remove('open')); });
+           // Agrega esto dentro del objeto App = { ... }
+saveMemory: async () => {
+    const client = document.getElementById('brain-client-select').value;
+    const text = document.querySelector('#view-settings textarea').value;
+    const btn = document.querySelector('#view-settings button.btn-primary');
+
+    if (!text) return alert("Escribe algo para memorizar.");
+
+    // Feedback visual de carga
+    const originalText = btn.innerText;
+    btn.innerText = "Guardando en la nube...";
+    btn.disabled = true;
+
+    try {
+        const res = await fetch('/api/memory', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, client })
+        });
+
+        const data = await res.json();
+
+        if (data.success) {
+            alert("✅ Memoria guardada exitosamente. Alfred ahora sabe esto.");
+            document.querySelector('#view-settings textarea').value = ""; // Limpiar
+        } else {
+            alert("Error al guardar: " + (data.error || "Desconocido"));
+        }
+    } catch (e) {
+        alert("Error de conexión.");
+    } finally {
+        btn.innerText = originalText;
+        btn.disabled = false;
+    }
+},
             },
 
             // --- CEREBRO AUTOMÁTICO (VERSIÓN 14.0) ---
@@ -670,3 +705,4 @@
     </script>
 </body>
 </html>
+
