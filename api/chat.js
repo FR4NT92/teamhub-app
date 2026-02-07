@@ -1,5 +1,5 @@
+// api/chat.js
 export default async function handler(req, res) {
-  // Solo aceptamos POST
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
   const openaiKey = process.env.OPENAI_API_KEY;
@@ -12,11 +12,10 @@ export default async function handler(req, res) {
   try {
     let finalSystemPrompt = context || "Eres Alfred, un asistente experto.";
 
-    // 🧠 1. INTENTAR RECORDAR (Consultar Supermemory)
-    // Solo si la clave existe en Vercel
+    // --- PASO 1: CONSULTAR MEMORIA (Si hay clave) ---
     if (supermemoryKey) {
       try {
-        console.log("🔍 Consultando Supermemory...");
+        console.log("🔍 Consultando cerebro...");
         const memoryRes = await fetch("https://api.supermemory.ai/v1/search", {
           method: "POST",
           headers: {
@@ -28,20 +27,20 @@ export default async function handler(req, res) {
         
         if (memoryRes.ok) {
           const memories = await memoryRes.json();
-          // Extraemos el texto de los resultados (ajustar según la respuesta exacta de Supermemory)
-          const retrievedText = memories.results ? memories.results.map(m => m.content).join("\n---\n") : "";
+          // Ajustar según la respuesta de Supermemory (a veces es .results, a veces directo)
+          const results = memories.results || memories; 
+          const retrievedText = Array.isArray(results) ? results.map(m => m.content).join("\n---\n") : "";
           
           if (retrievedText) {
-            console.log("✅ Memoria encontrada");
-            finalSystemPrompt += `\n\n[MEMORIA RECUPERADA DE LA BASE DE DATOS]:\n${retrievedText}\n\nUsa esta información para responder si es relevante.`;
+            finalSystemPrompt += `\n\n[DATOS RECUPERADOS DE MEMORIA]:\n${retrievedText}\n\nUsa esto para responder.`;
           }
         }
-      } catch (memError) {
-        console.warn("⚠️ Fallo al consultar memoria (se continuará sin ella):", memError.message);
+      } catch (e) {
+        console.warn("Memoria falló, ignorando...", e);
       }
     }
 
-    // 🤖 2. PENSAR (Consultar OpenAI)
+    // --- PASO 2: LLAMAR A GPT ---
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
