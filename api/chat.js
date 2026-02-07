@@ -1,19 +1,34 @@
+// api/chat.js (Concepto)
 export default async function handler(req, res) {
-  // 1. Solo aceptamos POST
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
+  // ... validaciones ...
+  const { message } = req.body;
 
-  // 2. Recuperamos la llave segura desde Vercel
-  const apiKey = process.env.OPENAI_API_KEY;
+  // 1. Preguntar a Supermemory (El Cerebro)
+  // "Busca en mis documentos información relevante para este mensaje"
+  const memoryResponse = await fetch("https://api.supermemory.ai/v1/search", {
+    method: "POST",
+    headers: { 
+        "Authorization": `Bearer ${process.env.SUPERMEMORY_KEY}`,
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ query: message, top_k: 3 }) 
+  });
+  
+  const memories = await memoryResponse.json();
+  const contextText = memories.map(m => m.content).join("\n---\n");
 
-  if (!apiKey) {
-    return res.status(500).json({ error: 'Server Error: API Key missing' });
-  }
+  // 2. Inyectar esa memoria en OpenAI
+  const systemPrompt = `
+    Eres Alfred, el COO de Abundance OS.
+    Usa ESTA INFORMACIÓN RECUPERADA de nuestra base de conocimientos para responder:
+    ${contextText}
+    
+    Si la información no está ahí, usa tu conocimiento general pero avisa que no es un dato interno.
+  `;
 
-  const { message, context } = req.body;
-
-  try {
+  // 3. Llamar a OpenAI con el contexto enriquecido
+  // ... (Tu código actual de OpenAI) ...
+}
     // 3. El servidor llama a OpenAI (Aquí sí es seguro usar la llave)
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
