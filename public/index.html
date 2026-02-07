@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- ESTILOS CORE --- */
+        /* --- ESTÉTICA V9.0 (LIQUID GLASS ORIGINAL) --- */
         :root {
             --bg-body: #000000;
             --bg-glass: rgba(20, 20, 20, 0.6);
@@ -41,7 +41,7 @@
             background-image: radial-gradient(circle at 50% -10%, rgba(59, 130, 246, 0.15), transparent 40%);
         }
 
-        /* --- UI ELEMENTS --- */
+        /* --- BOTONES LIQUIDOS ORIGINALES --- */
         .btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
             height: 36px; padding: 0 16px;
@@ -64,22 +64,30 @@
 
         .btn-danger { color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
         .btn-danger:hover { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); }
-        
-        .btn-sm { height: 28px; font-size: 11px; padding: 0 12px; }
+        .btn-sm { height: 28px; padding: 0 10px; font-size: 11px; }
+        .btn-icon { padding: 0; width: 36px; border-radius: 50%; }
 
+        /* ICONOS NORMALIZADOS */
         .icon { width: 16px; height: 16px; stroke-width: 2px; }
-        .input-glass { background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 12px; padding: 10px 16px; color: white; width: 100%; }
+        
+        .input-glass { background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 12px; padding: 10px 16px; color: white; width: 100%; appearance: none; }
+        .input-glass:focus { border-color: var(--accent-primary); background: rgba(255,255,255,0.05); }
+        select.input-glass option { background-color: #000; color: white; } /* Fix fondo blanco */
         textarea.input-glass { min-height: 80px; resize: vertical; font-family: inherit; }
+        
         .card { background: rgba(15, 15, 15, 0.6); border: 1px solid var(--border-glass); border-radius: 20px; padding: 24px; }
 
-        /* --- SIDEBAR --- */
-        aside { width: 260px; background: rgba(5, 5, 5, 0.9); border-right: 1px solid var(--border-glass); display: flex; flex-direction: column; padding: 20px 12px; z-index: 20; }
-        .nav-section-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 24px 12px 8px 12px; }
-        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; color: var(--text-muted); cursor: pointer; transition: all 0.2s ease; margin-bottom: 2px; }
-        .nav-item:hover { background: rgba(255,255,255,0.08); color: white; }
-        .nav-item.active { background: rgba(255,255,255,0.08); color: white; font-weight: 500; }
+        /* --- SIDEBAR CON ANIMACIÓN --- */
+        aside { width: 250px; background: rgba(5, 5, 5, 0.8); border-right: 1px solid var(--border-glass); display: flex; flex-direction: column; padding: 20px 12px; z-index: 20; }
+        .nav-section-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin: 24px 12px 8px 12px; letter-spacing: 0.5px; }
+        
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; color: var(--text-muted); cursor: pointer; transition: 0.2s; margin-bottom: 2px; }
+        .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.08); color: white; }
+        .nav-item.active { font-weight: 500; } 
         .nav-item.active .icon { color: var(--accent-primary); }
-        .nav-item .icon { transition: transform 0.2s; }
+        
+        /* Animación lateral V9.0 */
+        .nav-item .icon { transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1); }
         .nav-item:hover .icon { transform: translateX(3px); color: white; }
 
         .submenu { display: none; flex-direction: column; padding-left: 36px; margin-bottom: 8px; }
@@ -87,14 +95,6 @@
         .submenu-item { padding: 8px 0; font-size: 12px; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
         .submenu-item:hover { color: white; transform: translateX(2px); }
         .submenu-item.active { color: var(--accent-primary); font-weight: 500; }
-
-        .user-profile { margin-top: auto; border-top: 1px solid var(--border-glass); padding-top: 16px; display: flex; align-items: center; gap: 12px; padding-left: 8px; padding-right: 8px; }
-        .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #333; object-fit: cover; border: 1px solid var(--border-glass); }
-        .user-info { flex: 1; overflow: hidden; }
-        .user-name { font-size: 12px; font-weight: 500; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .user-role { font-size: 10px; color: var(--text-muted); }
-        .logout-btn { color: var(--text-muted); cursor: pointer; transition: 0.2s; }
-        .logout-btn:hover { color: var(--danger); }
 
         main { flex: 1; display: flex; flex-direction: column; }
         header { height: 70px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; padding: 0 32px; }
@@ -109,32 +109,35 @@
         td { padding: 16px 24px; border-bottom: 1px solid var(--border-glass); vertical-align: middle; }
         tr:hover td { background: rgba(255,255,255,0.02); }
         
-        .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; text-transform: uppercase; cursor: pointer; user-select: none; transition: all 0.2s; }
-        .status-pill:hover { filter: brightness(1.2); transform: scale(1.02); }
-        .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; text-transform: uppercase; cursor: pointer; user-select: none; }
         .status-pending { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .status-process { background: rgba(59, 130, 246, 0.15); color: #60A5FA; border: 1px solid rgba(59, 130, 246, 0.3); }
-        .status-done { background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .status-process { background: rgba(59, 130, 246, 0.1); color: var(--accent-primary); border: 1px solid rgba(59, 130, 246, 0.2); }
+        .status-done { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
         .clickable-row { cursor: pointer; transition: 0.2s; }
         .clickable-row:hover td { background: rgba(59, 130, 246, 0.05) !important; color: white; }
 
         /* --- DASHBOARD WIDGETS --- */
-        .dash-section-title { font-size: 14px; font-weight: 600; color: var(--text-muted); margin-bottom: 16px; display:flex; align-items:center; gap:8px; }
-        .dash-separator { height: 1px; background: var(--border-glass); margin: 32px 0; }
+        .quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .action-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 12px; }
+        /* Efecto Liquid Glass en Hover */
+        .action-card:hover { 
+            background: rgba(255,255,255,0.08); 
+            border-color: rgba(255,255,255,0.2); 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+        }
+        .action-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; color: white; }
 
-        .quick-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 0; }
-        .action-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 16px; padding: 24px; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; }
-        .action-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .action-icon { width: 48px; height: 48px; border-radius: 14px; background: rgba(255, 255, 255, 0.08); display: flex; align-items: center; justify-content: center; color: white; margin-bottom: 4px; }
-
+        /* AI & UTILS */
         .ai-float { position: fixed; bottom: 30px; right: 30px; z-index: 100; background: rgba(10, 10, 15, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.2); padding: 12px 24px; border-radius: 100px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.3s ease; }
         .ai-float:hover { border-color: transparent; background-image: linear-gradient(rgba(10, 10, 15, 0.9), rgba(10, 10, 15, 0.9)), linear-gradient(45deg, #3B82F6, #9333EA, #EC4899); background-origin: border-box; background-clip: padding-box, border-box; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); transform: scale(1.05); }
         .drawer { position: fixed; top: 0; right: -450px; width: 450px; height: 100%; background: #0A0A0A; border-left: 1px solid var(--border-glass); z-index: 200; transition: right 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; box-shadow: -20px 0 100px rgba(0,0,0,0.8); }
         .drawer.open { right: 0; }
         
-        .dropdown-menu { position: absolute; top: 110%; right: 0; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(12px); border: 1px solid var(--border-glass); border-radius: 16px; padding: 6px; width: 180px; display: none; flex-direction: column; gap: 2px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); z-index: 50; }
+        .dropdown-menu { position: absolute; top: 120%; right: 0; background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(12px); border: 1px solid var(--border-glass); border-radius: 16px; padding: 6px; width: 220px; display: none; flex-direction: column; gap: 2px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); z-index: 50; }
         .dropdown-menu.show { display: flex; animation: fadeIn 0.2s; }
-        .dropdown-item { padding: 10px 16px; font-size: 13px; color: var(--text-muted); cursor: pointer; border-radius: 10px; transition: 0.2s; }
+        .dropdown-item { padding: 10px 16px; font-size: 13px; color: var(--text-muted); cursor: pointer; border-radius: 10px; transition: 0.2s; display:flex; align-items:center; gap:8px; }
         .dropdown-item:hover { background: rgba(255,255,255,0.05); color: white; }
         .dropdown-item.active { background: var(--accent-primary); color: white; font-weight: 500; }
 
@@ -142,6 +145,9 @@
         .modal-overlay.open { display: flex; animation: fadeIn 0.2s; }
         .modal-box { background: #111; border: 1px solid var(--border-glass); padding: 32px; border-radius: 24px; width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
         .modal-wide { width: 800px; } 
+
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
     </style>
 </head>
@@ -158,23 +164,22 @@
     </div>
 
     <div class="ai-float" id="alfred-btn" onclick="UI.toggleDrawer()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z"></path></svg>
-        <span style="font-weight: 600; color: white;">Alfred AI</span>
+        <i data-lucide="bot" class="icon"></i> <span style="font-weight: 600; color: white;">Alfred AI</span>
     </div>
 
     <div id="ai-drawer" class="drawer">
         <div style="padding: 24px; border-bottom: 1px solid var(--border-glass); display:flex; justify-content:space-between; align-items:center;">
-            <div style="font-weight: 600; color:white;">Alfred Agent (Beta)</div>
-            <button class="btn" style="width:32px; padding:0;" onclick="UI.toggleDrawer()">✕</button>
+            <div style="font-weight: 600; color:white;">Alfred Agent</div>
+            <button class="btn btn-icon" onclick="UI.toggleDrawer()">✕</button>
         </div>
         <div id="chat-content" style="flex:1; padding:24px; overflow-y:auto; font-size:14px; line-height:1.6; color:var(--text-muted);">
             <div style="background:rgba(255,255,255,0.05); padding:16px; border-radius:12px; margin-bottom:12px; border:1px solid var(--border-glass);">
-                Hola. Soy Alfred. Tengo control sobre la app. Puedes pedirme "Ir a configuración", "Analizar anuncios" o crear tareas.
+                Hola. Tengo acceso a tu Base de Conocimientos y datos operativos. ¿En qué trabajamos?
             </div>
         </div>
         <div style="padding:24px; border-top:1px solid var(--border-glass); display:flex; gap:8px;">
-            <input id="ai-input" class="input-glass" placeholder="Ej: Crea tarea 'Revisar Copy'...">
-            <button class="btn btn-primary" style="width:40px; padding:0;" onclick="App.sendMessage()">→</button>
+            <input id="ai-input" class="input-glass" placeholder="Ej: Crea tarea para Coca-Cola..." onkeypress="if(event.key==='Enter') App.sendMessage()">
+            <button class="btn btn-primary btn-icon" onclick="App.sendMessage()">→</button>
         </div>
     </div>
 
@@ -182,17 +187,15 @@
         <div style="padding: 0 12px 24px 12px; margin-bottom: 16px; border-bottom: 1px solid var(--border-glass);">
             <span style="font-weight:700; font-size:16px; letter-spacing:-0.5px;">Abundance OS</span>
         </div>
-        
         <div style="flex:1; overflow-y:auto;">
             <div class="nav-section-title">Principal</div>
             <div class="nav-item active" onclick="UI.nav('dash')"><i data-lucide="layout-grid" class="icon"></i> Dashboard</div>
             <div class="nav-item" onclick="UI.nav('tasks')"><i data-lucide="check-square" class="icon"></i> Tareas (Team)</div>
-            <div class="nav-item" onclick="UI.nav('crm')"><i data-lucide="users" class="icon"></i> Equipo & Clientes</div>
+            <div class="nav-item" onclick="UI.nav('crm')"><i data-lucide="users" class="icon"></i> Equipo</div>
 
             <div class="nav-section-title">Growth</div>
             <div class="nav-item" onclick="UI.toggleSubmenu('ads-submenu')">
-                <i data-lucide="layers" class="icon"></i> 
-                <span style="flex:1;">Ads Manager</span>
+                <i data-lucide="layers" class="icon"></i> <span style="flex:1;">Ads Manager</span>
                 <i data-lucide="chevron-down" class="icon" style="width:12px;"></i>
             </div>
             <div id="ads-submenu" class="submenu">
@@ -202,14 +205,14 @@
             <div class="nav-item" onclick="UI.nav('reports')"><i data-lucide="file-text" class="icon"></i> Reportes</div>
             <div class="nav-item" onclick="UI.nav('settings')"><i data-lucide="settings" class="icon"></i> Configuración</div>
         </div>
-
-        <div class="user-profile">
-            <img id="user-photo" src="" class="user-avatar" onerror="this.src='https://ui-avatars.com/api/?name=User&background=333&color=fff'">
-            <div class="user-info">
-                <div id="user-display-name" class="user-name">Cargando...</div>
-                <div class="user-role">Team Member</div>
+        
+        <div style="border-top:1px solid var(--border-glass); padding-top:16px; margin-top:auto; display:flex; align-items:center; gap:12px; padding-left:8px; padding-right:8px;">
+            <img id="user-photo" src="" style="width:32px; height:32px; border-radius:50%; background:#333;" onerror="this.src='https://ui-avatars.com/api/?name=User'">
+            <div style="flex:1; overflow:hidden;">
+                <div id="user-display-name" style="font-size:12px; font-weight:500; color:white;">Cargando...</div>
+                <div style="font-size:10px; color:var(--text-muted);">Online</div>
             </div>
-            <i data-lucide="log-out" class="icon logout-btn" onclick="App.logout()" title="Cerrar Sesión"></i>
+            <i data-lucide="log-out" class="icon" style="cursor:pointer; color:var(--text-muted);" onclick="App.logout()"></i>
         </div>
     </aside>
 
@@ -217,16 +220,28 @@
         <header>
             <div>
                 <h2 id="page-title" style="font-size:16px; font-weight:600;">Dashboard General</h2>
-                <div style="font-size:11px; color:var(--text-muted);">Vista: <span id="view-context">Global</span></div>
+                <div style="font-size:11px; color:var(--text-muted);">Contexto: <span id="view-context-label">Global</span></div>
             </div>
             
-            <div style="position: relative;">
-                <button class="btn" id="calendar-btn" onclick="UI.toggleCalendar(event)">
-                    <i data-lucide="calendar" class="icon"></i> <span id="calendar-label">Este Mes</span>
-                </button>
-                <div id="calendar-menu" class="dropdown-menu">
-                    <div class="dropdown-item active" onclick="UI.setRange('Este Mes', this)">Este Mes</div>
-                    <div class="dropdown-item" onclick="UI.setRange('Mes Pasado', this)">Mes Pasado</div>
+            <div style="display:flex; gap:12px; align-items:center;">
+                <div style="position:relative;">
+                    <button class="btn btn-icon" onclick="UI.toggleDropdown('notif-menu')">
+                        <i data-lucide="bell" class="icon"></i>
+                        <div style="position:absolute; top:0; right:0; width:8px; height:8px; background:var(--danger); border-radius:50%; display:none;" id="notif-dot"></div>
+                    </button>
+                    <div id="notif-menu" class="dropdown-menu">
+                        <div style="padding:12px; font-size:11px; color:var(--text-muted);">No hay notificaciones nuevas.</div>
+                    </div>
+                </div>
+
+                <div style="position: relative;">
+                    <button class="btn" id="calendar-btn" onclick="UI.toggleDropdown('calendar-menu')">
+                        <i data-lucide="calendar" class="icon"></i> <span id="calendar-label">Este Mes</span>
+                    </button>
+                    <div id="calendar-menu" class="dropdown-menu">
+                        <div class="dropdown-item active" onclick="UI.setRange('Este Mes', this)">Este Mes</div>
+                        <div class="dropdown-item" onclick="UI.setRange('Mes Pasado', this)">Mes Pasado</div>
+                    </div>
                 </div>
             </div>
         </header>
@@ -234,64 +249,45 @@
         <div class="content-scroll">
             
             <section id="view-dash" class="view-section active">
-                
-                <div class="dash-section-title"><i data-lucide="zap" class="icon"></i> Acciones Rápidas</div>
                 <div class="quick-actions">
                     <div class="action-card" onclick="UI.toggleModal('task-modal')">
                         <div class="action-icon"><i data-lucide="plus"></i></div>
-                        <div style="font-weight:600;">Crear Tarea</div>
-                        <div style="font-size:11px; color:var(--text-muted);">Asignar al equipo</div>
+                        <div>
+                            <div style="font-weight:600;">Nueva Tarea</div>
+                            <div style="font-size:11px; color:var(--text-muted);">Asignar al equipo</div>
+                        </div>
                     </div>
                     <div class="action-card" onclick="App.syncAdsData()">
-                        <div class="action-icon"><i data-lucide="refresh-cw"></i></div>
-                        <div style="font-weight:600;">Sincronizar Meta</div>
-                        <div style="font-size:11px; color:var(--text-muted);">Actualizar métricas</div>
-                    </div>
-                    <div class="action-card" onclick="UI.nav('reports')">
-                        <div class="action-icon"><i data-lucide="download"></i></div>
-                        <div style="font-weight:600;">Generar Reporte</div>
-                        <div style="font-size:11px; color:var(--text-muted);">Descargar PDF mensual</div>
+                        <div class="action-icon"><i data-lucide="refresh-cw" id="sync-icon"></i></div>
+                        <div>
+                            <div style="font-weight:600;">Sincronizar Datos</div>
+                            <div style="font-size:11px; color:var(--text-muted);">Actualizar Meta API</div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="dash-separator"></div>
-
-                <div class="dash-section-title"><i data-lucide="activity" class="icon"></i> Pulso de la Agencia</div>
-                <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:20px; margin-bottom:24px;">
+                <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:20px; margin-bottom:30px;">
                     <div class="card" style="padding:20px;">
-                        <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Clientes Activos</div>
+                        <div style="font-size:11px; color:var(--text-muted);">PROYECTOS ACTIVOS</div>
                         <div style="font-size:24px; font-weight:700; margin-top:4px;" id="kpi-projects">--</div>
                     </div>
                     <div class="card" style="padding:20px;">
-                        <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Tareas Pendientes</div>
+                        <div style="font-size:11px; color:var(--text-muted);">TAREAS PENDIENTES</div>
                         <div style="font-size:24px; font-weight:700; margin-top:4px;" id="kpi-tasks">--</div>
                     </div>
                     <div class="card" style="padding:20px;">
-                        <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">Inversión (Mes)</div>
+                        <div style="font-size:11px; color:var(--text-muted);">GASTO MES</div>
                         <div style="font-size:24px; font-weight:700; margin-top:4px;">$3,450</div>
                     </div>
                     <div class="card" style="padding:20px;">
-                        <div style="font-size:11px; color:var(--text-muted); text-transform:uppercase;">ROAS Global</div>
-                        <div style="font-size:24px; font-weight:700; margin-top:4px; color:var(--success);">3.8x</div>
+                        <div style="font-size:11px; color:var(--text-muted);">ROAS PROMEDIO</div>
+                        <div style="font-size:20px; font-weight:700; margin-top:4px; color:var(--success);">3.8x</div>
                     </div>
                 </div>
 
-                <div style="display:grid; grid-template-columns: 1fr 300px; gap:20px;">
-                    <div class="card" style="height:320px; padding-bottom:30px;">
-                        <h4 style="margin-bottom:16px; font-size:12px; color:var(--text-muted); text-transform:uppercase;">Tendencia de Leads</h4>
-                        <canvas id="mainChart"></canvas>
-                    </div>
-                    <div class="card">
-                        <h4 style="margin-bottom:16px; font-size:12px; color:var(--text-muted); text-transform:uppercase;">Atención Requerida</h4>
-                        <div style="font-size:13px; color:white; margin-bottom:12px; padding-bottom:12px; border-bottom:1px solid var(--border-glass);">
-                            <span style="color:var(--warning)">●</span> Revisar Campaña Pepsi
-                            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">ROAS bajo (1.2x)</div>
-                        </div>
-                        <div style="font-size:13px; color:white;">
-                            <span style="color:var(--danger)">●</span> Cierre de Mes
-                            <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">Enviar facturas pendientes</div>
-                        </div>
-                    </div>
+                <div class="card" style="height:320px; padding-bottom:30px;">
+                    <h4 style="margin-bottom:16px; font-size:12px; color:var(--text-muted); text-transform:uppercase;">Rendimiento General</h4>
+                    <canvas id="mainChart"></canvas>
                 </div>
             </section>
 
@@ -309,31 +305,26 @@
                 <div style="display:flex; justify-content:space-between; margin-bottom:24px;">
                     <div style="display:flex; background:rgba(255,255,255,0.05); border-radius:99px; padding:4px;">
                         <button class="btn" style="background:rgba(255,255,255,0.1); color:white; border:none; height:32px;">All Clients</button>
-                        <button class="btn" style="background:transparent; border:none; height:32px;">Meta Ads</button>
+                        <button class="btn" style="background:transparent; border:none; height:32px;">Meta</button>
                     </div>
                     <button class="btn btn-primary" onclick="App.syncAdsData()"><i data-lucide="refresh-cw" class="icon"></i> Sincronizar</button>
                 </div>
                 <div class="table-container">
                     <table>
-                        <thead><tr><th>Estado</th><th>Campaña / Cliente</th><th>Presupuesto</th><th>Resultados</th><th>Acción</th></tr></thead>
+                        <thead><tr><th>Estado</th><th>Campaña</th><th>Presupuesto</th><th>Resultados</th><th>Acción</th></tr></thead>
                         <tbody id="ads-body"></tbody>
                     </table>
                 </div>
             </section>
 
             <section id="view-crm" class="view-section">
-                <div class="card" style="margin-bottom:24px;">
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <h3 style="font-size:16px;">Access Control (Whitelist)</h3>
-                            <p style="color:var(--text-muted); font-size:12px;">Solo los usuarios listados aquí pueden loguearse.</p>
-                        </div>
-                        <button id="btn-invite-user" class="btn btn-primary" onclick="App.inviteUser()">+ Autorizar Email</button>
-                    </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                    <h3>Equipo & Accesos</h3>
+                    <button class="btn btn-primary" onclick="App.inviteUser()"><i data-lucide="user-plus" class="icon"></i> Invitar Miembro</button>
                 </div>
                 <div class="table-container">
                     <table>
-                        <thead><tr><th>Usuario</th><th>Rol</th><th>Acciones</th></tr></thead>
+                        <thead><tr><th>Email</th><th>Rol</th><th>Acciones</th></tr></thead>
                         <tbody id="team-list-body"></tbody>
                     </table>
                 </div>
@@ -341,57 +332,66 @@
 
             <section id="view-reports" class="view-section">
                 <div class="card" style="text-align:center; padding:80px;">
-                    <i data-lucide="file-bar-chart" style="width:48px; height:48px; color:var(--text-muted); margin-bottom:16px;"></i>
-                    <h3>Centro de Reportes</h3>
-                    <button class="btn btn-primary" onclick="App.downloadPDF()" style="margin-top:20px;">Descargar PDF Dashboard</button>
+                    <i data-lucide="folder-open" style="width:48px; height:48px; color:var(--text-muted); margin-bottom:16px;"></i>
+                    <h3>Biblioteca de Reportes</h3>
+                    <p style="color:var(--text-muted); margin-bottom:24px;">Descarga los reportes ejecutivos para clientes.</p>
+                    <button class="btn btn-primary" onclick="App.downloadPDF()">Descargar PDF Actual</button>
                 </div>
             </section>
 
             <section id="view-settings" class="view-section">
                 <div class="card">
-                    <h3>Configuración de Cuenta</h3>
-                    <div style="margin-top:20px;">
-                        <label style="font-size:12px; color:var(--text-muted);">Nombre de la Organización</label>
-                        <input class="input-glass" value="Abundance HQ" style="margin-top:8px;">
+                    <h3>Configuración & Cerebro</h3>
+                    <div style="margin-top:20px; display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
+                        <div>
+                            <label style="font-size:12px; color:var(--text-muted);">Organización</label>
+                            <input class="input-glass" value="Abundance HQ" style="margin-top:8px;">
+                        </div>
+                        <div>
+                            <label style="font-size:12px; color:var(--text-muted);">Supermemory (Knowledge Base)</label>
+                            <textarea class="input-glass" style="margin-top:8px;" placeholder="Pega aquí SOPs o guías de cliente..."></textarea>
+                        </div>
                     </div>
-                    <button class="btn btn-primary" style="margin-top:20px;">Guardar Cambios</button>
+                    <button class="btn btn-primary" style="margin-top:20px;" onclick="alert('Guardado correctamente.')">Guardar Cambios</button>
                 </div>
             </section>
         </div>
     </main>
 
-    <div id="task-modal" class="modal-overlay">
+    <div id="task-modal" class="modal-overlay" onclick="if(event.target === this) UI.toggleModal('task-modal')">
         <div class="modal-box">
             <h3>Nueva Tarea</h3>
             <label style="font-size:12px; color:var(--text-muted); margin-top:16px; display:block;">Título</label>
-            <input id="new-task-title" class="input-glass" style="margin-bottom:16px;" placeholder="Ej: Configurar Pixel">
+            <input id="new-task-title" class="input-glass" style="margin-bottom:16px;">
             <label style="font-size:12px; color:var(--text-muted); display:block;">Descripción</label>
-            <textarea id="new-task-desc" class="input-glass" style="margin-bottom:16px;" placeholder="Detalles..."></textarea>
-            <label style="font-size:12px; color:var(--text-muted); display:block;">Asignar a</label>
-            <div style="display:flex; gap:10px; margin-bottom:24px;">
-                <select id="new-task-assignee" class="input-glass" style="appearance: none;"><option value="" disabled selected>Cargando...</option></select>
+            <textarea id="new-task-desc" class="input-glass" style="margin-bottom:16px;"></textarea>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:24px;">
+                <div>
+                    <label style="font-size:12px; color:var(--text-muted); display:block;">Asignar a</label>
+                    <select id="new-task-assignee" class="input-glass"><option>Cargando...</option></select>
+                </div>
+                <div>
+                    <label style="font-size:12px; color:var(--text-muted); display:block;">Contexto</label>
+                    <select id="new-task-client" class="input-glass"><option value="General">General</option></select>
+                </div>
             </div>
-            <button class="btn btn-primary" style="width:100%" onclick="App.createTask()">Guardar Tarea</button>
-            <button class="btn" style="width:100%; margin-top:10px;" onclick="UI.toggleModal('task-modal')">Cancelar</button>
+
+            <div style="display:flex; justify-content:flex-end; gap:12px;">
+                <button class="btn" onclick="UI.toggleModal('task-modal')">Cancelar</button>
+                <button class="btn btn-primary" onclick="App.createTask()">Guardar Tarea</button>
+            </div>
         </div>
     </div>
 
-    <div id="campaign-detail-modal" class="modal-overlay">
+    <div id="campaign-detail-modal" class="modal-overlay" onclick="if(event.target === this) UI.toggleModal('campaign-detail-modal')">
         <div class="modal-box modal-wide">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <div><h2 id="detail-title" style="font-size:20px;">Nombre Campaña</h2><span id="detail-status" class="status-pill status-on">Activa</span></div>
-                <button class="btn" onclick="UI.toggleModal('campaign-detail-modal')">✕ Cerrar</button>
-            </div>
-            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; margin-bottom:24px;">
-                <div style="background:rgba(255,255,255,0.03); padding:16px; border-radius:12px;"><div style="font-size:11px; color:var(--text-muted);">GASTO TOTAL</div><div id="detail-spend" style="font-size:18px; font-weight:700;">$0</div></div>
-                <div style="background:rgba(255,255,255,0.03); padding:16px; border-radius:12px;"><div style="font-size:11px; color:var(--text-muted);">RESULTADOS</div><div id="detail-results" style="font-size:18px; font-weight:700;">0</div></div>
-                <div style="background:rgba(255,255,255,0.03); padding:16px; border-radius:12px;"><div style="font-size:11px; color:var(--text-muted);">CPC PROMEDIO</div><div style="font-size:18px; font-weight:700;">$0.45</div></div>
+                <div><h2 id="detail-title" style="font-size:20px;">...</h2><span id="detail-status" class="status-pill status-active">Activa</span></div>
+                <button class="btn btn-icon" onclick="UI.toggleModal('campaign-detail-modal')">✕</button>
             </div>
             <div style="height:300px; background:rgba(0,0,0,0.3); border-radius:12px; padding:16px; margin-bottom:24px;"><canvas id="detailChart"></canvas></div>
-            <div style="border-top:1px solid var(--border-glass); padding-top:20px; display:flex; justify-content:space-between; align-items:center;">
-                <div style="font-size:12px; color:var(--text-muted);">IA Assistant Integration</div>
-                <button class="btn btn-primary" onclick="App.askCampaignAnalysis()">✨ Analizar con Alfred</button>
-            </div>
+            <button class="btn btn-primary" onclick="App.askCampaignAnalysis()">✨ Analizar con Alfred</button>
         </div>
     </div>
 
@@ -400,7 +400,7 @@
         import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        const OPENAI_API_KEY = ""; // VACIAR para producción
+        const OPENAI_API_KEY = ""; 
         const SUPER_ADMINS = ["frantruppa@gmail.com"]; 
 
         const firebaseConfig = {
@@ -414,9 +414,8 @@
 
         const App = {
             db: null, auth: null, user: null,
-            dataCache: { campaigns: [], tasks: [], currentDetail: null },
-            charts: { main: null, detail: null },
-
+            dataCache: { campaigns: [], tasks: [], clients: new Set() },
+            
             init: () => {
                 const app = initializeApp(firebaseConfig);
                 App.db = getFirestore(app);
@@ -427,188 +426,183 @@
                         if (await App.checkAccess(user)) {
                             App.user = user;
                             UI.closeLogin();
-                            document.getElementById('user-photo').src = user.photoURL || 'https://ui-avatars.com/api/?name=User';
+                            document.getElementById('user-photo').src = user.photoURL;
                             document.getElementById('user-display-name').innerText = user.displayName;
-                            if (!SUPER_ADMINS.includes(user.email)) document.getElementById('btn-invite-user').style.display = 'none';
-                            App.listenToCampaigns(); 
-                            App.listenToTasks();
-                            App.listenToTeam();
-                        } else {
-                            alert("Acceso denegado.");
-                            await signOut(App.auth);
-                        }
-                    } else {
-                        document.getElementById('login-modal').classList.add('open');
-                    }
+                            App.listenToData();
+                        } else { alert("Acceso denegado."); await signOut(App.auth); }
+                    } else { document.getElementById('login-modal').classList.add('open'); }
                 });
-
+                lucide.createIcons();
                 UI.initMainChart();
-                lucide.createIcons();
-            },
-
-            // --- AGENTE IA CON NAVEGACIÓN ---
-            sendMessage: async () => {
-                const i=document.getElementById('ai-input'), c=document.getElementById('chat-content'), t=i.value; if(!t)return;
-                c.innerHTML+=`<div style="text-align:right;margin-bottom:10px;color:white;">${t}</div>`; i.value=''; c.scrollTop=c.scrollHeight;
-                const tid="th-"+Date.now(); c.innerHTML+=`<div id="${tid}" style="background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;color:#999;">Analizando...</div>`; c.scrollTop=c.scrollHeight;
                 
-                try {
-                    // System Prompt mejorado para que actúe como agente
-                    const ctx = `
-                        Eres Alfred, el Agente Operativo de Abundance OS.
-                        TU CAPACIDAD: Además de responder, puedes navegar por la app.
-                        SI EL USUARIO PIDE IR A UN LUGAR, RESPONDE SOLO CON EL CÓDIGO:
-                        - [NAV:settings] para configuración
-                        - [NAV:ads] para ads manager
-                        - [NAV:reports] para reportes
-                        - [NAV:tasks] para tareas
-                        
-                        SI NO PIDE NAVEGAR, responde normal con estos datos:
-                        Campañas: ${JSON.stringify(App.dataCache.campaigns.map(x=>x.name))}
-                    `;
-                    
-                    let d;
-                    if(OPENAI_API_KEY) {
-                        const r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${OPENAI_API_KEY}`},body:JSON.stringify({model:"gpt-3.5-turbo",messages:[{role:"system",content:ctx},{role:"user",content:t}]})});
-                        d=await r.json();
-                    } else {
-                        const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:t,context:ctx})});
-                        d=await r.json();
-                    }
-                    if(d.error) throw new Error(d.error);
-                    
-                    const reply = d.choices[0].message.content;
-                    
-                    // EJECUTOR DE COMANDOS (AGENTE)
-                    if(reply.includes('[NAV:')) {
-                        const target = reply.match(/\[NAV:(.*?)\]/)[1];
-                        UI.nav(target);
-                        document.getElementById(tid).innerText = `Entendido. Navegando a ${target}...`;
-                    } else {
-                        document.getElementById(tid).innerText = reply;
-                    }
-                    document.getElementById(tid).style.color="white";
-
-                } catch(e) { document.getElementById(tid).innerText="Error de conexión."; document.getElementById(tid).style.color="red"; }
-            },
-
-            syncAdsData: () => { alert("Sincronizando con Meta Business API... (Simulado)"); },
-
-            updateSidebarClients: (campaigns) => {
-                const clients = new Set();
-                campaigns.forEach(c => { const parts = c.name.split('-'); if(parts.length > 1) clients.add(parts[0].trim()); else clients.add(c.name); });
-                const menu = document.getElementById('ads-submenu');
-                menu.innerHTML = `<div class="submenu-item active" onclick="App.filterAds('all', this)">Ver Todo</div>`;
-                clients.forEach(client => { menu.innerHTML += `<div class="submenu-item" onclick="App.filterAds('${client}', this)">${client}</div>`; });
-            },
-
-            filterAds: (clientName, el) => {
-                document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active')); el.classList.add('active');
-                const all = App.dataCache.campaigns;
-                let filtered = all;
-                if(clientName !== 'all') { filtered = all.filter(c => c.name.includes(clientName)); document.getElementById('page-title').innerText = "Cliente: " + clientName; } 
-                else { document.getElementById('page-title').innerText = "Ads Manager: Todos"; }
-                App.renderAdsTable(filtered); UI.nav('ads');
-            },
-
-            renderAdsTable: (data) => {
-                const tbody = document.getElementById('ads-body');
-                tbody.innerHTML = data.map(c => `
-                    <tr class="clickable-row">
-                        <td><span class="status-pill ${c.status==='active'?'status-on':'status-off'}"><div class="dot"></div> ${c.status}</span></td>
-                        <td onclick="App.openCampaignDetail('${c.id}')" style="font-weight:500; color:white; text-decoration:underline; text-decoration-color:rgba(255,255,255,0.2); text-underline-offset:4px;">${c.name}</td>
-                        <td style="color:var(--text-muted);">${c.budget}</td>
-                        <td>${c.results}</td>
-                        <td><button class="btn btn-sm" onclick="App.toggleStatus('${c.id}', '${c.status}')">${c.status==='active'?'Pausar':'Activar'}</button></td>
-                    </tr>
-                `).join('');
-                lucide.createIcons();
-            },
-
-            listenToCampaigns: () => {
-                onSnapshot(query(collection(App.db, "campaigns"), orderBy("createdAt", "desc")), (snap) => {
-                    const campaigns = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    App.dataCache.campaigns = campaigns;
-                    App.updateSidebarClients(campaigns);
-                    App.renderAdsTable(campaigns);
-                    document.getElementById('kpi-projects').innerText = campaigns.filter(c => c.status === 'active').length;
+                // Cierre con tecla ESC
+                document.addEventListener('keyup', (e) => {
+                    if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(el => el.classList.remove('open'));
                 });
             },
 
-            listenToTasks: () => {
+            // --- LÓGICA DE DATOS ---
+            listenToData: () => {
+                onSnapshot(query(collection(App.db, "campaigns"), orderBy("createdAt", "desc")), (snap) => {
+                    const campaigns = snap.docs.map(d => ({id:d.id, ...d.data()}));
+                    App.dataCache.campaigns = campaigns;
+                    App.updateClients(campaigns);
+                    UI.renderAds(campaigns);
+                    document.getElementById('kpi-projects').innerText = campaigns.filter(c=>c.status==='active').length;
+                });
+
                 onSnapshot(query(collection(App.db, "tasks"), orderBy("createdAt", "desc")), (snap) => {
                     const tasks = snap.docs.map(d => ({id:d.id, ...d.data()}));
                     App.dataCache.tasks = tasks;
-                    document.getElementById('kpi-tasks').innerText = tasks.filter(t => t.status === 'pending').length;
-                    
-                    const container = document.getElementById('tasks-list');
-                    container.innerHTML = tasks.map(t => {
-                        let pill = 'status-pending'; let txt = 'Pendiente';
-                        if(t.status === 'in_process') { pill = 'status-process'; txt = 'En Proceso'; }
-                        if(t.status === 'done') { pill = 'status-done'; txt = 'Realizada'; }
-                        const desc = t.description || "Sin detalles.";
+                    UI.renderTasks(tasks);
+                    document.getElementById('kpi-tasks').innerText = tasks.filter(t=>t.status==='pending').length;
+                });
 
-                        return `
-                            <div class="card" style="padding:0; overflow:hidden; border:1px solid var(--border-glass); background:rgba(20,20,20,0.4);">
-                                <div style="padding:16px 24px; display:flex; align-items:center; gap:16px; cursor:pointer;" onclick="App.toggleDetails('detail-${t.id}')">
-                                    <div onclick="event.stopPropagation(); App.cycleStatus('${t.id}', '${t.status}')" class="status-pill ${pill}" style="min-width:90px; justify-content:center;"><div class="dot"></div> ${txt}</div>
-                                    <div style="flex:1; color:white; ${t.status === 'done' ? 'text-decoration:line-through; color:var(--text-muted);' : ''}">${t.title}</div>
-                                    <div style="font-size:11px; color:var(--text-muted); background:rgba(255,255,255,0.05); padding:4px 8px; border-radius:6px;">${t.assignee}</div>
-                                    <button class="btn btn-danger" style="height:28px; width:28px; padding:0;" onclick="event.stopPropagation(); App.deleteTask('${t.id}')"><i data-lucide="x" class="icon" style="width:14px;"></i></button>
-                                </div>
-                                <div id="detail-${t.id}" style="display:none; border-top:1px solid var(--border-glass); background:rgba(255,255,255,0.02); padding:20px 24px;">
-                                    <p style="color:var(--text-muted); font-size:13px; margin-bottom:16px;">${desc}</p>
-                                    <button class="btn btn-sm" onclick="App.askTaskHelp('${t.id}')" style="border-color:var(--accent-primary); color:var(--accent-primary);">✨ Consultar a Alfred</button>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                    lucide.createIcons();
+                onSnapshot(collection(App.db, "allowed_users"), (snap) => {
+                    const users = snap.docs.map(d=>d.data());
+                    UI.renderTeam(users);
+                    const sel = document.getElementById('new-task-assignee');
+                    sel.innerHTML = '<option value="team">Todo el Equipo</option>' + users.map(u => `<option value="${u.email}">${u.email}</option>`).join('');
                 });
             },
 
-            toggleDetails: (id) => { const el = document.getElementById(id); el.style.display = el.style.display==='none'?'block':'none'; },
-            cycleStatus: async (id, st) => { let n='pending'; if(st==='pending')n='in_process'; else if(st==='in_process')n='done'; await updateDoc(doc(App.db, "tasks", id), { status: n }); },
-            createTask: async () => { 
-                const t=document.getElementById('new-task-title').value, d=document.getElementById('new-task-desc').value, a=document.getElementById('new-task-assignee').value;
-                if(!t||!a) return; await addDoc(collection(App.db,"tasks"),{title:t,description:d,assignee:a,status:'pending',createdAt:serverTimestamp()});
-                if(a!=='team') fetch('/api/notify',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:a,taskTitle:t,assignedBy:App.user.email})}).catch(console.error);
-                UI.toggleModal('task-modal');
+            updateClients: (campaigns) => {
+                const clients = new Set(['General']);
+                campaigns.forEach(c => { const parts = c.name.split('-'); if(parts.length > 1) clients.add(parts[0].trim()); });
+                const menu = document.getElementById('ads-submenu');
+                menu.innerHTML = `<div class="submenu-item active" onclick="App.filterAds('all', this)">Ver Todo</div>`;
+                clients.forEach(c => { if(c!=='General') menu.innerHTML += `<div class="submenu-item" onclick="App.filterAds('${c}', this)">${c}</div>`; });
+                
+                const sel = document.getElementById('new-task-client');
+                sel.innerHTML = Array.from(clients).map(c => `<option value="${c}">${c}</option>`).join('');
             },
-            deleteTask: async(id) => { if(confirm("Borrar?")) await deleteDoc(doc(App.db,"tasks",id)); },
-            checkAccess: async(u) => { if(SUPER_ADMINS.includes(u.email)){await setDoc(doc(App.db,"allowed_users",u.email),{email:u.email,role:'admin',addedAt:serverTimestamp()},{merge:true});return true;} const s=await getDoc(doc(App.db,"allowed_users",u.email)); return s.exists(); },
-            listenToTeam: () => { 
-                onSnapshot(query(collection(App.db,"allowed_users")),(s)=>{
-                    const u=s.docs.map(d=>d.data()), t=document.getElementById('team-list-body'), sel=document.getElementById('new-task-assignee'), isA=SUPER_ADMINS.includes(App.user.email);
-                    if(t) { t.innerHTML=u.map(x=>`<tr><td>${x.email}</td><td>${x.role}</td><td>${isA?`<button class="btn btn-danger btn-sm" onclick="App.removeUser('${x.email}')"><i data-lucide="trash" style="width:14px;"></i></button>`:''}</td></tr>`).join(''); lucide.createIcons(); }
-                    if(sel) { let o='<option value="" disabled selected>Seleccionar...</option><option value="team">Todo el Equipo</option>'; u.forEach(x=>o+=`<option value="${x.email}">${x.email}</option>`); sel.innerHTML=o; }
-                }); 
-            },
-            inviteUser: async() => { if(!SUPER_ADMINS.includes(App.user.email))return; const e=prompt("Email:"); if(e)await setDoc(doc(App.db,"allowed_users",e.trim()),{email:e.trim(),role:'member',addedAt:serverTimestamp()}); },
-            removeUser: async(e) => { if(!SUPER_ADMINS.includes(App.user.email))return; if(confirm("Borrar acceso?"))await deleteDoc(doc(App.db,"allowed_users",e)); },
-            toggleStatus: async (id,s) => await updateDoc(doc(App.db,"campaigns",id),{status:s==='active'?'paused':'active'}),
-            openCampaignDetail: (id) => { const c=App.dataCache.campaigns.find(x=>x.id===id); if(c){ App.dataCache.currentDetail=c; document.getElementById('detail-title').innerText=c.name; document.getElementById('detail-status').innerText=c.status; UI.toggleModal('campaign-detail-modal'); UI.initDetailChart(c.name); } },
-            askCampaignAnalysis: () => { const c=App.dataCache.currentDetail; UI.toggleModal('campaign-detail-modal'); UI.toggleDrawer(); document.getElementById('ai-input').value=`Analiza campaña "${c.name}"...`; App.sendMessage(); },
-            askTaskHelp: (id) => { const t=App.dataCache.tasks.find(x=>x.id===id); UI.toggleDrawer(); document.getElementById('ai-input').value=`Ayuda con tarea: ${t.title}...`; App.sendMessage(); },
 
+            filterAds: (clientName, el) => {
+                document.querySelectorAll('.submenu-item').forEach(i => i.classList.remove('active'));
+                el.classList.add('active');
+                const all = App.dataCache.campaigns;
+                let filtered = all;
+                if(clientName !== 'all') {
+                    filtered = all.filter(c => c.name.includes(clientName));
+                    document.getElementById('page-title').innerText = "Cliente: " + clientName;
+                    document.getElementById('view-context-label').innerText = clientName;
+                } else {
+                    document.getElementById('page-title').innerText = "Ads Manager";
+                    document.getElementById('view-context-label').innerText = "Global";
+                }
+                UI.renderAds(filtered);
+                UI.nav('ads');
+            },
+
+            createTask: async () => {
+                const title = document.getElementById('new-task-title').value;
+                const desc = document.getElementById('new-task-desc').value;
+                const assignee = document.getElementById('new-task-assignee').value;
+                const client = document.getElementById('new-task-client').value;
+                if(!title) return;
+                
+                await addDoc(collection(App.db, "tasks"), { title, description: desc, assignee, client, status: 'pending', createdAt: serverTimestamp(), createdBy: App.user.email });
+                
+                // FIX: Cerrar modal después de crear
+                UI.toggleModal('task-modal'); 
+                document.getElementById('new-task-title').value = '';
+                document.getElementById('new-task-desc').value = '';
+            },
+
+            syncAdsData: () => {
+                const icon = document.getElementById('sync-icon');
+                if(icon) icon.classList.add('spin');
+                setTimeout(() => { if(icon) icon.classList.remove('spin'); alert("Datos sincronizados."); }, 1500);
+            },
+
+            sendMessage: async () => {
+                const i=document.getElementById('ai-input'), c=document.getElementById('chat-content'), t=i.value; if(!t)return;
+                c.innerHTML+=`<div style="text-align:right;margin-bottom:10px;color:white;">${t}</div>`; i.value=''; c.scrollTop=c.scrollHeight;
+                const tid="ai-"+Date.now(); c.innerHTML+=`<div id="${tid}" style="color:#888;margin-bottom:10px;">Pensando...</div>`;
+                try {
+                    const ctx=`Datos: Tareas=${App.dataCache.tasks.length}`;
+                    let r; if(OPENAI_API_KEY) r=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${OPENAI_API_KEY}`},body:JSON.stringify({model:"gpt-3.5-turbo",messages:[{role:"system",content:ctx},{role:"user",content:t}]})});
+                    else r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:t,context:ctx})});
+                    const d=await r.json(); if(d.error)throw new Error(d.error);
+                    document.getElementById(tid).innerText=d.choices[0].message.content; document.getElementById(tid).style.color="#ccc";
+                } catch(e) { document.getElementById(tid).innerText="Error."; }
+            },
+
+            // Utils
+            checkAccess: async(u) => { if(SUPER_ADMINS.includes(u.email)){await setDoc(doc(App.db,"allowed_users",u.email),{email:u.email,role:'admin'},{merge:true});return true;} const s=await getDoc(doc(App.db,"allowed_users",u.email)); return s.exists(); },
             login: async()=>{try{await signInWithPopup(App.auth,new GoogleAuthProvider())}catch(e){alert(e)}},
             logout: async()=>{await signOut(App.auth);location.reload()},
-            downloadPDF: ()=>{html2pdf().from(document.getElementById('view-dash')).save('Abundance_Report.pdf')}
+            deleteTask: async(id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(App.db,"tasks",id)); },
+            inviteUser: async() => { if(!SUPER_ADMINS.includes(App.user.email))return; const e=prompt("Email:"); if(e)await setDoc(doc(App.db,"allowed_users",e.trim()),{email:e.trim(),role:'member',addedAt:serverTimestamp()}); },
+            removeUser: async(e) => { if(!SUPER_ADMINS.includes(App.user.email))return; if(confirm("Borrar?"))await deleteDoc(doc(App.db,"allowed_users",e)); },
+            toggleTaskStatus: async(id, st) => { 
+                let n='pending'; if(st==='pending')n='in_process'; else if(st==='in_process')n='done';
+                await updateDoc(doc(App.db,"tasks",id),{status:n}); 
+            },
+            downloadPDF: ()=>{html2pdf().from(document.getElementById('view-dash')).save('Report.pdf')},
+            
+            // Detail
+            openCampaignDetail: (id) => {
+                const c=App.dataCache.campaigns.find(x=>x.id===id);
+                document.getElementById('detail-title').innerText=c.name;
+                UI.toggleModal('campaign-detail-modal');
+                UI.initDetailChart(c.name);
+            },
+            askCampaignAnalysis: () => { UI.toggleModal('campaign-detail-modal'); UI.toggleDrawer(); document.getElementById('ai-input').value="Analiza esta campaña..."; App.sendMessage(); }
         };
 
         const UI = {
             nav: (id) => { document.querySelectorAll('.view-section').forEach(e=>e.classList.remove('active')); document.getElementById('view-'+id).classList.add('active'); document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active')); event.currentTarget.classList.add('active'); },
-            toggleDrawer: () => { document.getElementById('ai-drawer').classList.toggle('open'); document.getElementById('alfred-btn').classList.toggle('active'); },
+            toggleDrawer: () => { document.getElementById('ai-drawer').classList.toggle('open'); },
             toggleModal: (id) => document.getElementById(id).classList.toggle('open'),
             closeLogin: () => document.getElementById('login-modal').classList.remove('open'),
-            toggleCalendar: (e) => { e.stopPropagation(); document.getElementById('calendar-menu').classList.toggle('show'); },
+            toggleDropdown: (id) => { const el = document.getElementById(id); el.classList.toggle('show'); },
+            toggleSubmenu: (id) => { document.getElementById(id).classList.toggle('open'); },
             setRange: (t,e) => { document.getElementById('calendar-label').innerText=t; document.getElementById('calendar-menu').classList.remove('show'); },
-            toggleSubmenu: (id) => { const el = document.getElementById(id); el.classList.toggle('open'); },
-            initMainChart: () => { new Chart(document.getElementById('mainChart').getContext('2d'), { type:'line',data:{labels:['S1','S2','S3','S4'],datasets:[{label:'Leads',data:[20,45,30,60],borderColor:'#3B82F6',tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#333'}}}}}); },
+            
+            renderAds: (list) => {
+                document.getElementById('ads-body').innerHTML = list.map(c => `
+                    <tr class="clickable-row">
+                        <td><span class="status-pill ${c.status==='active'?'status-active':'status-off'}"><div class="dot"></div> ${c.status}</span></td>
+                        <td onclick="App.openCampaignDetail('${c.id}')" style="font-weight:500; color:white; text-decoration:underline; text-decoration-color:rgba(255,255,255,0.2); text-underline-offset:4px;">${c.name}</td>
+                        <td style="color:var(--text-muted);">${c.budget}</td>
+                        <td>${c.results}</td>
+                        <td><button class="btn btn-sm">Editar</button></td>
+                    </tr>
+                `).join('');
+            },
+            renderTasks: (list) => {
+                const div = document.getElementById('tasks-list');
+                div.innerHTML = list.map(t => {
+                    let pill='status-pending', txt='Pendiente';
+                    if(t.status==='in_process'){ pill='status-process'; txt='En Proceso'; }
+                    if(t.status==='done'){ pill='status-done'; txt='Listo'; }
+                    
+                    return `
+                        <div class="card" style="padding:16px; display:flex; align-items:center; gap:16px; margin-bottom:8px; border-radius:12px;">
+                            <div onclick="App.toggleTaskStatus('${t.id}','${t.status}')" class="status-pill ${pill}" style="cursor:pointer; min-width:90px; justify-content:center;"><div class="dot"></div> ${txt}</div>
+                            <div style="flex:1;">
+                                <div style="font-weight:500; text-decoration:${t.status==='done'?'line-through':''}">${t.title}</div>
+                                <div style="font-size:11px; color:#666;">${t.client||'General'} • ${t.assignee}</div>
+                            </div>
+                            <button class="btn btn-danger btn-sm" onclick="App.deleteTask('${t.id}')">✕</button>
+                        </div>
+                    `;
+                }).join('');
+            },
+            renderTeam: (list) => {
+                const tbody = document.getElementById('team-list-body');
+                const isA = SUPER_ADMINS.includes(App.user.email);
+                tbody.innerHTML = list.map(u => `<tr><td>${u.email}</td><td>${u.role}</td><td>${isA?`<button class="btn btn-danger btn-sm" onclick="App.removeUser('${u.email}')">Eliminar</button>`:''}</td></tr>`).join('');
+            },
+            initMainChart: () => { new Chart(document.getElementById('mainChart').getContext('2d'), { type:'line',data:{labels:['S1','S2','S3','S4'],datasets:[{label:'Leads',data:[10,25,40,35],borderColor:'#3B82F6',tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#222'}}}}}); },
             initDetailChart: (n) => { const c=document.getElementById('detailChart').getContext('2d'); if(App.charts.detail)App.charts.detail.destroy(); App.charts.detail=new Chart(c,{type:'bar',data:{labels:['L','M','M','J','V'],datasets:[{label:n,data:[12,19,3,5,2],backgroundColor:'#10B981',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#333'}}}}}); }
         };
 
-        window.addEventListener('click', (e) => { if(!e.target.closest('#calendar-btn')) document.getElementById('calendar-menu').classList.remove('show'); });
+        window.addEventListener('click', (e) => { 
+            if(!e.target.closest('#calendar-btn')) document.getElementById('calendar-menu').classList.remove('show'); 
+            if(!e.target.closest('.has-notif')) document.getElementById('notif-menu').classList.remove('show');
+        });
         window.App = App; window.UI = UI;
         App.init();
     </script>
