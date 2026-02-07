@@ -516,37 +516,92 @@
             },
 
             // --- CEREBRO AUTOMÁTICO ---
-            runBackgroundAgent: async () => {
-                const box = document.getElementById('ai-attention-box');
-                const status = document.getElementById('ai-scan-status');
-                const list = document.getElementById('ai-insights-list');
-                
-                box.classList.add('scanning');
-                status.innerText = "Alfred está analizando 24 campañas y 12 tareas...";
-                
-                setTimeout(() => {
-                    box.classList.remove('scanning');
-                    status.style.display = 'none';
-                    list.style.display = 'flex';
-                    list.innerHTML = `
-                        <div class="attention-item">
-                            <div class="attention-dot" style="background:var(--danger); box-shadow:0 0 10px var(--danger);"></div>
-                            <div>
-                                <div class="attention-text">Campaña: Retargeting Pepsi</div>
-                                <div class="attention-sub">ROAS cayó a 1.2x.</div>
-                            </div>
-                        </div>
-                        <div class="attention-item">
-                            <div class="attention-dot"></div>
-                            <div>
-                                <div class="attention-text">Oportunidad: Coca-Cola</div>
-                                <div class="attention-sub">Escalar presupuesto recomendado.</div>
-                            </div>
-                        </div>
-                    `;
-                }, 2500);
-            },
+          runBackgroundAgent: async () => {
+    const box = document.getElementById('ai-attention-box');
+    const status = document.getElementById('ai-scan-status');
+    const list = document.getElementById('ai-insights-list');
+    
+    // 1. UI: Modo Escaneo
+    box.classList.add('scanning');
+    status.style.display = 'block';
+    list.style.display = 'none';
+    
+    // 2. Recopilar Datos Reales de la App
+    const campaigns = App.dataCache.campaigns;
+    const tasks = App.dataCache.tasks.filter(t => t.status === 'pending');
+    
+    if (campaigns.length === 0 && tasks.length === 0) {
+        box.classList.remove('scanning');
+        status.innerText = "Sin datos para analizar. Crea campañas o tareas.";
+        return;
+    }
 
+    status.innerText = `Analizando ${campaigns.length} campañas y ${tasks.length} tareas pendientes...`;
+
+    try {
+        // 3. Crear el Prompt para el Agente
+        const prompt = `
+            Actúa como un Auditor de Agencia. Analiza estos datos JSON y genera 2 alertas críticas breves.
+            
+            DATOS:
+            - Campañas: ${JSON.stringify(campaigns.map(c => ({name: c.name, budget: c.budget, results: c.results, status: c.status})))}
+            - Tareas Pendientes: ${JSON.stringify(tasks.map(t => t.title))}
+            
+            FORMATO RESPUESTA (Solo devuelve un JSON Array, nada más):
+            [{"type": "danger|warning|success", "title": "Titulo corto", "desc": "Explicación breve"}]
+            
+            Reglas:
+            - Si hay campañas pausadas con gasto alto, alerta Danger.
+            - Si hay muchas tareas pendientes, alerta Warning.
+            - Si no hay problemas graves, da un consejo de optimización (Success).
+        `;
+
+        // 4. Consultar a Alfred (Usando tu backend existente)
+        // Nota: Usamos fetch directo a chat.js para no ensuciar el chat visual
+        let response;
+        const payload = { message: prompt, context: "Eres un sistema JSON puro." };
+        
+        // Determinar si usar key local (prueba) o server (prod)
+        if (OPENAI_API_KEY) {
+             response = await fetch("https://api.openai.com/v1/chat/completions", {
+                method: "POST", headers: {"Content-Type":"application/json", "Authorization": `Bearer ${OPENAI_API_KEY}`},
+                body: JSON.stringify({ model: "gpt-3.5-turbo", messages: [{role:"system", content: "Output JSON only."}, {role:"user", content: prompt}] })
+            });
+        } else {
+             response = await fetch("/api/chat", {
+                method: "POST", headers: {"Content-Type":"application/json"},
+                body: JSON.stringify(payload)
+            });
+        }
+
+        const data = await response.json();
+        let content = data.choices[0].message.content;
+        
+        // Limpieza por si la IA devuelve texto extra
+        if(content.includes("```json")) content = content.split("```json")[1].split("```")[0];
+        const insights = JSON.parse(content);
+
+        // 5. Renderizar Resultados Reales
+        list.innerHTML = insights.map(item => `
+            <div class="attention-item">
+                <div class="attention-dot" style="background:var(--${item.type}); box-shadow:0 0 10px var(--${item.type});"></div>
+                <div>
+                    <div class="attention-text">${item.title}</div>
+                    <div class="attention-sub">${item.desc}</div>
+                </div>
+            </div>
+        `).join('');
+
+        status.style.display = 'none';
+        list.style.display = 'flex';
+
+    } catch (e) {
+        console.error(e);
+        status.innerText = "Alfred está descansando (Error de análisis).";
+    } finally {
+        box.classList.remove('scanning');
+    }
+},
             listenToData: () => {
                 onSnapshot(query(collection(App.db, "campaigns"), orderBy("createdAt", "desc")), (snap) => {
                     const campaigns = snap.docs.map(d => ({id:d.id, ...d.data()}));
@@ -668,16 +723,75 @@
             setRange: (t,e) => { document.getElementById('calendar-label').innerText=t; document.getElementById('calendar-menu').classList.remove('show'); },
             
             renderAds: (list) => {
-                document.getElementById('ads-body').innerHTML = list.map(c => `
-                    <tr class="clickable-row">
-                        <td><span class="status-pill ${c.status==='active'?'status-on':'status-off'}"><div class="dot"></div> ${c.status}</span></td>
-                        <td onclick="App.openCampaignDetail('${c.id}')" style="font-weight:500; color:white; text-decoration:underline; text-decoration-color:rgba(255,255,255,0.2); text-underline-offset:4px;">${c.name}</td>
-                        <td style="color:var(--text-muted);">${c.budget}</td>
-                        <td>${c.results}</td>
-                        <td><button class="btn btn-sm">Editar</button></td>
-                    </tr>
-                `).join('');
+        document.getElementById('ads-body').innerHTML = list.map(c => `
+            <tr class="clickable-row">
+                <td><span class="status-pill ${c.status==='active'?'status-on':'status-off'}"><div class="dot"></div> ${c.status}</span></td>
+                <td onclick="App.openCampaignDetail('${c.id}')" style="font-weight:500; color:white; text-decoration:underline; text-decoration-color:rgba(255,255,255,0.2); text-underline-offset:4px;">${c.name}</td>
+                <td style="color:var(--text-muted);">${c.budget}</td>
+                <td>${c.results}</td>
+                <td><button class="btn btn-sm">Editar</button></td>
+            </tr>
+        `).join('');
+        
+        // NUEVO: Actualizar Gráfico basado en estos datos
+        UI.updateChartFromData(list);
+    },
+
+    // Nueva función para procesar datos reales al gráfico
+    updateChartFromData: (campaigns) => {
+        const chart = UI.mainChartInstance; // Necesitamos guardar la instancia
+        if (!chart) return;
+
+        // Lógica simple: Sumar resultados (leads) de todas las campañas activas
+        // En un caso real con Meta, tendrías un array de fechas. 
+        // Aquí simulamos una distribución basada en el total para que se mueva.
+        
+        let totalResults = 0;
+        campaigns.forEach(c => {
+            // Extraer numero de string "145" o "$10"
+            const num = parseInt(c.results.replace(/\D/g,'')) || 0;
+            totalResults += num;
+        });
+
+        // Distribuir el total en 4 semanas para simular curva
+        const dataPoints = [
+            Math.floor(totalResults * 0.1),
+            Math.floor(totalResults * 0.2),
+            Math.floor(totalResults * 0.4),
+            Math.floor(totalResults * 0.3)
+        ];
+
+        chart.data.datasets[0].data = dataPoints;
+        chart.update();
+    },
+
+    // Modificar init para guardar la instancia
+    initMainChart: () => { 
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        UI.mainChartInstance = new Chart(ctx, { 
+            type:'line',
+            data:{
+                labels:['Semana 1','Semana 2','Semana 3','Semana 4'],
+                datasets:[{
+                    label:'Resultados (Leads/Ventas)',
+                    data:[0,0,0,0], // Empieza vacío
+                    borderColor:'#3B82F6',
+                    tension:0.4,
+                    pointBackgroundColor: '#000',
+                    pointBorderColor: '#3B82F6'
+                }]
             },
+            options:{
+                responsive:true,
+                maintainAspectRatio:false,
+                plugins:{legend:{display:false}},
+                scales:{
+                    x:{grid:{display:false}, ticks:{color:'#666'}},
+                    y:{grid:{color:'#222'}, ticks:{color:'#666'}}
+                }
+            }
+        }); 
+    },
             renderTasks: (list) => {
                 const div = document.getElementById('tasks-list');
                 div.innerHTML = list.map(t => {
@@ -726,4 +840,5 @@
     </script>
 </body>
 </html>
+
 
