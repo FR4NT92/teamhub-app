@@ -12,10 +12,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- ESTILOS CORE & LIQUID GLASS --- */
+        /* --- ESTILOS CORE --- */
         :root {
             --bg-body: #050505;
-            --bg-glass: rgba(20, 20, 20, 0.6);
             --border-glass: rgba(255, 255, 255, 0.08);
             --text-main: #FFFFFF;
             --text-muted: #9CA3AF;
@@ -31,83 +30,143 @@
         body { 
             background-color: var(--bg-body); color: var(--text-main); font-family: 'Inter', sans-serif; font-size: 13px; 
             height: 100vh; overflow: hidden; display: flex;
-            background-image: radial-gradient(circle at 50% -10%, rgba(59, 130, 246, 0.1), transparent 40%);
+            background-image: radial-gradient(circle at 50% -10%, rgba(59, 130, 246, 0.15), transparent 45%);
         }
 
-        /* UI KIT */
-        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 36px; padding: 0 16px; border-radius: 8px; font-weight: 500; font-size: 13px; cursor: pointer; transition: all 0.2s var(--ease); background: rgba(255,255,255,0.05); border: 1px solid var(--border-glass); color: var(--text-muted); }
-        .btn:hover { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.2); }
-        .btn-primary { background: var(--text-main); color: black; border: none; }
-        .btn-primary:hover { background: #e5e5e5; color: black; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
-        .btn-danger { color: var(--danger); border-color: rgba(239,68,68,0.2); }
-        .btn-danger:hover { background: rgba(239,68,68,0.1); border-color: var(--danger); }
-        .btn-sm { height: 28px; font-size: 11px; padding: 0 10px; border-radius: 6px; }
-
-        .input-glass { background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 8px; padding: 10px 12px; color: white; width: 100%; transition: 0.2s; }
-        .input-glass:focus { border-color: var(--accent-primary); background: rgba(255,255,255,0.05); }
-        textarea.input-glass { min-height: 80px; resize: vertical; font-family: inherit; }
+        /* --- LIQUID GLASS UI (REFORZADO) --- */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            height: 36px; padding: 0 16px; border-radius: 99px; font-weight: 500; font-size: 13px; cursor: pointer;
+            transition: all 0.3s var(--ease);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px); border: 1px solid var(--border-glass);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05);
+            color: var(--text-muted);
+        }
+        .btn:hover { background: rgba(255, 255, 255, 0.08); color: white; border-color: rgba(255, 255, 255, 0.2); transform: translateY(-1px); }
         
-        .card { background: rgba(18, 18, 18, 0.6); border: 1px solid var(--border-glass); border-radius: 16px; padding: 24px; backdrop-filter: blur(10px); }
-        .separator { height: 1px; background: var(--border-glass); margin: 24px 0; }
+        .btn-primary { 
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25); color: white; 
+            box-shadow: 0 0 20px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.1); text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        .btn-primary:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.5); box-shadow: 0 0 30px rgba(255,255,255,0.15); }
 
-        /* LAYOUT */
-        aside { width: 260px; background: rgba(10, 10, 10, 0.95); border-right: 1px solid var(--border-glass); display: flex; flex-direction: column; padding: 20px 12px; z-index: 20; }
+        .btn-icon { width: 36px; padding: 0; border-radius: 50%; }
+
+        /* INPUTS & SELECTS (CORRECCIÓN FONDO BLANCO) */
+        .input-glass { 
+            background: rgba(20, 20, 20, 0.6); border: 1px solid var(--border-glass); 
+            border-radius: 12px; padding: 10px 16px; color: white; width: 100%; transition: 0.2s;
+            appearance: none; /* Quita estilo nativo del navegador */
+        }
+        .input-glass:focus { border-color: var(--accent-primary); background: rgba(30, 30, 30, 0.8); }
+        
+        /* Select específico para que las opciones sean oscuras */
+        select.input-glass option { background-color: #111; color: white; padding: 10px; }
+
+        .card { background: rgba(18, 18, 18, 0.6); border: 1px solid var(--border-glass); border-radius: 20px; padding: 24px; backdrop-filter: blur(10px); }
+
+        /* --- LAYOUT --- */
+        aside { width: 260px; background: rgba(5, 5, 5, 0.95); border-right: 1px solid var(--border-glass); display: flex; flex-direction: column; padding: 20px 12px; z-index: 20; }
         main { flex: 1; display: flex; flex-direction: column; position: relative; }
-        header { height: 64px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; padding: 0 32px; background: rgba(5,5,5,0.5); backdrop-filter: blur(10px); }
-        .content-scroll { flex: 1; overflow-y: auto; padding: 32px; }
-        .view-section { display: none; animation: fadeIn 0.3s var(--ease); }
+        
+        header { 
+            height: 70px; border-bottom: 1px solid var(--border-glass); display: flex; justify-content: space-between; align-items: center; padding: 0 32px; 
+            background: rgba(5,5,5,0.3); backdrop-filter: blur(10px); z-index: 10;
+        }
+
+        .content-scroll { flex: 1; overflow-y: auto; padding: 32px; display: flex; gap: 24px; } /* Flex para el sidebar derecho */
+        
+        .view-content { flex: 1; min-width: 0; } /* Contenido principal */
+        
+        /* RIGHT SIDEBAR (ACTIVITY) - AHORA DENTRO DEL DASHBOARD */
+        .activity-panel { 
+            width: 320px; flex-shrink: 0; 
+            border-left: 1px solid var(--border-glass); padding-left: 24px;
+            display: none; /* Oculto por defecto, se activa en Dashboard */
+        }
+        
+        .view-section { display: none; animation: fadeIn 0.3s var(--ease); width: 100%; }
         .view-section.active { display: block; }
+        /* Caso especial: Dashboard activa el layout flex */
+        #view-dash.active { display: flex; } 
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* NAV */
+        /* --- NAV --- */
         .nav-title { font-size: 11px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin: 24px 12px 8px 12px; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; color: var(--text-muted); cursor: pointer; transition: 0.2s; margin-bottom: 2px; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; color: var(--text-muted); cursor: pointer; transition: 0.2s; margin-bottom: 2px; }
         .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.06); color: white; }
-        .nav-item.active .icon { color: var(--text-main); }
-        .nav-item .icon { width: 16px; height: 16px; opacity: 0.7; }
-
-        /* SUBMENU */
-        .submenu { display: none; flex-direction: column; padding-left: 28px; margin-bottom: 8px; border-left: 1px solid rgba(255,255,255,0.05); margin-left: 18px; }
+        .nav-item.active .icon { color: var(--accent-primary); }
+        
+        /* Submenu */
+        .submenu { display: none; flex-direction: column; padding-left: 36px; margin-bottom: 8px; }
         .submenu.open { display: flex; }
-        .submenu-item { padding: 6px 12px; font-size: 12px; color: #666; cursor: pointer; transition: 0.2s; border-radius: 6px; }
-        .submenu-item:hover { color: white; background: rgba(255,255,255,0.03); }
-        .submenu-item.active { color: var(--accent-primary); background: rgba(59,130,246,0.1); }
+        .submenu-item { padding: 8px 0; font-size: 12px; color: #666; cursor: pointer; transition: 0.2s; }
+        .submenu-item:hover { color: white; transform: translateX(2px); }
+        .submenu-item.active { color: var(--accent-primary); font-weight: 500; }
 
-        /* ACTIVITY FEED (NUEVO) */
-        .activity-feed { border-left: 1px solid var(--border-glass); padding: 24px; width: 300px; background: rgba(10,10,10,0.3); overflow-y: auto; display: none; }
-        @media (min-width: 1400px) { .activity-feed { display: block; } }
-        .activity-item { display: flex; gap: 12px; margin-bottom: 20px; font-size: 12px; }
-        .activity-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-primary); margin-top: 5px; flex-shrink: 0; box-shadow: 0 0 10px rgba(59,130,246,0.5); }
+        /* --- WIDGETS --- */
+        .activity-item { display: flex; gap: 12px; margin-bottom: 20px; font-size: 12px; position: relative; }
+        .activity-item::before { content:''; position:absolute; left: 3px; top: 12px; bottom: -24px; width: 1px; background: rgba(255,255,255,0.1); }
+        .activity-item:last-child::before { display: none; }
+        .activity-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-primary); margin-top: 5px; flex-shrink: 0; box-shadow: 0 0 10px rgba(59,130,246,0.5); z-index: 2; }
         .activity-time { color: #555; font-size: 10px; margin-top: 4px; }
 
-        /* TABLES & LISTS */
-        .table-container { border: 1px solid var(--border-glass); border-radius: 12px; overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 14px 20px; color: #666; font-size: 11px; font-weight: 600; text-transform: uppercase; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-glass); }
-        td { padding: 14px 20px; border-bottom: 1px solid var(--border-glass); vertical-align: middle; color: #ddd; }
-        tr:hover td { background: rgba(255,255,255,0.02); }
+        .quick-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+        .action-card { 
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 16px; padding: 24px; 
+            cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; 
+        }
+        .action-card:hover { 
+            background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); 
+            transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+        }
+        .action-icon { width: 48px; height: 48px; border-radius: 14px; background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; color: white; }
 
-        /* UTILS */
+        /* --- NOTIFICATIONS BELL --- */
+        .notif-badge { 
+            position: absolute; top: -2px; right: -2px; width: 14px; height: 14px; 
+            background: var(--danger); border-radius: 50%; border: 2px solid var(--bg-body); 
+            display: none; 
+        }
+        .has-notif .notif-badge { display: block; }
+
+        /* --- SPINNER --- */
         .spin { animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
-        .empty-state { text-align: center; padding: 60px 0; color: #555; }
-        
-        /* AGENT CHAT */
+
+        /* --- TABLES & LISTS --- */
+        .table-container { border: 1px solid var(--border-glass); border-radius: 16px; overflow: hidden; background: rgba(10,10,10,0.4); }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 16px 24px; color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-glass); }
+        td { padding: 16px 24px; border-bottom: 1px solid var(--border-glass); vertical-align: middle; }
+        tr:hover td { background: rgba(255,255,255,0.02); }
+        .clickable-row { cursor: pointer; transition: 0.2s; }
+        .clickable-row:hover td { background: rgba(59, 130, 246, 0.05) !important; color: white; }
+
+        /* Pills */
+        .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+        .status-active { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-off { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+        /* TEAM GRID */
+        .team-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+        .team-card { display: flex; align-items: center; gap: 16px; padding: 20px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 16px; }
+        .team-avatar { width: 48px; height: 48px; border-radius: 50%; background: #222; }
+
+        /* AGENT */
         .ai-float { position: fixed; bottom: 30px; right: 30px; z-index: 100; background: #111; border: 1px solid #333; padding: 12px 20px; border-radius: 100px; display: flex; align-items: center; gap: 10px; cursor: pointer; box-shadow: 0 10px 40px rgba(0,0,0,0.5); transition: 0.3s; }
         .ai-float:hover { border-color: var(--accent-primary); transform: translateY(-2px); }
         .drawer { position: fixed; top: 0; right: -450px; width: 450px; height: 100%; background: #0A0A0A; border-left: 1px solid var(--border-glass); z-index: 200; transition: right 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; box-shadow: -50px 0 100px rgba(0,0,0,0.8); }
         .drawer.open { right: 0; }
 
         /* MODALS */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 300; display: none; align-items: center; justify-content: center; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 300; display: none; align-items: center; justify-content: center; }
         .modal-overlay.open { display: flex; animation: fadeIn 0.2s; }
-        .modal-box { background: #0F0F0F; border: 1px solid var(--border-glass); padding: 32px; border-radius: 20px; width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.7); }
-        .modal-wide { width: 800px; }
-
-        /* COMMENTS */
-        .comment-thread { margin-top: 20px; border-top: 1px solid var(--border-glass); padding-top: 20px; }
-        .comment { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 8px; font-size: 12px; }
-        .comment-header { display: flex; justify-content: space-between; color: #666; margin-bottom: 4px; font-size: 10px; }
+        .modal-box { background: #0A0A0A; border: 1px solid var(--border-glass); padding: 32px; border-radius: 24px; width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.7); }
+        .modal-wide { width: 800px; } 
 
     </style>
 </head>
@@ -134,12 +193,12 @@
         </div>
         <div id="chat-content" style="flex:1; padding:24px; overflow-y:auto; font-size:13px; line-height:1.6; color:#ccc;">
             <div style="background:rgba(255,255,255,0.05); padding:16px; border-radius:12px; margin-bottom:12px; border:1px solid var(--border-glass);">
-                Hola. Soy Alfred. Tengo acceso a tu Base de Conocimientos y datos operativos. ¿En qué trabajamos?
+                Hola. Tengo acceso a tu Base de Conocimientos. ¿En qué trabajamos?
             </div>
         </div>
         <div style="padding:24px; border-top:1px solid var(--border-glass); display:flex; gap:8px;">
             <input id="ai-input" class="input-glass" placeholder="Ej: Crea tarea para Coca-Cola..." onkeypress="if(event.key==='Enter') App.sendMessage()">
-            <button class="btn btn-primary" style="width:40px; padding:0;" onclick="App.sendMessage()">→</button>
+            <button class="btn btn-primary btn-icon" onclick="App.sendMessage()">→</button>
         </div>
     </div>
 
@@ -164,14 +223,14 @@
             <div class="nav-item" onclick="UI.nav('crm')"><i data-lucide="users" class="icon"></i> Equipo</div>
 
             <div class="nav-title">Sistema</div>
-            <div class="nav-item" onclick="UI.nav('reports')"><i data-lucide="file-text" class="icon"></i> Reportes</div>
+            <div class="nav-item" onclick="UI.nav('reports')"><i data-lucide="folder-open" class="icon"></i> Biblioteca</div>
             <div class="nav-item" onclick="UI.nav('settings')"><i data-lucide="settings" class="icon"></i> Configuración</div>
         </div>
 
-        <div style="margin-top:auto; padding-top:16px; border-top:1px solid var(--border-glass); display:flex; align-items:center; gap:10px;">
+        <div class="user-profile" style="margin-top:auto; padding-top:16px; border-top:1px solid var(--border-glass); display:flex; align-items:center; gap:10px;">
             <img id="user-photo" src="" style="width:32px; height:32px; border-radius:50%; background:#333;">
             <div style="flex:1; overflow:hidden;">
-                <div id="user-name" style="font-size:12px; font-weight:500; color:white; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">...</div>
+                <div id="user-name" style="font-size:12px; font-weight:500; color:white;">...</div>
                 <div style="font-size:10px; color:#666;">Online</div>
             </div>
             <button class="btn btn-sm" onclick="App.logout()" style="color:var(--danger);"><i data-lucide="log-out" style="width:14px;"></i></button>
@@ -184,15 +243,45 @@
                 <h2 id="page-title" style="font-size:16px; font-weight:600;">Dashboard</h2>
                 <div style="font-size:11px; color:var(--text-muted);">Contexto: <span id="view-context-label">Global</span></div>
             </div>
-            <div style="display:flex; gap:10px;">
-                <button class="btn btn-primary" onclick="UI.toggleModal('task-modal')"><i data-lucide="plus" style="width:14px;"></i> Tarea</button>
+            <div style="display:flex; gap:12px; align-items:center;">
+                <button class="btn btn-icon relative has-notif" style="border:none; background:transparent;">
+                    <i data-lucide="bell"></i>
+                    <div class="notif-badge"></div>
+                </button>
+                
+                <div style="width:1px; height:24px; background:var(--border-glass);"></div>
+                
+                <div id="calendar-wrapper" style="position: relative;">
+                    <button class="btn" id="calendar-btn" onclick="UI.toggleCalendar(event)">
+                        <i data-lucide="calendar" class="icon"></i> <span id="calendar-label">Este Mes</span>
+                    </button>
+                </div>
             </div>
         </header>
 
-        <div style="display:flex; flex:1; overflow:hidden;">
-            <div class="content-scroll">
-                
-                <section id="view-dash" class="view-section active">
+        <div class="content-scroll">
+            
+            <section id="view-dash" class="view-section active">
+                <div class="view-content">
+                    
+                    <div class="quick-actions">
+                        <div class="action-card" onclick="UI.toggleModal('task-modal')">
+                            <div class="action-icon"><i data-lucide="plus"></i></div>
+                            <div style="font-weight:600;">Nueva Tarea</div>
+                            <div style="font-size:11px; color:var(--text-muted);">Asignar al equipo</div>
+                        </div>
+                        <div class="action-card" onclick="App.syncData()">
+                            <div class="action-icon"><i data-lucide="refresh-cw" id="sync-icon-dash"></i></div>
+                            <div style="font-weight:600;">Sincronizar Meta</div>
+                            <div style="font-size:11px; color:var(--text-muted);">Actualizar métricas</div>
+                        </div>
+                        <div class="action-card" onclick="UI.nav('reports')">
+                            <div class="action-icon"><i data-lucide="file-text"></i></div>
+                            <div style="font-weight:600;">Ver Reportes</div>
+                            <div style="font-size:11px; color:var(--text-muted);">Historial mensual</div>
+                        </div>
+                    </div>
+
                     <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; margin-bottom:32px;">
                         <div class="card" style="padding:20px;">
                             <div style="font-size:11px; color:#666; text-transform:uppercase;">Clientes Activos</div>
@@ -213,89 +302,123 @@
                     </div>
 
                     <div class="card" style="height:350px; padding-bottom:30px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
-                            <h4 style="font-size:12px; color:#666; text-transform:uppercase;">Rendimiento</h4>
-                            <button class="btn btn-sm" onclick="App.syncData()"><i data-lucide="refresh-cw" style="width:12px;"></i> Sincronizar</button>
-                        </div>
+                        <h4 style="margin-bottom:16px; font-size:12px; color:#666; text-transform:uppercase;">Tendencia de Leads</h4>
                         <canvas id="mainChart"></canvas>
                     </div>
-                </section>
+                </div>
 
-                <section id="view-tasks" class="view-section">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:24px;">
-                        <h3>Tareas del Equipo</h3>
-                        <div style="display:flex; gap:8px;">
-                            <input class="input-glass" placeholder="Buscar tarea..." style="width:200px; height:36px;">
+                <div class="activity-panel">
+                    <div style="font-size:11px; font-weight:600; color:#555; text-transform:uppercase; margin-bottom:20px;">Actividad Reciente</div>
+                    <div id="activity-list"></div>
+                </div>
+            </section>
+
+            <section id="view-tasks" class="view-section">
+                <div style="display:flex; justify-content:space-between; margin-bottom:24px; align-items:center;">
+                    <h3 style="font-size:20px;">Lista de Tareas</h3>
+                    <button class="btn btn-primary" onclick="UI.toggleModal('task-modal')"><i data-lucide="plus"></i> Agregar</button>
+                </div>
+                <div id="tasks-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+                <div id="tasks-empty" style="text-align:center; padding:60px 0; display:none; color:#444;">
+                    <i data-lucide="check-circle" style="width:48px; height:48px; margin-bottom:10px; opacity:0.3;"></i>
+                    <p>Todo limpio por aquí</p>
+                </div>
+            </section>
+
+            <section id="view-ads" class="view-section">
+                <div style="display:flex; justify-content:space-between; margin-bottom:24px; align-items:center;">
+                    <div style="display:flex; background:rgba(255,255,255,0.05); border-radius:99px; padding:2px;">
+                        <button class="btn btn-sm" style="background:transparent; color:white;">Meta Ads</button>
+                        <button class="btn btn-sm" style="background:transparent; border:none;">Google</button>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn" onclick="App.downloadPDF()"><i data-lucide="download"></i> Reporte Cliente</button>
+                        <button class="btn btn-primary" onclick="App.syncData()"><i data-lucide="refresh-cw" id="sync-icon-ads"></i> Sincronizar</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Estado</th><th>Campaña</th><th>Presupuesto</th><th>Resultados</th><th>Acción</th></tr></thead>
+                        <tbody id="ads-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="view-crm" class="view-section">
+                <div style="display:flex; justify-content:space-between; margin-bottom:24px; align-items:center;">
+                    <h3>Directorio de Equipo</h3>
+                    <button class="btn btn-primary" onclick="App.inviteUser()"><i data-lucide="user-plus"></i> Invitar</button>
+                </div>
+                <div id="team-grid" class="team-grid">
+                    </div>
+            </section>
+
+            <section id="view-reports" class="view-section">
+                <h3>Biblioteca de Reportes</h3>
+                <p style="color:#666; margin-bottom:24px;">Historial de reportes generados y documentos de la agencia.</p>
+                
+                <div class="table-container">
+                    <table>
+                        <thead><tr><th>Nombre Archivo</th><th>Fecha</th><th>Tipo</th><th>Acción</th></tr></thead>
+                        <tbody>
+                            <tr>
+                                <td>Reporte Mensual - Enero.pdf</td>
+                                <td>Hace 2 días</td>
+                                <td><span class="status-pill status-off">PDF</span></td>
+                                <td><button class="btn btn-sm">Descargar</button></td>
+                            </tr>
+                            <tr>
+                                <td>Onboarding Coca Cola.pdf</td>
+                                <td>Hace 1 semana</td>
+                                <td><span class="status-pill status-active">SOP</span></td>
+                                <td><button class="btn btn-sm">Ver</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="view-settings" class="view-section">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:32px;">
+                    <div>
+                        <h3>Configuración General</h3>
+                        <div style="margin-top:20px;">
+                            <label style="font-size:12px; color:#666;">Nombre Organización</label>
+                            <input class="input-glass" value="Abundance HQ" style="margin-top:8px;">
                         </div>
+                        <button class="btn btn-primary" style="margin-top:24px;">Guardar Cambios</button>
                     </div>
-                    <div id="tasks-list" style="display:flex; flex-direction:column; gap:8px;"></div>
-                    <div id="tasks-empty" class="empty-state" style="display:none;">
-                        <i data-lucide="check-circle" style="width:48px; height:48px; opacity:0.2; margin-bottom:16px;"></i>
-                        <p>Todo al día. No hay tareas pendientes.</p>
-                    </div>
-                </section>
-
-                <section id="view-ads" class="view-section">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:24px;">
-                        <div style="display:flex; background:rgba(255,255,255,0.05); border-radius:8px; padding:2px;">
-                            <button class="btn btn-sm" style="background:transparent; color:white;">Meta Ads</button>
-                            <button class="btn btn-sm" style="background:transparent; border:none;">Google</button>
-                        </div>
-                        <button class="btn" onclick="App.syncData()"><i data-lucide="refresh-cw" style="width:14px;"></i> Refresh</button>
-                    </div>
-                    <div class="table-container">
-                        <table>
-                            <thead><tr><th>Estado</th><th>Campaña</th><th>Presupuesto</th><th>Resultados</th><th>Acción</th></tr></thead>
-                            <tbody id="ads-body"></tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section id="view-settings" class="view-section">
                     <div class="card">
-                        <h3>Base de Conocimiento (Supermemory)</h3>
-                        <p style="color:#666; margin-bottom:16px;">Pega aquí información clave (SOPs, guías de estilo) para que Alfred la aprenda.</p>
-                        <textarea class="input-glass" style="height:150px; margin-bottom:16px;" placeholder="Ej: El cliente Coca-Cola prefiere un tono formal. El objetivo de ROAS es 4.0..."></textarea>
-                        <button class="btn btn-primary">Guardar en Memoria</button>
+                        <h3 style="display:flex; align-items:center; gap:8px;"><i data-lucide="brain"></i> Base de Conocimiento</h3>
+                        <p style="color:#666; font-size:12px; margin-bottom:16px;">Sube información para que Alfred aprenda sobre tus clientes.</p>
+                        <textarea class="input-glass" style="height:120px; margin-bottom:12px;" placeholder="Pega aquí guías de estilo, objetivos o notas..."></textarea>
+                        <button class="btn" style="width:100%;">Guardar en Memoria (Supermemory)</button>
                     </div>
-                </section>
+                </div>
+            </section>
 
-                <section id="view-crm" class="view-section"><div class="card"><h3>Gestión de Equipo</h3><p>Lista de miembros...</p></div></section>
-                <section id="view-reports" class="view-section"><div class="card"><h3>Reportes</h3><button class="btn btn-primary" onclick="App.downloadPDF()">Descargar PDF</button></div></section>
-
-            </div>
-
-            <div class="activity-feed">
-                <div style="font-size:11px; font-weight:600; color:#555; text-transform:uppercase; margin-bottom:20px;">Actividad Reciente</div>
-                <div id="activity-list">
-                    </div>
-            </div>
         </div>
     </main>
 
     <div id="task-modal" class="modal-overlay">
         <div class="modal-box">
             <h3 style="margin-bottom:20px;">Nueva Tarea</h3>
-            
             <label style="font-size:11px; color:#666; display:block; margin-bottom:4px;">Título</label>
             <input id="new-task-title" class="input-glass" style="margin-bottom:16px;">
-            
             <label style="font-size:11px; color:#666; display:block; margin-bottom:4px;">Descripción</label>
             <textarea id="new-task-desc" class="input-glass" style="margin-bottom:16px; height:80px;"></textarea>
-            
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px; margin-bottom:24px;">
                 <div>
                     <label style="font-size:11px; color:#666; display:block; margin-bottom:4px;">Asignar a</label>
-                    <select id="new-task-assignee" class="input-glass" style="appearance:none;"><option>Cargando...</option></select>
+                    <select id="new-task-assignee" class="input-glass"><option>Cargando...</option></select>
                 </div>
                 <div>
-                    <label style="font-size:11px; color:#666; display:block; margin-bottom:4px;">Cliente / Contexto</label>
-                    <select id="new-task-client" class="input-glass" style="appearance:none;">
+                    <label style="font-size:11px; color:#666; display:block; margin-bottom:4px;">Cliente</label>
+                    <select id="new-task-client" class="input-glass">
                         <option value="General">General</option>
-                        </select>
+                    </select>
                 </div>
             </div>
-
             <div style="display:flex; justify-content:flex-end; gap:8px;">
                 <button class="btn" onclick="UI.toggleModal('task-modal')">Cancelar</button>
                 <button class="btn btn-primary" onclick="App.createTask()">Crear Tarea</button>
@@ -307,16 +430,13 @@
         <div class="modal-box">
             <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
                 <h3 id="td-title">...</h3>
-                <span id="td-status" class="status-pill status-pending"><div class="dot"></div> Pendiente</span>
+                <span id="td-status" class="status-pill status-pending">Pendiente</span>
             </div>
             <p id="td-desc" style="color:#999; font-size:13px; margin-bottom:24px; line-height:1.5;"></p>
-            
-            <div class="comment-thread">
-                <div style="font-size:11px; font-weight:600; color:#555; margin-bottom:12px;">COMENTARIOS</div>
-                <div id="td-comments-list" style="max-height:150px; overflow-y:auto; margin-bottom:12px;">
-                    </div>
+            <div style="border-top: 1px solid var(--border-glass); padding-top: 16px;">
+                <div id="td-comments-list" style="max-height:150px; overflow-y:auto; margin-bottom:12px;"></div>
                 <div style="display:flex; gap:8px;">
-                    <input id="td-new-comment" class="input-glass" placeholder="Escribe un comentario...">
+                    <input id="td-new-comment" class="input-glass" placeholder="Comentar...">
                     <button class="btn btn-primary btn-sm" onclick="App.addComment()">Enviar</button>
                 </div>
             </div>
@@ -328,7 +448,6 @@
         import { getFirestore, collection, addDoc, query, where, orderBy, onSnapshot, doc, updateDoc, deleteDoc, serverTimestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // 🔥 CONFIG: VACIAR API KEY PARA MODO PRO
         const OPENAI_API_KEY = ""; 
         const SUPER_ADMINS = ["frantruppa@gmail.com"]; 
 
@@ -349,7 +468,6 @@
                 const app = initializeApp(firebaseConfig);
                 App.db = getFirestore(app);
                 App.auth = getAuth(app);
-                
                 onAuthStateChanged(App.auth, async (user) => {
                     if (user) {
                         if (await App.checkAccess(user)) {
@@ -357,9 +475,7 @@
                             UI.closeLogin();
                             App.setupUI(user);
                             App.listenToData();
-                        } else {
-                            alert("Acceso denegado."); await signOut(App.auth);
-                        }
+                        } else { alert("Acceso denegado."); await signOut(App.auth); }
                     } else { document.getElementById('login-modal').classList.add('open'); }
                 });
                 lucide.createIcons();
@@ -372,7 +488,7 @@
             },
 
             listenToData: () => {
-                // CAMPAÑAS
+                // DATA LOAD
                 onSnapshot(query(collection(App.db, "campaigns"), orderBy("createdAt", "desc")), (snap) => {
                     const campaigns = snap.docs.map(d => ({id:d.id, ...d.data()}));
                     App.dataCache.campaigns = campaigns;
@@ -381,7 +497,6 @@
                     document.getElementById('kpi-projects').innerText = campaigns.filter(c=>c.status==='active').length;
                 });
 
-                // TAREAS & ACTIVIDAD
                 onSnapshot(query(collection(App.db, "tasks"), orderBy("createdAt", "desc")), (snap) => {
                     const tasks = snap.docs.map(d => ({id:d.id, ...d.data()}));
                     App.dataCache.tasks = tasks;
@@ -389,55 +504,38 @@
                     document.getElementById('kpi-tasks').innerText = tasks.filter(t=>t.status==='pending').length;
                 });
 
-                // ACTIVITY FEED (Simulada para demo, idealmente collection "activity")
                 onSnapshot(query(collection(App.db, "activities"), orderBy("createdAt", "desc"), where("createdAt", ">", new Date(Date.now() - 86400000 * 7))), (snap) => {
                     const acts = snap.docs.map(d => d.data());
                     UI.renderActivity(acts);
                 });
 
-                // TEAM
+                // TEAM (REAL RENDERING)
                 onSnapshot(collection(App.db, "allowed_users"), (snap) => {
                     const users = snap.docs.map(d=>d.data());
+                    UI.renderTeam(users); // NUEVO
                     const sel = document.getElementById('new-task-assignee');
                     sel.innerHTML = '<option value="team">Todo el Equipo</option>' + users.map(u => `<option value="${u.email}">${u.email}</option>`).join('');
                 });
             },
 
-            // --- CORE LOGIC ---
             updateClients: (campaigns) => {
                 const clients = new Set(['General']);
-                campaigns.forEach(c => {
-                    const name = c.name.split('-')[0].trim();
-                    clients.add(name);
-                });
+                campaigns.forEach(c => { const name = c.name.split('-'); if(name.length>1) clients.add(name[0].trim()); });
                 App.dataCache.clients = clients;
-                
-                // Update Sidebar
                 const menu = document.getElementById('ads-submenu');
                 menu.innerHTML = `<div class="submenu-item active" onclick="App.filterContext('all', this)">Ver Todo</div>`;
-                clients.forEach(c => {
-                    if(c!=='General') menu.innerHTML += `<div class="submenu-item" onclick="App.filterContext('${c}', this)">${c}</div>`;
-                });
-
-                // Update Task Modal Client Select
+                clients.forEach(c => { if(c!=='General') menu.innerHTML += `<div class="submenu-item" onclick="App.filterContext('${c}', this)">${c}</div>`; });
                 const sel = document.getElementById('new-task-client');
                 sel.innerHTML = Array.from(clients).map(c => `<option value="${c}">${c}</option>`).join('');
             },
 
             filterContext: (client, el) => {
-                document.querySelectorAll('.submenu-item').forEach(i=>i.classList.remove('active'));
-                if(el) el.classList.add('active');
-                
+                document.querySelectorAll('.submenu-item').forEach(i=>i.classList.remove('active')); if(el) el.classList.add('active');
                 document.getElementById('view-context-label').innerText = client === 'all' ? "Global" : client;
-                
-                // Filter Ads
                 const ads = client === 'all' ? App.dataCache.campaigns : App.dataCache.campaigns.filter(c => c.name.includes(client));
                 UI.renderAds(ads);
-
-                // Filter Tasks
                 const tasks = client === 'all' ? App.dataCache.tasks : App.dataCache.tasks.filter(t => t.client === client);
                 UI.renderTasks(tasks);
-
                 UI.nav('dash');
             },
 
@@ -446,14 +544,8 @@
                 const desc = document.getElementById('new-task-desc').value;
                 const assignee = document.getElementById('new-task-assignee').value;
                 const client = document.getElementById('new-task-client').value;
-
                 if(!title) return;
-
-                await addDoc(collection(App.db, "tasks"), {
-                    title, description: desc, assignee, client, status: 'pending',
-                    createdAt: serverTimestamp(), createdBy: App.user.email
-                });
-
+                await addDoc(collection(App.db, "tasks"), { title, description: desc, assignee, client, status: 'pending', createdAt: serverTimestamp(), createdBy: App.user.email });
                 App.logActivity(`Creó tarea: ${title}`);
                 UI.toggleModal('task-modal');
             },
@@ -462,94 +554,67 @@
                 const txt = document.getElementById('td-new-comment').value;
                 const task = App.dataCache.currentTask;
                 if(!txt || !task) return;
-
-                // En una app real, esto sería una subcolección. Aquí actualizamos un array.
                 const comments = task.comments || [];
                 comments.push({ user: App.user.displayName, text: txt, time: new Date().toISOString() });
-                
                 await updateDoc(doc(App.db, "tasks", task.id), { comments });
                 document.getElementById('td-new-comment').value = '';
-                // La UI se actualiza sola por el onSnapshot
                 App.openTaskDetail(task.id); 
             },
 
-            logActivity: async (text) => {
-                await addDoc(collection(App.db, "activities"), {
-                    text, user: App.user.displayName, createdAt: serverTimestamp()
-                });
-            },
+            logActivity: async (text) => { await addDoc(collection(App.db, "activities"), { text, user: App.user.displayName, createdAt: serverTimestamp() }); },
 
             syncData: () => {
-                const icon = document.querySelector('i[data-lucide="refresh-cw"]');
-                icon.classList.add('spin');
-                setTimeout(() => { icon.classList.remove('spin'); alert("Datos sincronizados con Meta."); }, 1500);
+                const icon1 = document.getElementById('sync-icon-dash');
+                const icon2 = document.getElementById('sync-icon-ads');
+                if(icon1) icon1.classList.add('spin');
+                if(icon2) icon2.classList.add('spin');
+                setTimeout(() => { 
+                    if(icon1) icon1.classList.remove('spin');
+                    if(icon2) icon2.classList.remove('spin');
+                    alert("Datos sincronizados."); 
+                }, 1500);
             },
 
             sendMessage: async () => {
-                const input = document.getElementById('ai-input');
-                const chat = document.getElementById('chat-content');
-                const txt = input.value; if(!txt) return;
-                
-                chat.innerHTML += `<div style="text-align:right; margin-bottom:10px; color:white;">${txt}</div>`;
-                input.value = ''; chat.scrollTop = chat.scrollHeight;
-                const tid = "ai-" + Date.now();
-                chat.innerHTML += `<div id="${tid}" style="color:#888; margin-bottom:10px;">Pensando...</div>`;
-
+                const i=document.getElementById('ai-input'), c=document.getElementById('chat-content'), t=i.value; if(!t)return;
+                c.innerHTML+=`<div style="text-align:right;margin-bottom:10px;color:white;">${t}</div>`; i.value=''; c.scrollTop=c.scrollHeight;
+                const tid="ai-"+Date.now(); c.innerHTML+=`<div id="${tid}" style="color:#888;margin-bottom:10px;">Pensando...</div>`;
                 try {
-                    const ctx = `Datos App: Tareas=${App.dataCache.tasks.length}, Clientes=${Array.from(App.dataCache.clients).join(',')}.`;
-                    
+                    const ctx=`Datos App: Tareas=${App.dataCache.tasks.length}, Clientes=${Array.from(App.dataCache.clients).join(',')}.`;
                     let res;
-                    if(OPENAI_API_KEY) {
-                        res = await fetch("https://api.openai.com/v1/chat/completions", {
-                            method: "POST", headers: {"Content-Type":"application/json", "Authorization": `Bearer ${OPENAI_API_KEY}`},
-                            body: JSON.stringify({ model: "gpt-3.5-turbo", messages: [{role:"system", content: ctx}, {role:"user", content: txt}] })
-                        });
-                    } else {
-                        res = await fetch("/api/chat", {
-                            method: "POST", headers: {"Content-Type":"application/json"},
-                            body: JSON.stringify({ message: txt, context: ctx })
-                        });
+                    if(OPENAI_API_KEY){
+                        res=await fetch("https://api.openai.com/v1/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${OPENAI_API_KEY}`},body:JSON.stringify({model:"gpt-3.5-turbo",messages:[{role:"system",content:ctx},{role:"user",content:t}]})});
+                    }else{
+                        res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:t,context:ctx})});
                     }
-                    
-                    const data = await res.json();
-                    if(data.error) throw new Error(data.error);
-                    
-                    document.getElementById(tid).innerText = data.choices[0].message.content;
-                    document.getElementById(tid).style.color = "#ccc";
-                } catch(e) { document.getElementById(tid).innerText = "Error conexión."; }
+                    const data=await res.json(); if(data.error)throw new Error(data.error);
+                    document.getElementById(tid).innerText=data.choices[0].message.content; document.getElementById(tid).style.color="#ccc";
+                } catch(e) { document.getElementById(tid).innerText="Error."; }
             },
 
-            // --- UTILS ---
-            checkAccess: async(u) => { if(SUPER_ADMINS.includes(u.email)){ await setDoc(doc(App.db,"allowed_users",u.email),{email:u.email,role:'admin'},{merge:true}); return true; } const s=await getDoc(doc(App.db,"allowed_users",u.email)); return s.exists(); },
+            checkAccess: async(u) => { if(SUPER_ADMINS.includes(u.email)){await setDoc(doc(App.db,"allowed_users",u.email),{email:u.email,role:'admin'},{merge:true});return true;} const s=await getDoc(doc(App.db,"allowed_users",u.email)); return s.exists(); },
             login: async()=>{try{await signInWithPopup(App.auth,new GoogleAuthProvider())}catch(e){alert(e)}},
             logout: async()=>{await signOut(App.auth);location.reload()},
-            
             openTaskDetail: (id) => {
-                const t = App.dataCache.tasks.find(x=>x.id===id);
-                App.dataCache.currentTask = t;
-                document.getElementById('td-title').innerText = t.title;
-                document.getElementById('td-desc').innerText = t.description || "Sin descripción";
-                
-                const comms = document.getElementById('td-comments-list');
-                comms.innerHTML = (t.comments||[]).map(c => `
-                    <div class="comment">
-                        <div class="comment-header"><span>${c.user}</span><span>${new Date(c.time).toLocaleTimeString()}</span></div>
-                        <div>${c.text}</div>
-                    </div>
-                `).join('');
-                
+                const t=App.dataCache.tasks.find(x=>x.id===id); App.dataCache.currentTask=t;
+                document.getElementById('td-title').innerText=t.title; document.getElementById('td-desc').innerText=t.description||"Sin descripción";
+                const comms=document.getElementById('td-comments-list');
+                comms.innerHTML=(t.comments||[]).map(c=>`<div style="margin-bottom:8px; font-size:12px;"><span style="color:#666;">${c.user}:</span> ${c.text}</div>`).join('');
                 UI.toggleModal('task-detail-modal');
             },
-            toggleTaskStatus: async(id, st) => {
-                const n = st==='pending'?'done':'pending';
-                await updateDoc(doc(App.db,"tasks",id), {status:n});
-                App.logActivity(`Cambió estado tarea a: ${n}`);
-            },
-            deleteTask: async(id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(App.db,"tasks",id)); }
+            toggleTaskStatus: async(id, st) => { const n=st==='pending'?'done':'pending'; await updateDoc(doc(App.db,"tasks",id),{status:n}); App.logActivity(`Cambió estado tarea a: ${n}`); },
+            deleteTask: async(id) => { if(confirm("¿Borrar?")) await deleteDoc(doc(App.db,"tasks",id)); },
+            inviteUser: async() => { if(!SUPER_ADMINS.includes(App.user.email))return; const e=prompt("Email:"); if(e)await setDoc(doc(App.db,"allowed_users",e.trim()),{email:e.trim(),role:'member',addedAt:serverTimestamp()}); },
+            downloadPDF: ()=>{html2pdf().from(document.getElementById('view-dash')).save('Report.pdf')}
         };
 
         const UI = {
-            nav: (id) => { document.querySelectorAll('.view-section').forEach(e=>e.classList.remove('active')); document.getElementById('view-'+id).classList.add('active'); document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active')); event.currentTarget.classList.add('active'); },
+            nav: (id) => { 
+                document.querySelectorAll('.view-section').forEach(e=>e.classList.remove('active')); 
+                document.getElementById('view-'+id).classList.add('active'); 
+                document.querySelectorAll('.nav-item').forEach(e=>e.classList.remove('active')); 
+                event.currentTarget.classList.add('active'); 
+            },
             toggleDrawer: () => { document.getElementById('ai-drawer').classList.toggle('open'); },
             toggleModal: (id) => document.getElementById(id).classList.toggle('open'),
             closeLogin: () => document.getElementById('login-modal').classList.remove('open'),
@@ -558,26 +623,21 @@
             renderAds: (list) => {
                 document.getElementById('ads-body').innerHTML = list.map(c => `
                     <tr class="clickable-row">
-                        <td><span class="status-pill ${c.status==='active'?'status-process':'status-pending'}"><div class="dot"></div> ${c.status}</span></td>
-                        <td>${c.name}</td>
-                        <td style="color:#999;">${c.budget}</td>
-                        <td>${c.results}</td>
-                        <td><button class="btn btn-sm">Editar</button></td>
+                        <td><span class="status-pill ${c.status==='active'?'status-active':'status-off'}"><div class="dot"></div> ${c.status}</span></td>
+                        <td>${c.name}</td> <td style="color:#999;">${c.budget}</td> <td>${c.results}</td> <td><button class="btn btn-sm">Editar</button></td>
                     </tr>
                 `).join('');
             },
             renderTasks: (list) => {
                 const div = document.getElementById('tasks-list');
-                if(list.length === 0) {
-                    div.innerHTML = ''; document.getElementById('tasks-empty').style.display='block'; return;
-                }
+                if(list.length===0){ div.innerHTML=''; document.getElementById('tasks-empty').style.display='block'; return; }
                 document.getElementById('tasks-empty').style.display='none';
                 div.innerHTML = list.map(t => `
                     <div class="card" style="padding:16px; display:flex; align-items:center; gap:16px; margin-bottom:8px; border-radius:12px;">
                         <div onclick="App.toggleTaskStatus('${t.id}','${t.status}')" class="status-pill ${t.status==='done'?'status-done':'status-pending'}" style="cursor:pointer; min-width:80px; justify-content:center;">${t.status}</div>
                         <div style="flex:1; cursor:pointer;" onclick="App.openTaskDetail('${t.id}')">
                             <div style="font-weight:500; text-decoration:${t.status==='done'?'line-through':''}">${t.title}</div>
-                            <div style="font-size:11px; color:#666;">${t.client || 'General'} • ${t.assignee}</div>
+                            <div style="font-size:11px; color:#666;">${t.client||'General'} • ${t.assignee}</div>
                         </div>
                         <button class="btn btn-danger btn-sm" onclick="App.deleteTask('${t.id}')">✕</button>
                     </div>
@@ -585,12 +645,14 @@
             },
             renderActivity: (list) => {
                 document.getElementById('activity-list').innerHTML = list.map(a => `
-                    <div class="activity-item">
-                        <div class="activity-dot"></div>
-                        <div>
-                            <div style="color:white;">${a.text}</div>
-                            <div class="activity-time">${a.user} • hace un momento</div>
-                        </div>
+                    <div class="activity-item"><div class="activity-dot"></div><div><div style="color:white;">${a.text}</div><div class="activity-time">${a.user}</div></div></div>
+                `).join('');
+            },
+            renderTeam: (list) => {
+                document.getElementById('team-grid').innerHTML = list.map(u => `
+                    <div class="team-card">
+                        <div class="team-avatar"></div>
+                        <div><div style="font-weight:600;">${u.email.split('@')[0]}</div><div style="font-size:11px; color:#666;">${u.role}</div></div>
                     </div>
                 `).join('');
             },
