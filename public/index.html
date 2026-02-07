@@ -12,7 +12,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
-        /* --- ESTÉTICA V9.0 (LIQUID GLASS ORIGINAL) --- */
+        /* --- ESTILOS CORE & LIQUID GLASS (V9.0) --- */
         :root {
             --bg-body: #000000;
             --bg-glass: rgba(20, 20, 20, 0.6);
@@ -31,63 +31,42 @@
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-font-smoothing: antialiased; }
         
         body { 
-            background-color: var(--bg-body); 
-            color: var(--text-main); 
-            font-family: 'Inter', sans-serif; 
-            font-size: 13px; 
-            height: 100vh; 
-            overflow: hidden; 
-            display: flex;
+            background-color: var(--bg-body); color: var(--text-main); font-family: 'Inter', sans-serif; font-size: 13px; 
+            height: 100vh; overflow: hidden; display: flex;
             background-image: radial-gradient(circle at 50% -10%, rgba(59, 130, 246, 0.15), transparent 40%);
         }
 
-        /* --- BOTONES LIQUIDOS ORIGINALES --- */
+        /* LIQUID BUTTONS */
         .btn {
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            height: 36px; padding: 0 16px;
-            border-radius: 9999px; font-weight: 500; font-size: 13px; cursor: pointer;
+            height: 36px; padding: 0 16px; border-radius: 9999px; font-weight: 500; font-size: 13px; cursor: pointer;
             transition: all 0.3s var(--ease);
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border-glass);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid var(--border-glass);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); color: var(--text-muted);
         }
         .btn:hover { background: var(--bg-glass-hover); color: white; border-color: var(--border-highlight); transform: translateY(-1px); }
-        
-        .btn-primary { 
-            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25); color: white; 
-            box-shadow: 0 0 20px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.1);
-            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-        }
+        .btn-primary { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25); color: white; box-shadow: 0 0 20px rgba(255,255,255,0.05); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
         .btn-primary:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.5); box-shadow: 0 0 30px rgba(255,255,255,0.15); }
-
         .btn-danger { color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
         .btn-danger:hover { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); }
         .btn-sm { height: 28px; padding: 0 10px; font-size: 11px; }
         .btn-icon { padding: 0; width: 36px; border-radius: 50%; }
 
-        /* ICONOS NORMALIZADOS */
         .icon { width: 16px; height: 16px; stroke-width: 2px; }
-        
         .input-glass { background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 12px; padding: 10px 16px; color: white; width: 100%; appearance: none; }
         .input-glass:focus { border-color: var(--accent-primary); background: rgba(255,255,255,0.05); }
-        select.input-glass option { background-color: #000; color: white; } /* Fix fondo blanco */
+        select.input-glass option { background-color: #000; color: white; }
         textarea.input-glass { min-height: 80px; resize: vertical; font-family: inherit; }
-        
         .card { background: rgba(15, 15, 15, 0.6); border: 1px solid var(--border-glass); border-radius: 20px; padding: 24px; }
 
-        /* --- SIDEBAR CON ANIMACIÓN --- */
+        /* LAYOUT & SIDEBAR */
         aside { width: 250px; background: rgba(5, 5, 5, 0.8); border-right: 1px solid var(--border-glass); display: flex; flex-direction: column; padding: 20px 12px; z-index: 20; }
         .nav-section-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin: 24px 12px 8px 12px; letter-spacing: 0.5px; }
-        
         .nav-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; color: var(--text-muted); cursor: pointer; transition: 0.2s; margin-bottom: 2px; }
         .nav-item:hover, .nav-item.active { background: rgba(255,255,255,0.08); color: white; }
         .nav-item.active { font-weight: 500; } 
         .nav-item.active .icon { color: var(--accent-primary); }
-        
-        /* Animación lateral V9.0 */
-        .nav-item .icon { transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1); }
+        .nav-item .icon { transition: transform 0.2s; }
         .nav-item:hover .icon { transform: translateX(3px); color: white; }
 
         .submenu { display: none; flex-direction: column; padding-left: 36px; margin-bottom: 8px; }
@@ -103,35 +82,50 @@
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* WIDGETS & COMPONENTS */
         .table-container { border: 1px solid var(--border-glass); border-radius: 16px; overflow: hidden; background: rgba(10,10,10,0.4); }
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 16px 24px; color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--border-glass); }
         td { padding: 16px 24px; border-bottom: 1px solid var(--border-glass); vertical-align: middle; }
         tr:hover td { background: rgba(255,255,255,0.02); }
-        
-        .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; text-transform: uppercase; cursor: pointer; user-select: none; }
-        .status-pending { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .status-process { background: rgba(59, 130, 246, 0.1); color: var(--accent-primary); border: 1px solid rgba(59, 130, 246, 0.2); }
-        .status-done { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
-        .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
         .clickable-row { cursor: pointer; transition: 0.2s; }
         .clickable-row:hover td { background: rgba(59, 130, 246, 0.05) !important; color: white; }
 
-        /* --- DASHBOARD WIDGETS --- */
+        .status-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; text-transform: uppercase; cursor: pointer; }
+        .status-pending { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .status-process { background: rgba(59, 130, 246, 0.1); color: var(--accent-primary); border: 1px solid rgba(59, 130, 246, 0.2); }
+        .status-done { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-on { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-off { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+        /* Dashboard Actions */
         .quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
         .action-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 12px; }
-        /* Efecto Liquid Glass en Hover */
-        .action-card:hover { 
-            background: rgba(255,255,255,0.08); 
-            border-color: rgba(255,255,255,0.2); 
-            transform: translateY(-2px); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-        }
+        .action-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         .action-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; color: white; }
 
-        /* AI & UTILS */
+        /* Attention Box */
+        .attention-box { background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 16px; padding: 24px; display:flex; flex-direction:column; gap:16px; }
+        .attention-item { display:flex; gap:10px; align-items:flex-start; }
+        .attention-dot { width: 8px; height: 8px; border-radius:50%; background:var(--warning); margin-top:5px; box-shadow:0 0 8px var(--warning); }
+        .attention-text { font-size:13px; color:#ddd; }
+        .attention-sub { font-size:11px; color:var(--text-muted); margin-top:2px; }
+
+        /* Dropzone (Settings) */
+        .dropzone { border: 2px dashed var(--border-glass); border-radius: 12px; padding: 40px; text-align: center; color: var(--text-muted); transition: 0.2s; cursor: pointer; }
+        .dropzone:hover { border-color: var(--accent-primary); background: rgba(59, 130, 246, 0.05); color: white; }
+
+        /* Folder Grid (Library) */
+        .folder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+        .folder-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border-glass); border-radius: 16px; padding: 24px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .folder-card:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); border-color: var(--accent-primary); }
+        .folder-icon { width: 48px; height: 48px; margin: 0 auto 12px; color: var(--accent-primary); opacity: 0.8; }
+
+        /* UI Utils */
         .ai-float { position: fixed; bottom: 30px; right: 30px; z-index: 100; background: rgba(10, 10, 15, 0.8); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.2); padding: 12px 24px; border-radius: 100px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: all 0.3s ease; }
         .ai-float:hover { border-color: transparent; background-image: linear-gradient(rgba(10, 10, 15, 0.9), rgba(10, 10, 15, 0.9)), linear-gradient(45deg, #3B82F6, #9333EA, #EC4899); background-origin: border-box; background-clip: padding-box, border-box; box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); transform: scale(1.05); }
+        
         .drawer { position: fixed; top: 0; right: -450px; width: 450px; height: 100%; background: #0A0A0A; border-left: 1px solid var(--border-glass); z-index: 200; transition: right 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); display: flex; flex-direction: column; box-shadow: -20px 0 100px rgba(0,0,0,0.8); }
         .drawer.open { right: 0; }
         
@@ -145,7 +139,7 @@
         .modal-overlay.open { display: flex; animation: fadeIn 0.2s; }
         .modal-box { background: #111; border: 1px solid var(--border-glass); padding: 32px; border-radius: 24px; width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
         .modal-wide { width: 800px; } 
-
+        
         .spin { animation: spin 1s linear infinite; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
 
@@ -174,7 +168,7 @@
         </div>
         <div id="chat-content" style="flex:1; padding:24px; overflow-y:auto; font-size:14px; line-height:1.6; color:var(--text-muted);">
             <div style="background:rgba(255,255,255,0.05); padding:16px; border-radius:12px; margin-bottom:12px; border:1px solid var(--border-glass);">
-                Hola. Tengo acceso a tu Base de Conocimientos y datos operativos. ¿En qué trabajamos?
+                Hola. Soy Alfred. Accedo a la base de datos de tus clientes. ¿Qué necesitas?
             </div>
         </div>
         <div style="padding:24px; border-top:1px solid var(--border-glass); display:flex; gap:8px;">
@@ -190,9 +184,8 @@
         <div style="flex:1; overflow-y:auto;">
             <div class="nav-section-title">Principal</div>
             <div class="nav-item active" onclick="UI.nav('dash')"><i data-lucide="layout-grid" class="icon"></i> Dashboard</div>
-            <div class="nav-item" onclick="UI.nav('tasks')"><i data-lucide="check-square" class="icon"></i> Tareas (Team)</div>
-            <div class="nav-item" onclick="UI.nav('crm')"><i data-lucide="users" class="icon"></i> Equipo</div>
-
+            <div class="nav-item" onclick="UI.nav('tasks')"><i data-lucide="check-square" class="icon"></i> Tareas</div>
+            
             <div class="nav-section-title">Growth</div>
             <div class="nav-item" onclick="UI.toggleSubmenu('ads-submenu')">
                 <i data-lucide="layers" class="icon"></i> <span style="flex:1;">Ads Manager</span>
@@ -202,7 +195,7 @@
                 <div class="submenu-item active" onclick="App.filterAds('all', this)">Ver Todo</div>
             </div>
 
-            <div class="nav-item" onclick="UI.nav('reports')"><i data-lucide="file-text" class="icon"></i> Reportes</div>
+            <div class="nav-item" onclick="UI.nav('library')"><i data-lucide="folder-open" class="icon"></i> Biblioteca</div>
             <div class="nav-item" onclick="UI.nav('settings')"><i data-lucide="settings" class="icon"></i> Configuración</div>
         </div>
         
@@ -249,45 +242,66 @@
         <div class="content-scroll">
             
             <section id="view-dash" class="view-section active">
-                <div class="quick-actions">
-                    <div class="action-card" onclick="UI.toggleModal('task-modal')">
-                        <div class="action-icon"><i data-lucide="plus"></i></div>
-                        <div>
-                            <div style="font-weight:600;">Nueva Tarea</div>
-                            <div style="font-size:11px; color:var(--text-muted);">Asignar al equipo</div>
+                <div style="display:grid; grid-template-columns: 2fr 1fr; gap:24px;">
+                    <div>
+                        <div class="quick-actions">
+                            <div class="action-card" onclick="UI.toggleModal('task-modal')">
+                                <div class="action-icon"><i data-lucide="plus"></i></div>
+                                <div><div style="font-weight:600;">Nueva Tarea</div><div style="font-size:11px; color:var(--text-muted);">Asignar al equipo</div></div>
+                            </div>
+                            <div class="action-card" onclick="App.syncAdsData()">
+                                <div class="action-icon"><i data-lucide="refresh-cw" id="sync-icon"></i></div>
+                                <div><div style="font-weight:600;">Sincronizar Datos</div><div style="font-size:11px; color:var(--text-muted);">Actualizar Meta API</div></div>
+                            </div>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; margin-bottom:24px;">
+                            <div class="card" style="padding:16px;">
+                                <div style="font-size:10px; color:var(--text-muted); margin-bottom:4px;">PROYECTOS</div>
+                                <div style="font-size:20px; font-weight:700;" id="kpi-projects">--</div>
+                            </div>
+                            <div class="card" style="padding:16px;">
+                                <div style="font-size:10px; color:var(--text-muted); margin-bottom:4px;">TAREAS</div>
+                                <div style="font-size:20px; font-weight:700;" id="kpi-tasks">--</div>
+                            </div>
+                            <div class="card" style="padding:16px;">
+                                <div style="font-size:10px; color:var(--text-muted); margin-bottom:4px;">GASTO MES</div>
+                                <div style="font-size:20px; font-weight:700;">$3,450</div>
+                            </div>
+                            <div class="card" style="padding:16px;">
+                                <div style="font-size:10px; color:var(--text-muted); margin-bottom:4px;">ROAS</div>
+                                <div style="font-size:20px; font-weight:700; color:var(--success);">3.8x</div>
+                            </div>
+                        </div>
+
+                        <div class="card" style="height:320px; padding-bottom:30px;">
+                            <h4 style="margin-bottom:16px; font-size:12px; color:var(--text-muted); text-transform:uppercase;">Rendimiento General</h4>
+                            <canvas id="mainChart"></canvas>
                         </div>
                     </div>
-                    <div class="action-card" onclick="App.syncAdsData()">
-                        <div class="action-icon"><i data-lucide="refresh-cw" id="sync-icon"></i></div>
-                        <div>
-                            <div style="font-weight:600;">Sincronizar Datos</div>
-                            <div style="font-size:11px; color:var(--text-muted);">Actualizar Meta API</div>
+
+                    <div class="attention-box">
+                        <div style="font-size:11px; font-weight:700; color:var(--warning); text-transform:uppercase; display:flex; align-items:center; gap:8px;">
+                            <i data-lucide="alert-triangle" class="icon"></i> Atención Requerida
                         </div>
+                        <div class="attention-item">
+                            <div class="attention-dot"></div>
+                            <div>
+                                <div class="attention-text">Revisar Campaña Pepsi</div>
+                                <div class="attention-sub">ROAS Crítico (1.2x) - Posible fatiga de creativos.</div>
+                            </div>
+                        </div>
+                        <div class="attention-item">
+                            <div class="attention-dot" style="background:var(--danger); box-shadow:0 0 8px var(--danger);"></div>
+                            <div>
+                                <div class="attention-text">Deadline: Landing Page</div>
+                                <div class="attention-sub">Vence hoy a las 18:00hs.</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm" style="margin-top:auto; width:100%; border-color:var(--border-highlight);" onclick="App.sendMessage('Dame un reporte de los problemas urgentes')">
+                            Pedir Análisis a Alfred
+                        </button>
                     </div>
-                </div>
-
-                <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:20px; margin-bottom:30px;">
-                    <div class="card" style="padding:20px;">
-                        <div style="font-size:11px; color:var(--text-muted);">PROYECTOS ACTIVOS</div>
-                        <div style="font-size:24px; font-weight:700; margin-top:4px;" id="kpi-projects">--</div>
-                    </div>
-                    <div class="card" style="padding:20px;">
-                        <div style="font-size:11px; color:var(--text-muted);">TAREAS PENDIENTES</div>
-                        <div style="font-size:24px; font-weight:700; margin-top:4px;" id="kpi-tasks">--</div>
-                    </div>
-                    <div class="card" style="padding:20px;">
-                        <div style="font-size:11px; color:var(--text-muted);">GASTO MES</div>
-                        <div style="font-size:24px; font-weight:700; margin-top:4px;">$3,450</div>
-                    </div>
-                    <div class="card" style="padding:20px;">
-                        <div style="font-size:11px; color:var(--text-muted);">ROAS PROMEDIO</div>
-                        <div style="font-size:20px; font-weight:700; margin-top:4px; color:var(--success);">3.8x</div>
-                    </div>
-                </div>
-
-                <div class="card" style="height:320px; padding-bottom:30px;">
-                    <h4 style="margin-bottom:16px; font-size:12px; color:var(--text-muted); text-transform:uppercase;">Rendimiento General</h4>
-                    <canvas id="mainChart"></canvas>
                 </div>
             </section>
 
@@ -317,44 +331,58 @@
                 </div>
             </section>
 
-            <section id="view-crm" class="view-section">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-                    <h3>Equipo & Accesos</h3>
-                    <button class="btn btn-primary" onclick="App.inviteUser()"><i data-lucide="user-plus" class="icon"></i> Invitar Miembro</button>
-                </div>
-                <div class="table-container">
-                    <table>
-                        <thead><tr><th>Email</th><th>Rol</th><th>Acciones</th></tr></thead>
-                        <tbody id="team-list-body"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section id="view-reports" class="view-section">
-                <div class="card" style="text-align:center; padding:80px;">
-                    <i data-lucide="folder-open" style="width:48px; height:48px; color:var(--text-muted); margin-bottom:16px;"></i>
-                    <h3>Biblioteca de Reportes</h3>
-                    <p style="color:var(--text-muted); margin-bottom:24px;">Descarga los reportes ejecutivos para clientes.</p>
-                    <button class="btn btn-primary" onclick="App.downloadPDF()">Descargar PDF Actual</button>
-                </div>
+            <section id="view-library" class="view-section">
+                <h3 style="margin-bottom:24px;">Biblioteca de Clientes</h3>
+                <div id="library-grid" class="folder-grid">
+                    </div>
             </section>
 
             <section id="view-settings" class="view-section">
-                <div class="card">
-                    <h3>Configuración & Cerebro</h3>
-                    <div style="margin-top:20px; display:grid; grid-template-columns: 1fr 1fr; gap:24px;">
-                        <div>
-                            <label style="font-size:12px; color:var(--text-muted);">Organización</label>
-                            <input class="input-glass" value="Abundance HQ" style="margin-top:8px;">
+                <div style="display:grid; grid-template-columns: 300px 1fr; gap:32px;">
+                    <div>
+                        <div class="card" style="margin-bottom:24px;">
+                            <h3 style="font-size:16px; margin-bottom:16px;">Equipo</h3>
+                            <div class="table-container">
+                                <table>
+                                    <tbody id="team-list-body"></tbody>
+                                </table>
+                            </div>
+                            <button class="btn btn-primary" style="width:100%; margin-top:12px;" onclick="App.inviteUser()">+ Invitar Miembro</button>
                         </div>
-                        <div>
-                            <label style="font-size:12px; color:var(--text-muted);">Supermemory (Knowledge Base)</label>
-                            <textarea class="input-glass" style="margin-top:8px;" placeholder="Pega aquí SOPs o guías de cliente..."></textarea>
+                        
+                        <div class="card">
+                            <h3 style="font-size:16px; margin-bottom:16px;">Cuenta</h3>
+                            <label style="font-size:11px; color:var(--text-muted);">Organización</label>
+                            <input class="input-glass" value="Abundance HQ" style="margin-top:8px;">
+                            <button class="btn" style="margin-top:16px; width:100%;">Guardar</button>
                         </div>
                     </div>
-                    <button class="btn btn-primary" style="margin-top:20px;" onclick="alert('Guardado correctamente.')">Guardar Cambios</button>
+
+                    <div class="card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                            <h3 style="display:flex; align-items:center; gap:8px;"><i data-lucide="brain" class="icon" style="color:var(--accent-primary);"></i> Cerebro de Cliente</h3>
+                            <select id="brain-client-select" class="input-glass" style="width:200px;">
+                                <option>Seleccionar Cliente...</option>
+                            </select>
+                        </div>
+                        
+                        <div class="dropzone" onclick="alert('Simulación: Abrir selector de archivos')">
+                            <i data-lucide="upload-cloud" style="width:32px; height:32px; margin-bottom:12px;"></i>
+                            <div style="font-weight:600; color:white;">Arrastra SOPs, Guías o Brand Books aquí</div>
+                            <div style="font-size:11px; margin-top:8px;">PDF, DOCX, TXT soportados. Alimentan la memoria de Alfred.</div>
+                        </div>
+
+                        <div style="margin-top:24px;">
+                            <label style="font-size:11px; color:var(--text-muted);">O escribe una nota rápida de memoria:</label>
+                            <textarea class="input-glass" style="margin-top:8px; height:120px;" placeholder="Ej: Para Coca-Cola, usar siempre emojis rojos. El objetivo de Q1 es leads..."></textarea>
+                            <div style="display:flex; justify-content:flex-end; margin-top:12px;">
+                                <button class="btn btn-primary" onclick="alert('Memoria guardada en Supermemory')">Guardar en Memoria</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
+
         </div>
     </main>
 
@@ -387,7 +415,7 @@
     <div id="campaign-detail-modal" class="modal-overlay" onclick="if(event.target === this) UI.toggleModal('campaign-detail-modal')">
         <div class="modal-box modal-wide">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <div><h2 id="detail-title" style="font-size:20px;">...</h2><span id="detail-status" class="status-pill status-active">Activa</span></div>
+                <div><h2 id="detail-title" style="font-size:20px;">...</h2><span id="detail-status" class="status-pill status-on">Activa</span></div>
                 <button class="btn btn-icon" onclick="UI.toggleModal('campaign-detail-modal')">✕</button>
             </div>
             <div style="height:300px; background:rgba(0,0,0,0.3); border-radius:12px; padding:16px; margin-bottom:24px;"><canvas id="detailChart"></canvas></div>
@@ -441,7 +469,6 @@
                 });
             },
 
-            // --- LÓGICA DE DATOS ---
             listenToData: () => {
                 onSnapshot(query(collection(App.db, "campaigns"), orderBy("createdAt", "desc")), (snap) => {
                     const campaigns = snap.docs.map(d => ({id:d.id, ...d.data()}));
@@ -469,12 +496,19 @@
             updateClients: (campaigns) => {
                 const clients = new Set(['General']);
                 campaigns.forEach(c => { const parts = c.name.split('-'); if(parts.length > 1) clients.add(parts[0].trim()); });
+                App.dataCache.clients = clients;
+                
                 const menu = document.getElementById('ads-submenu');
                 menu.innerHTML = `<div class="submenu-item active" onclick="App.filterAds('all', this)">Ver Todo</div>`;
                 clients.forEach(c => { if(c!=='General') menu.innerHTML += `<div class="submenu-item" onclick="App.filterAds('${c}', this)">${c}</div>`; });
                 
-                const sel = document.getElementById('new-task-client');
-                sel.innerHTML = Array.from(clients).map(c => `<option value="${c}">${c}</option>`).join('');
+                // Llenar select de Tarea y de Configuración
+                const opts = Array.from(clients).map(c => `<option value="${c}">${c}</option>`).join('');
+                document.getElementById('new-task-client').innerHTML = opts;
+                document.getElementById('brain-client-select').innerHTML = opts;
+                
+                // Llenar Biblioteca
+                UI.renderLibrary(Array.from(clients).filter(c => c !== 'General'));
             },
 
             filterAds: (clientName, el) => {
@@ -503,7 +537,6 @@
                 
                 await addDoc(collection(App.db, "tasks"), { title, description: desc, assignee, client, status: 'pending', createdAt: serverTimestamp(), createdBy: App.user.email });
                 
-                // FIX: Cerrar modal después de crear
                 UI.toggleModal('task-modal'); 
                 document.getElementById('new-task-title').value = '';
                 document.getElementById('new-task-desc').value = '';
@@ -528,7 +561,6 @@
                 } catch(e) { document.getElementById(tid).innerText="Error."; }
             },
 
-            // Utils
             checkAccess: async(u) => { if(SUPER_ADMINS.includes(u.email)){await setDoc(doc(App.db,"allowed_users",u.email),{email:u.email,role:'admin'},{merge:true});return true;} const s=await getDoc(doc(App.db,"allowed_users",u.email)); return s.exists(); },
             login: async()=>{try{await signInWithPopup(App.auth,new GoogleAuthProvider())}catch(e){alert(e)}},
             logout: async()=>{await signOut(App.auth);location.reload()},
@@ -541,7 +573,6 @@
             },
             downloadPDF: ()=>{html2pdf().from(document.getElementById('view-dash')).save('Report.pdf')},
             
-            // Detail
             openCampaignDetail: (id) => {
                 const c=App.dataCache.campaigns.find(x=>x.id===id);
                 document.getElementById('detail-title').innerText=c.name;
@@ -563,7 +594,7 @@
             renderAds: (list) => {
                 document.getElementById('ads-body').innerHTML = list.map(c => `
                     <tr class="clickable-row">
-                        <td><span class="status-pill ${c.status==='active'?'status-active':'status-off'}"><div class="dot"></div> ${c.status}</span></td>
+                        <td><span class="status-pill ${c.status==='active'?'status-on':'status-off'}"><div class="dot"></div> ${c.status}</span></td>
                         <td onclick="App.openCampaignDetail('${c.id}')" style="font-weight:500; color:white; text-decoration:underline; text-decoration-color:rgba(255,255,255,0.2); text-underline-offset:4px;">${c.name}</td>
                         <td style="color:var(--text-muted);">${c.budget}</td>
                         <td>${c.results}</td>
@@ -595,13 +626,24 @@
                 const isA = SUPER_ADMINS.includes(App.user.email);
                 tbody.innerHTML = list.map(u => `<tr><td>${u.email}</td><td>${u.role}</td><td>${isA?`<button class="btn btn-danger btn-sm" onclick="App.removeUser('${u.email}')">Eliminar</button>`:''}</td></tr>`).join('');
             },
+            renderLibrary: (clients) => {
+                const grid = document.getElementById('library-grid');
+                grid.innerHTML = clients.map(c => `
+                    <div class="folder-card" onclick="alert('Abriendo carpeta de ${c} (Conectado a Drive/Assets)')">
+                        <i data-lucide="folder" class="folder-icon"></i>
+                        <div style="font-weight:600; color:white;">${c}</div>
+                        <div style="font-size:11px; color:var(--text-muted);">12 Archivos</div>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            },
             initMainChart: () => { new Chart(document.getElementById('mainChart').getContext('2d'), { type:'line',data:{labels:['S1','S2','S3','S4'],datasets:[{label:'Leads',data:[10,25,40,35],borderColor:'#3B82F6',tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#222'}}}}}); },
             initDetailChart: (n) => { const c=document.getElementById('detailChart').getContext('2d'); if(App.charts.detail)App.charts.detail.destroy(); App.charts.detail=new Chart(c,{type:'bar',data:{labels:['L','M','M','J','V'],datasets:[{label:n,data:[12,19,3,5,2],backgroundColor:'#10B981',borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#333'}}}}}); }
         };
 
         window.addEventListener('click', (e) => { 
             if(!e.target.closest('#calendar-btn')) document.getElementById('calendar-menu').classList.remove('show'); 
-            if(!e.target.closest('.has-notif')) document.getElementById('notif-menu').classList.remove('show');
+            if(!e.target.closest('.btn-icon')) document.getElementById('notif-menu').classList.remove('show');
         });
         window.App = App; window.UI = UI;
         App.init();
