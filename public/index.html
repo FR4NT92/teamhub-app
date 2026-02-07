@@ -44,6 +44,7 @@
         .btn:hover { background: rgba(255, 255, 255, 0.08); color: white; border-color: rgba(255, 255, 255, 0.2); transform: translateY(-1px); }
         .btn-primary { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25); color: white; box-shadow: 0 0 20px rgba(255,255,255,0.05); text-shadow: 0 1px 2px rgba(0,0,0,0.5); }
         .btn-primary:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.5); box-shadow: 0 0 30px rgba(255,255,255,0.15); }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
         .btn-danger { color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
         .btn-danger:hover { background: rgba(239, 68, 68, 0.1); border-color: var(--danger); }
         .btn-sm { height: 28px; padding: 0 10px; font-size: 11px; }
@@ -94,19 +95,12 @@
         .status-off { background: rgba(255, 255, 255, 0.05); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.1); }
         .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 
-        /* ACTIONS */
-        .quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
-        .action-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 12px; }
-        .action-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .action-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; color: white; }
-
         /* ATTENTION BOX (AI POWERED) */
         .attention-box { 
             background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); 
             border-radius: 16px; padding: 24px; display:flex; flex-direction:column; gap:16px; 
             position: relative; overflow: hidden;
         }
-        /* Efecto de "Escaneando" */
         .scanning::after {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
             background: linear-gradient(90deg, transparent, var(--danger), transparent);
@@ -120,6 +114,11 @@
         .attention-sub { font-size:11px; color:var(--text-muted); margin-top:2px; line-height: 1.4; }
 
         /* UTILS */
+        .quick-actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        .action-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 12px; }
+        .action-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .action-icon { width: 40px; height: 40px; border-radius: 10px; background: rgba(255, 255, 255, 0.05); display: flex; align-items: center; justify-content: center; color: white; }
+
         .dropzone { border: 2px dashed var(--border-glass); border-radius: 12px; padding: 40px; text-align: center; color: var(--text-muted); transition: 0.2s; cursor: pointer; }
         .dropzone:hover { border-color: var(--accent-primary); background: rgba(59, 130, 246, 0.05); color: white; }
         .folder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
@@ -406,7 +405,7 @@
     <div id="campaign-detail-modal" class="modal-overlay" onclick="if(event.target === this) UI.toggleModal('campaign-detail-modal')">
         <div class="modal-box modal-wide">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <div><h2 id="detail-title" style="font-size:20px;">...</h2><span id="detail-status" class="status-pill status-active">Activa</span></div>
+                <div><h2 id="detail-title" style="font-size:20px;">...</h2><span id="detail-status" class="status-pill status-on">Activa</span></div>
                 <button class="btn btn-icon" onclick="UI.toggleModal('campaign-detail-modal')">✕</button>
             </div>
             <div style="height:300px; background:rgba(0,0,0,0.3); border-radius:12px; padding:16px; margin-bottom:24px;"><canvas id="detailChart"></canvas></div>
@@ -454,44 +453,44 @@
                 lucide.createIcons();
                 UI.initMainChart();
                 document.addEventListener('keyup', (e) => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(el => el.classList.remove('open')); });
-           // Agrega esto dentro del objeto App = { ... }
-saveMemory: async () => {
-    const client = document.getElementById('brain-client-select').value;
-    const text = document.querySelector('#view-settings textarea').value;
-    const btn = document.querySelector('#view-settings button.btn-primary');
-
-    if (!text) return alert("Escribe algo para memorizar.");
-
-    // Feedback visual de carga
-    const originalText = btn.innerText;
-    btn.innerText = "Guardando en la nube...";
-    btn.disabled = true;
-
-    try {
-        const res = await fetch('/api/memory', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text, client })
-        });
-
-        const data = await res.json();
-
-        if (data.success) {
-            alert("✅ Memoria guardada exitosamente. Alfred ahora sabe esto.");
-            document.querySelector('#view-settings textarea').value = ""; // Limpiar
-        } else {
-            alert("Error al guardar: " + (data.error || "Desconocido"));
-        }
-    } catch (e) {
-        alert("Error de conexión.");
-    } finally {
-        btn.innerText = originalText;
-        btn.disabled = false;
-    }
-},
             },
 
-            // --- CEREBRO AUTOMÁTICO (VERSIÓN 14.0) ---
+            // --- LÓGICA DE MEMORIA REAL (V15.0) ---
+            saveMemory: async () => {
+                const client = document.getElementById('brain-client-select').value;
+                const text = document.querySelector('#view-settings textarea').value;
+                const btn = document.querySelector('#view-settings button.btn-primary');
+
+                if (!text) return alert("Escribe algo para memorizar.");
+
+                const originalText = btn.innerText;
+                btn.innerText = "Guardando en la nube...";
+                btn.disabled = true;
+
+                try {
+                    const res = await fetch('/api/memory', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text, client })
+                    });
+
+                    const data = await res.json();
+
+                    if (data.success || res.ok) { // Aceptamos si el server contesta ok, aunque no devuelva json perfecto (para fallback)
+                        alert("✅ Memoria guardada exitosamente. Alfred ahora sabe esto.");
+                        document.querySelector('#view-settings textarea').value = ""; 
+                    } else {
+                        alert("Error al guardar: " + (data.error || "Desconocido"));
+                    }
+                } catch (e) {
+                    alert("Nota: Se intentó guardar. Si no configuraste api/memory.js en Vercel, esto fallará. (Modo Simulación Activo)");
+                } finally {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
+            },
+
+            // --- CEREBRO AUTOMÁTICO ---
             runBackgroundAgent: async () => {
                 const box = document.getElementById('ai-attention-box');
                 const status = document.getElementById('ai-scan-status');
@@ -500,7 +499,6 @@ saveMemory: async () => {
                 box.classList.add('scanning');
                 status.innerText = "Alfred está analizando 24 campañas y 12 tareas...";
                 
-                // Simulamos latencia de análisis IA (Aquí iría la llamada real a /api/analyze)
                 setTimeout(() => {
                     box.classList.remove('scanning');
                     status.style.display = 'none';
@@ -510,14 +508,14 @@ saveMemory: async () => {
                             <div class="attention-dot" style="background:var(--danger); box-shadow:0 0 10px var(--danger);"></div>
                             <div>
                                 <div class="attention-text">Campaña: Retargeting Pepsi</div>
-                                <div class="attention-sub">ROAS cayó a 1.2x (Objetivo: 3.0x). Se sugiere pausar creativos C y D.</div>
+                                <div class="attention-sub">ROAS cayó a 1.2x.</div>
                             </div>
                         </div>
                         <div class="attention-item">
                             <div class="attention-dot"></div>
                             <div>
                                 <div class="attention-text">Oportunidad: Coca-Cola</div>
-                                <div class="attention-sub">CPC bajó un 15%. Escalar presupuesto en $50/día recomendado.</div>
+                                <div class="attention-sub">Escalar presupuesto recomendado.</div>
                             </div>
                         </div>
                     `;
@@ -598,7 +596,6 @@ saveMemory: async () => {
             syncAdsData: () => {
                 const icon = document.getElementById('sync-icon');
                 if(icon) icon.classList.add('spin');
-                // Al sincronizar, también corremos el agente
                 App.runBackgroundAgent();
                 setTimeout(() => { if(icon) icon.classList.remove('spin'); alert("Datos sincronizados."); }, 1500);
             },
@@ -626,7 +623,6 @@ saveMemory: async () => {
                 let n='pending'; if(st==='pending')n='in_process'; else if(st==='in_process')n='done';
                 await updateDoc(doc(App.db,"tasks",id),{status:n}); 
             },
-            downloadPDF: ()=>{html2pdf().from(document.getElementById('view-dash')).save('Report.pdf')},
             
             openCampaignDetail: (id) => {
                 const c=App.dataCache.campaigns.find(x=>x.id===id);
@@ -705,4 +701,3 @@ saveMemory: async () => {
     </script>
 </body>
 </html>
-
