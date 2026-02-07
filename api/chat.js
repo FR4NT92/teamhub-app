@@ -2,44 +2,47 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method Not Allowed' });
 
   const openaiKey = process.env.OPENAI_API_KEY;
-  const supermemoryKey = process.env.SUPERMEMORY_API_KEY;
+  const mem0Key = process.env.MEM0_API_KEY;
 
-  if (!openaiKey) return res.status(500).json({ error: 'Server Error: OpenAI Key missing' });
+  if (!openaiKey) return res.status(500).json({ error: 'Falta OpenAI Key' });
 
   const { message, context, model = "gpt-3.5-turbo" } = req.body;
 
   try {
-    let finalSystemPrompt = context || "Eres Alfred, un asistente experto.";
+    let finalSystemPrompt = context || "Eres Alfred, un asistente experto en marketing.";
 
-    // --- PASO 1: CONSULTAR MEMORIA (Si hay clave) ---
-    if (supermemoryKey) {
+    // --- 1. BUSCAR MEMORIA EN MEM0 ---
+    if (mem0Key) {
       try {
-        console.log("🔍 Consultando cerebro...");
-        const memoryRes = await fetch("https://api.supermemory.ai/v1/search", {
+        // Buscamos memorias relevantes para el mensaje del usuario
+        const searchRes = await fetch("https://api.mem0.ai/v1/memories/search/", {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${supermemoryKey}`,
+            "Authorization": `Token ${mem0Key}`,
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ query: message, top_k: 3 })
+          body: JSON.stringify({
+            query: message,
+            user_id: "General", // Opcional: podrías pasar el cliente actual si lo tuvieras en el contexto
+            top_k: 3
+          })
         });
-        
-        if (memoryRes.ok) {
-          const memories = await memoryRes.json();
-          // Ajustar según la respuesta de Supermemory (a veces es .results, a veces directo)
-          const results = memories.results || memories; 
-          const retrievedText = Array.isArray(results) ? results.map(m => m.content).join("\n---\n") : "";
+
+        if (searchRes.ok) {
+          const memories = await searchRes.json();
+          // Mem0 devuelve un array de objetos. Extraemos el campo 'memory'
+          const retrievedText = memories.map(m => m.memory).join("\n- ");
           
           if (retrievedText) {
-            finalSystemPrompt += `\n\n[DATOS RECUPERADOS DE MEMORIA]:\n${retrievedText}\n\nUsa esto para responder.`;
+            finalSystemPrompt += `\n\n[MEMORIA A LARGO PLAZO RECUPERADA]:\n- ${retrievedText}\n\nUsa esta información para personalizar tu respuesta.`;
           }
         }
       } catch (e) {
-        console.warn("Memoria falló, ignorando...", e);
+        console.warn("Error leyendo memoria:", e);
       }
     }
 
-    // --- PASO 2: LLAMAR A GPT ---
+    // --- 2. GENERAR RESPUESTA CON OPENAI ---
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
